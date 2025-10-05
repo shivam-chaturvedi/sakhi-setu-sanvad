@@ -2,24 +2,44 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import Navigation from "@/components/Navigation";
-import { Activity, Moon, Smile, Droplets, ArrowLeft } from "lucide-react";
+import { Activity, Moon, Smile, Droplets, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const Tracker = () => {
   const navigate = useNavigate();
   const [sleep, setSleep] = useState([7]);
   const [mood, setMood] = useState([5]);
   const [hotFlashes, setHotFlashes] = useState([0]);
+  const [notes, setNotes] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
 
   const symptoms = [
-    { icon: Moon, label: "Sleep (hours)", value: sleep, setter: setSleep, max: 12 },
-    { icon: Smile, label: "Mood", value: mood, setter: setMood, max: 10 },
-    { icon: Droplets, label: "Hot Flashes", value: hotFlashes, setter: setHotFlashes, max: 10 },
+    { icon: Moon, label: "Sleep (hours)", value: sleep, setter: setSleep, max: 12, color: "primary" },
+    { icon: Smile, label: "Mood", value: mood, setter: setMood, max: 10, color: "energy" },
+    { icon: Droplets, label: "Hot Flashes", value: hotFlashes, setter: setHotFlashes, max: 10, color: "secondary" },
   ];
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    toast.success("Symptoms logged successfully!", {
+      description: "Your data has been saved and AI is analyzing patterns.",
+      icon: <CheckCircle2 className="w-5 h-5" />,
+    });
+    
+    setIsSaving(false);
+    
+    // Navigate back after a short delay
+    setTimeout(() => navigate("/"), 1500);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-energy-light/20 to-primary-glow/30 pb-24">
@@ -29,7 +49,12 @@ const Tracker = () => {
         className="pt-8 pb-6 px-6"
       >
         <div className="flex items-center gap-4 mb-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => navigate("/")}
+            className="hover:bg-primary/10"
+          >
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
@@ -54,11 +79,14 @@ const Tracker = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 + index * 0.1 }}
             >
-              <Card className="glass-card p-6">
+              <Card className="glass-card p-6 hover:shadow-lg transition-shadow">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 bg-primary/20 rounded-lg">
-                    <Icon className="w-5 h-5 text-primary" />
-                  </div>
+                  <motion.div 
+                    className={`p-2 bg-${symptom.color}/20 rounded-lg`}
+                    whileHover={{ scale: 1.1, rotate: 10 }}
+                  >
+                    <Icon className={`w-5 h-5 text-${symptom.color}`} />
+                  </motion.div>
                   <Label className="text-lg font-semibold">{symptom.label}</Label>
                 </div>
                 <div className="space-y-4">
@@ -71,9 +99,14 @@ const Tracker = () => {
                   />
                   <div className="flex justify-between text-sm text-muted-foreground">
                     <span>0</span>
-                    <span className="font-semibold text-primary text-lg">
+                    <motion.span 
+                      className={`font-semibold text-${symptom.color} text-lg`}
+                      key={symptom.value[0]}
+                      initial={{ scale: 1.3 }}
+                      animate={{ scale: 1 }}
+                    >
                       {symptom.value[0]}
-                    </span>
+                    </motion.span>
                     <span>{symptom.max}</span>
                   </div>
                 </div>
@@ -82,18 +115,50 @@ const Tracker = () => {
           );
         })}
 
-        <Card className="glass-card p-6">
-          <Label className="text-lg font-semibold mb-4 block">Today's Notes</Label>
-          <Input
-            placeholder="How are you feeling today?"
-            className="min-h-24 resize-none"
-          />
-        </Card>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+          <Card className="glass-card p-6">
+            <Label className="text-lg font-semibold mb-4 block">Today's Notes</Label>
+            <Textarea
+              placeholder="How are you feeling today? Any observations or symptoms to note..."
+              className="min-h-32 resize-none"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+            />
+          </Card>
+        </motion.div>
 
-        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-          <Button className="w-full h-14 text-lg bg-primary hover:bg-primary/90 shadow-lg">
-            <Activity className="w-5 h-5 mr-2" />
-            Save Entry
+        <motion.div 
+          whileHover={{ scale: 1.02 }} 
+          whileTap={{ scale: 0.98 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+        >
+          <Button 
+            className="w-full h-14 text-lg bg-primary hover:bg-primary/90 shadow-lg"
+            onClick={handleSave}
+            disabled={isSaving}
+          >
+            {isSaving ? (
+              <>
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                >
+                  <Activity className="w-5 h-5 mr-2" />
+                </motion.div>
+                Saving...
+              </>
+            ) : (
+              <>
+                <Activity className="w-5 h-5 mr-2" />
+                Save Entry
+              </>
+            )}
           </Button>
         </motion.div>
       </motion.div>
