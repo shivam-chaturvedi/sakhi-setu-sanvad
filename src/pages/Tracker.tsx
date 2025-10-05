@@ -16,9 +16,9 @@ const Tracker = () => {
   const [hotFlashes, setHotFlashes] = useState([0]);
 
   const symptoms = [
-    { icon: Moon, label: "झोप (तास)", value: sleep, setter: setSleep, max: 12 },
-    { icon: Smile, label: "मूड", value: mood, setter: setMood, max: 10 },
-    { icon: Droplets, label: "गरम लाटा", value: hotFlashes, setter: setHotFlashes, max: 10 },
+    { icon: Moon, label: "Sleep (hours)", value: sleep, setter: setSleep, max: 12 },
+    { icon: Smile, label: "Mood", value: mood, setter: setMood, max: 10 },
+    { icon: Droplets, label: "Hot Flashes", value: hotFlashes, setter: setHotFlashes, max: 10 },
   ];
 
   return (
@@ -33,8 +33,8 @@ const Tracker = () => {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">लक्षणे नोंदवा</h1>
-            <p className="text-muted-foreground mt-1">आजची तुमची प्रगती ट्रॅक करा</p>
+            <h1 className="text-3xl font-bold">Log Symptoms</h1>
+            <p className="text-muted-foreground mt-1">Track your progress today</p>
           </div>
         </div>
       </motion.header>
@@ -83,9 +83,9 @@ const Tracker = () => {
         })}
 
         <Card className="glass-card p-6">
-          <Label className="text-lg font-semibold mb-4 block">आजच्या नोट्स</Label>
+          <Label className="text-lg font-semibold mb-4 block">Today's Notes</Label>
           <Input
-            placeholder="तुम्हाला आज कसे वाटत आहे?"
+            placeholder="How are you feeling today?"
             className="min-h-24 resize-none"
           />
         </Card>
@@ -93,7 +93,7 @@ const Tracker = () => {
         <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
           <Button className="w-full h-14 text-lg bg-primary hover:bg-primary/90 shadow-lg">
             <Activity className="w-5 h-5 mr-2" />
-            जतन करा
+            Save Entry
           </Button>
         </motion.div>
       </motion.div>

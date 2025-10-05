@@ -7,10 +7,10 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const Profile = () => {
   const menuItems = [
-    { icon: Settings, label: "सेटिंग्ज", subtitle: "Settings" },
-    { icon: Bell, label: "सूचना", subtitle: "Notifications" },
-    { icon: Shield, label: "गोपनीयता", subtitle: "Privacy" },
-    { icon: Heart, label: "कल्याण लक्ष्य", subtitle: "Wellness Goals" },
+    { icon: Settings, label: "Settings" },
+    { icon: Bell, label: "Notifications" },
+    { icon: Shield, label: "Privacy" },
+    { icon: Heart, label: "Wellness Goals" },
   ];
 
   return (
@@ -20,8 +20,8 @@ const Profile = () => {
         animate={{ y: 0, opacity: 1 }}
         className="pt-8 pb-6 px-6"
       >
-        <h1 className="text-3xl font-bold">माझे प्रोफाइल</h1>
-        <p className="text-muted-foreground mt-1">तुमची माहिती व्यवस्थापित करा</p>
+        <h1 className="text-3xl font-bold">My Profile</h1>
+        <p className="text-muted-foreground mt-1">Manage your information</p>
       </motion.header>
 
       {/* Profile Card */}
@@ -35,24 +35,24 @@ const Profile = () => {
           <div className="flex items-center gap-4 mb-4">
             <Avatar className="w-20 h-20">
               <AvatarFallback className="bg-gradient-to-br from-primary to-secondary text-white text-2xl font-bold">
-                प्र
+                P
               </AvatarFallback>
             </Avatar>
             <div className="flex-1">
-              <h2 className="text-xl font-bold">प्रिया पाटील</h2>
+              <h2 className="text-xl font-bold">Priya Patil</h2>
               <p className="text-sm text-muted-foreground">priya.patil@example.com</p>
               <div className="flex gap-2 mt-2">
                 <span className="text-xs bg-primary/20 text-primary px-3 py-1 rounded-full">
-                  45 वर्षे
+                  45 years old
                 </span>
                 <span className="text-xs bg-energy/20 text-energy px-3 py-1 rounded-full">
-                  7 दिवस सक्रिय
+                  7 days active
                 </span>
               </div>
             </div>
           </div>
           <Button variant="outline" className="w-full">
-            प्रोफाइल संपादित करा
+            Edit Profile
           </Button>
         </Card>
       </motion.div>
@@ -67,15 +67,15 @@ const Profile = () => {
         <div className="grid grid-cols-3 gap-4">
           <Card className="glass-card p-4 text-center">
             <div className="text-2xl font-bold text-primary">12</div>
-            <div className="text-xs text-muted-foreground mt-1">दिवस ट्रॅक</div>
+            <div className="text-xs text-muted-foreground mt-1">Days tracked</div>
           </Card>
           <Card className="glass-card p-4 text-center">
             <div className="text-2xl font-bold text-energy">8</div>
-            <div className="text-xs text-muted-foreground mt-1">लेख वाचले</div>
+            <div className="text-xs text-muted-foreground mt-1">Articles read</div>
           </Card>
           <Card className="glass-card p-4 text-center">
             <div className="text-2xl font-bold text-secondary">5</div>
-            <div className="text-xs text-muted-foreground mt-1">समुदाय पोस्ट</div>
+            <div className="text-xs text-muted-foreground mt-1">Community posts</div>
           </Card>
         </div>
       </motion.div>
@@ -103,7 +103,6 @@ const Profile = () => {
                   </div>
                   <div className="flex-1">
                     <p className="font-semibold">{item.label}</p>
-                    <p className="text-xs text-muted-foreground">{item.subtitle}</p>
                   </div>
                   <ChevronRight className="w-5 h-5 text-muted-foreground" />
                 </div>
@@ -122,7 +121,7 @@ const Profile = () => {
       >
         <Button variant="outline" className="w-full text-destructive hover:bg-destructive/10">
           <LogOut className="w-4 h-4 mr-2" />
-          लॉग आउट
+          Log Out
         </Button>
       </motion.div>
 

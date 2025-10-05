@@ -6,11 +6,11 @@ const Navigation = () => {
   const location = useLocation();
   
   const navItems = [
-    { path: "/", icon: Home, label: "होम", labelHi: "होम" },
-    { path: "/tracker", icon: Activity, label: "लक्षणे", labelHi: "लक्षण" },
-    { path: "/community", icon: Users, label: "समुदाय", labelHi: "समुदाय" },
-    { path: "/resources", icon: BookOpen, label: "माहिती", labelHi: "जानकारी" },
-    { path: "/profile", icon: User, label: "प्रोफाइल", labelHi: "प्रोफ़ाइल" },
+    { path: "/", icon: Home, label: "Home" },
+    { path: "/tracker", icon: Activity, label: "Tracker" },
+    { path: "/community", icon: Users, label: "Community" },
+    { path: "/resources", icon: BookOpen, label: "Resources" },
+    { path: "/profile", icon: User, label: "Profile" },
   ];
 
   return (

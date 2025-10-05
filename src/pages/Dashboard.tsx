@@ -21,25 +21,22 @@ const Dashboard = () => {
   const insights = [
     {
       icon: Heart,
-      title: "आजचा सल्ला",
-      subtitle: "Today's Advice",
-      description: "10 मिनिटे ध्यान करा",
+      title: "Today's Advice",
+      description: "Practice 10 minutes of meditation",
       bgColor: "bg-primary-light",
       iconColor: "text-primary",
     },
     {
       icon: TrendingUp,
-      title: "तुमचा ट्रेंड",
-      subtitle: "Your Trend",
-      description: "झोप सुधारली आहे",
+      title: "Your Trend",
+      description: "Sleep quality has improved",
       bgColor: "bg-energy-light",
       iconColor: "text-energy",
     },
     {
       icon: Users,
-      title: "समुदाय",
-      subtitle: "Community",
-      description: "नवीन संदेश",
+      title: "Community",
+      description: "New messages available",
       bgColor: "bg-secondary-light",
       iconColor: "text-secondary",
     },
@@ -55,8 +52,8 @@ const Dashboard = () => {
       >
         <div className="flex items-center justify-between mb-2">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">नमस्ते 🌸</h1>
-            <p className="text-muted-foreground mt-1">तुमच्या कल्याणाचे स्वागत आहे</p>
+            <h1 className="text-3xl font-bold text-foreground">Welcome 🌸</h1>
+            <p className="text-muted-foreground mt-1">Your wellness journey starts here</p>
           </div>
           <Button variant="ghost" size="icon" className="relative">
             <Bell className="w-5 h-5" />
@@ -80,15 +77,15 @@ const Dashboard = () => {
                 <Sparkles className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <h2 className="text-xl font-bold">आजची कल्याण टीप</h2>
+                <h2 className="text-xl font-bold">Today's Wellness Tip</h2>
                 <p className="text-sm text-muted-foreground">AI-powered insight</p>
               </div>
             </div>
             <p className="text-foreground leading-relaxed">
-              तुमची झोपेची गुणवत्ता चांगली आहे! आज सकाळी 15 मिनिटे योगाचा सराव करा.
+              Your sleep quality is excellent! Continue with 15 minutes of morning yoga practice today.
             </p>
             <Button className="mt-4 bg-primary hover:bg-primary/90">
-              अधिक जाणून घ्या
+              Learn More
             </Button>
           </div>
         </Card>
@@ -101,7 +98,7 @@ const Dashboard = () => {
         animate="show"
         className="px-6 mb-8"
       >
-        <h3 className="text-lg font-semibold mb-4">त्वरित माहिती</h3>
+        <h3 className="text-lg font-semibold mb-4">Quick Insights</h3>
         <div className="grid grid-cols-1 gap-4">
           {insights.map((insight, index) => {
             const Icon = insight.icon;
@@ -114,8 +111,7 @@ const Dashboard = () => {
                     </div>
                     <div className="flex-1">
                       <h4 className="font-semibold text-foreground">{insight.title}</h4>
-                      <p className="text-xs text-muted-foreground mb-1">{insight.subtitle}</p>
-                      <p className="text-sm text-muted-foreground">{insight.description}</p>
+                      <p className="text-sm text-muted-foreground mt-1">{insight.description}</p>
                     </div>
                   </div>
                 </Card>
@@ -132,15 +128,15 @@ const Dashboard = () => {
         transition={{ delay: 0.4 }}
         className="px-6"
       >
-        <h3 className="text-lg font-semibold mb-4">त्वरित क्रिया</h3>
+        <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
         <div className="grid grid-cols-2 gap-4">
           <Button variant="outline" className="h-24 flex flex-col gap-2 hover:bg-primary/5">
             <Calendar className="w-6 h-6 text-primary" />
-            <span className="text-sm">लक्षणे नोंदवा</span>
+            <span className="text-sm">Log Symptoms</span>
           </Button>
           <Button variant="outline" className="h-24 flex flex-col gap-2 hover:bg-secondary/5">
             <Heart className="w-6 h-6 text-secondary" />
-            <span className="text-sm">व्यायाम</span>
+            <span className="text-sm">Exercise</span>
           </Button>
         </div>
       </motion.div>

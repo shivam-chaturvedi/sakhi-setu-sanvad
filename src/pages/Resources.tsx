@@ -7,29 +7,29 @@ import { BookOpen, Video, Utensils, Play, Clock } from "lucide-react";
 const Resources = () => {
   const resources = [
     {
-      type: "व्हिडिओ",
+      type: "Video",
       icon: Video,
-      title: "योग आणि प्राणायाम",
-      subtitle: "Yoga & Breathing",
-      duration: "15 मिनिटे",
+      title: "Yoga & Breathing",
+      subtitle: "Guided exercises",
+      duration: "15 minutes",
       bgColor: "bg-primary-light",
       iconColor: "text-primary",
     },
     {
-      type: "लेख",
+      type: "Article",
       icon: BookOpen,
-      title: "रजोनिवृत्ती माहिती",
-      subtitle: "Menopause Guide",
-      duration: "5 मिनिटे वाचन",
+      title: "Menopause Guide",
+      subtitle: "Comprehensive information",
+      duration: "5 min read",
       bgColor: "bg-energy-light",
       iconColor: "text-energy",
     },
     {
-      type: "पाककृती",
+      type: "Recipe",
       icon: Utensils,
-      title: "पौष्टिक आहार",
-      subtitle: "Nutritious Diet",
-      duration: "पारंपरिक रेसिपी",
+      title: "Nutritious Diet",
+      subtitle: "Healthy meals",
+      duration: "Traditional recipes",
       bgColor: "bg-secondary-light",
       iconColor: "text-secondary",
     },
@@ -37,17 +37,17 @@ const Resources = () => {
 
   const videos = [
     {
-      title: "सकाळचा योग",
+      title: "Morning Yoga",
       duration: "10:30",
       thumbnail: "bg-gradient-to-br from-primary-light to-primary",
     },
     {
-      title: "ध्यान तंत्र",
+      title: "Meditation Techniques",
       duration: "15:00",
       thumbnail: "bg-gradient-to-br from-energy-light to-energy",
     },
     {
-      title: "श्वास व्यायाम",
+      title: "Breathing Exercises",
       duration: "8:45",
       thumbnail: "bg-gradient-to-br from-secondary-light to-secondary",
     },
@@ -65,8 +65,8 @@ const Resources = () => {
             <BookOpen className="w-6 h-6 text-energy" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold">माहिती केंद्र</h1>
-            <p className="text-muted-foreground mt-1">शिका आणि वाढा</p>
+            <h1 className="text-3xl font-bold">Resource Center</h1>
+            <p className="text-muted-foreground mt-1">Learn and grow</p>
           </div>
         </div>
       </motion.header>
@@ -78,7 +78,7 @@ const Resources = () => {
         transition={{ delay: 0.1 }}
         className="px-6 mb-8"
       >
-        <h2 className="text-lg font-semibold mb-4">श्रेणी</h2>
+        <h2 className="text-lg font-semibold mb-4">Categories</h2>
         <div className="grid grid-cols-1 gap-4">
           {resources.map((resource, index) => {
             const Icon = resource.icon;
@@ -124,7 +124,7 @@ const Resources = () => {
         transition={{ delay: 0.5 }}
         className="px-6"
       >
-        <h2 className="text-lg font-semibold mb-4">लोकप्रिय व्हिडिओ</h2>
+        <h2 className="text-lg font-semibold mb-4">Featured Videos</h2>
         <div className="space-y-4">
           {videos.map((video, index) => (
             <motion.div
@@ -147,10 +147,10 @@ const Resources = () => {
                   <div className="flex-1">
                     <h3 className="font-semibold mb-1">{video.title}</h3>
                     <p className="text-sm text-muted-foreground">
-                      तज्ञ मार्गदर्शन
+                      Expert guidance
                     </p>
                     <Button variant="ghost" size="sm" className="mt-2 h-8 text-xs">
-                      आता पहा
+                      Watch Now
                     </Button>
                   </div>
                 </div>

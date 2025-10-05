@@ -9,24 +9,24 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 const Community = () => {
   const posts = [
     {
-      user: "प्रिया",
-      initial: "प्र",
-      time: "2 तास",
-      content: "योगाच्या मदतीने मला खूप फरक जाणवतो आहे. तुम्ही सुद्धा प्रयत्न करा!",
+      user: "Priya",
+      initial: "P",
+      time: "2 hours ago",
+      content: "Yoga has made such a difference for me. I highly recommend trying it!",
       likes: 12,
     },
     {
-      user: "मीना",
-      initial: "मी",
-      time: "5 तास",
-      content: "गरम लाटा कमी करण्यासाठी काही उपाय सांगाल का?",
+      user: "Meena",
+      initial: "M",
+      time: "5 hours ago",
+      content: "Does anyone have tips for managing hot flashes?",
       likes: 8,
     },
     {
-      user: "सुनीता",
-      initial: "सु",
-      time: "1 दिवस",
-      content: "ध्यान आणि प्राणायाम खूप मदत करतात. दररोज 15 मिनिटे करा.",
+      user: "Sunita",
+      initial: "S",
+      time: "1 day ago",
+      content: "Meditation and breathing exercises help a lot. Try 15 minutes daily.",
       likes: 15,
     },
   ];
@@ -43,8 +43,8 @@ const Community = () => {
             <MessageCircle className="w-6 h-6 text-secondary" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold">समुदाय</h1>
-            <p className="text-muted-foreground mt-1">एकत्र आम्ही मजबूत आहोत</p>
+            <h1 className="text-3xl font-bold">Community</h1>
+            <p className="text-muted-foreground mt-1">Together we are stronger</p>
           </div>
         </div>
       </motion.header>
@@ -60,9 +60,9 @@ const Community = () => {
           <div className="flex items-start gap-3">
             <Shield className="w-5 h-5 text-secondary mt-0.5" />
             <div className="text-sm">
-              <p className="font-semibold text-secondary mb-1">सुरक्षित जागा</p>
+              <p className="font-semibold text-secondary mb-1">Safe Space</p>
               <p className="text-muted-foreground">
-                ही एक सुरक्षित आणि सहायक समुदाय आहे. कृपया सन्माना आणि दयाळूपणा ठेवा.
+                This is a safe and supportive community. Please maintain respect and kindness.
               </p>
             </div>
           </div>
@@ -107,7 +107,7 @@ const Community = () => {
                 </Button>
                 <Button variant="ghost" size="sm" className="gap-2">
                   <MessageCircle className="w-4 h-4" />
-                  <span className="text-sm">उत्तर द्या</span>
+                  <span className="text-sm">Reply</span>
                 </Button>
               </div>
             </Card>
@@ -124,7 +124,7 @@ const Community = () => {
       >
         <div className="flex gap-2">
           <Input
-            placeholder="तुमचे विचार शेअर करा..."
+            placeholder="Share your thoughts..."
             className="flex-1 bg-card"
           />
           <Button size="icon" className="bg-primary hover:bg-primary/90">
