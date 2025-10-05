@@ -14,7 +14,148 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      users: {
+        Row: {
+          id: string
+          email: string
+          full_name: string | null
+          avatar_url: string | null
+          preferred_language: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          email: string
+          full_name?: string | null
+          avatar_url?: string | null
+          preferred_language?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          email?: string
+          full_name?: string | null
+          avatar_url?: string | null
+          preferred_language?: string
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      symptoms: {
+        Row: {
+          id: string
+          user_id: string
+          symptom_type: string
+          severity: number
+          notes: string | null
+          recorded_at: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          symptom_type: string
+          severity: number
+          notes?: string | null
+          recorded_at: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          symptom_type?: string
+          severity?: number
+          notes?: string | null
+          recorded_at?: string
+          created_at?: string
+        }
+      }
+      wellness_tips: {
+        Row: {
+          id: string
+          title: string
+          content: string
+          category: string
+          language: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          title: string
+          content: string
+          category: string
+          language: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          title?: string
+          content?: string
+          category?: string
+          language?: string
+          created_at?: string
+        }
+      }
+      community_posts: {
+        Row: {
+          id: string
+          user_id: string
+          title: string
+          content: string
+          likes: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          title: string
+          content: string
+          likes?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          title?: string
+          content?: string
+          likes?: number
+          created_at?: string
+        }
+      }
+      resources: {
+        Row: {
+          id: string
+          title: string
+          description: string
+          type: string
+          url: string
+          language: string
+          category: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          title: string
+          description: string
+          type: string
+          url: string
+          language: string
+          category: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          title?: string
+          description?: string
+          type?: string
+          url?: string
+          language?: string
+          category?: string
+          created_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never

@@ -1,14 +1,55 @@
 import { motion } from "framer-motion";
-import { Heart, TrendingUp, Users, Sparkles, Bell, Calendar } from "lucide-react";
+import { Heart, TrendingUp, Users, Sparkles, Bell, Calendar, LogOut, FileText, MapPin, Mic, Clock } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import Navigation from "@/components/Navigation";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { LanguageSelector } from "@/components/LanguageSelector";
+import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { useEffect } from "react";
+import { testSupabaseConnection, checkTablesExist } from "@/utils/testSupabase";
+import DatabaseSetupChecker from "@/components/DatabaseSetupChecker";
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const { user, signOut, loading } = useAuth();
+  const { language, translate } = useLanguage();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/auth');
+    }
+  }, [user, loading, navigate]);
+
+  // Test Supabase connection on component mount
+  useEffect(() => {
+    const testConnection = async () => {
+      const isConnected = await testSupabaseConnection();
+      if (!isConnected) {
+        toast.error('Database connection failed. Please check your Supabase setup.');
+        console.log('🔍 Checking which tables exist...');
+        await checkTablesExist();
+      }
+    };
+    
+    testConnection();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
   
   const container = {
     hidden: { opacity: 0 },
@@ -58,6 +99,57 @@ const Dashboard = () => {
     },
   ];
 
+  const quickActions = [
+    {
+      icon: Calendar,
+      title: "Log Symptoms",
+      description: "Track your daily symptoms",
+      color: "text-blue-500",
+      bgColor: "bg-blue-50",
+      onClick: () => navigate("/tracker")
+    },
+    {
+      icon: Heart,
+      title: "Exercise",
+      description: "Start your workout",
+      color: "text-green-500",
+      bgColor: "bg-green-50",
+      onClick: () => navigate("/resources")
+    },
+    {
+      icon: FileText,
+      title: "Health Reports",
+      description: "View your reports",
+      color: "text-purple-500",
+      bgColor: "bg-purple-50",
+      onClick: () => navigate("/profile")
+    },
+    {
+      icon: MapPin,
+      title: "Find PHC",
+      description: "Locate health centers",
+      color: "text-red-500",
+      bgColor: "bg-red-50",
+      onClick: () => navigate("/resources")
+    },
+    {
+      icon: Mic,
+      title: "Voice Assistant",
+      description: "Chat with AI",
+      color: "text-orange-500",
+      bgColor: "bg-orange-50",
+      onClick: () => navigate("/community")
+    },
+    {
+      icon: Clock,
+      title: "Reminders",
+      description: "Set wellness reminders",
+      color: "text-indigo-500",
+      bgColor: "bg-indigo-50",
+      onClick: () => navigate("/profile")
+    }
+  ];
+
   const handleLearnMore = () => {
     toast.success("Opening wellness insights...");
     setTimeout(() => navigate("/resources"), 500);
@@ -71,12 +163,15 @@ const Dashboard = () => {
         animate={{ y: 0, opacity: 1 }}
         className="pt-8 pb-6 px-6"
       >
-        <div className="flex items-center justify-between mb-2">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Welcome 🌸</h1>
-            <p className="text-muted-foreground mt-1">Your wellness journey starts here</p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2 gap-4">
+          <div className="flex-1">
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+              Welcome {user.user_metadata?.full_name || 'User'} 🌸
+            </h1>
+            <p className="text-sm md:text-base text-muted-foreground mt-1">Your wellness journey starts here</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
+            <LanguageSelector />
             <ThemeToggle />
             <Button 
               variant="ghost" 
@@ -84,12 +179,30 @@ const Dashboard = () => {
               className="relative"
               onClick={() => toast.info("No new notifications")}
             >
-              <Bell className="w-5 h-5" />
+              <Bell className="w-4 h-4 md:w-5 md:h-5" />
               <span className="absolute top-2 right-2 w-2 h-2 bg-energy rounded-full animate-pulse" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={signOut}
+              title="Sign Out"
+            >
+              <LogOut className="w-4 h-4 md:w-5 md:h-5" />
             </Button>
           </div>
         </div>
       </motion.header>
+
+      {/* Database Setup Checker */}
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: 0.1 }}
+        className="px-6 mb-6"
+      >
+        <DatabaseSetupChecker />
+      </motion.div>
 
       {/* Hero Card */}
       <motion.div
@@ -177,31 +290,62 @@ const Dashboard = () => {
         className="px-6"
       >
         <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
-        <div className="grid grid-cols-2 gap-4">
-          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-            <Button 
-              variant="outline" 
-              className="w-full h-24 flex flex-col gap-2 hover:bg-primary/5 hover:border-primary transition-all"
-              onClick={() => navigate("/tracker")}
-            >
-              <Calendar className="w-6 h-6 text-primary" />
-              <span className="text-sm">Log Symptoms</span>
-            </Button>
-          </motion.div>
-          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-            <Button 
-              variant="outline" 
-              className="w-full h-24 flex flex-col gap-2 hover:bg-secondary/5 hover:border-secondary transition-all"
-              onClick={() => {
-                toast.success("Let's get moving!");
-                navigate("/resources");
-              }}
-            >
-              <Heart className="w-6 h-6 text-secondary" />
-              <span className="text-sm">Exercise</span>
-            </Button>
-          </motion.div>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          {quickActions.map((action, index) => {
+            const Icon = action.icon;
+            return (
+              <motion.div
+                key={index}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Card 
+                  className="p-4 cursor-pointer hover:shadow-lg transition-all group"
+                  onClick={action.onClick}
+                >
+                  <div className="flex flex-col items-center text-center gap-2">
+                    <div className={`p-3 rounded-full ${action.bgColor} group-hover:scale-110 transition-transform`}>
+                      <Icon className={`w-6 h-6 ${action.color}`} />
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-sm">{action.title}</h4>
+                      <p className="text-xs text-gray-600">{action.description}</p>
+                    </div>
+                  </div>
+                </Card>
+              </motion.div>
+            );
+          })}
         </div>
+      </motion.div>
+
+      {/* Recent Activity */}
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.5 }}
+        className="px-6"
+      >
+        <h3 className="text-lg font-semibold mb-4">Recent Activity</h3>
+        <Card className="p-4">
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <span className="text-sm">Logged sleep quality: 8/10</span>
+              <Badge variant="secondary" className="text-xs">2 hours ago</Badge>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+              <span className="text-sm">Completed morning meditation</span>
+              <Badge variant="secondary" className="text-xs">4 hours ago</Badge>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+              <span className="text-sm">Shared experience in community</span>
+              <Badge variant="secondary" className="text-xs">1 day ago</Badge>
+            </div>
+          </div>
+        </Card>
       </motion.div>
 
       <Navigation />

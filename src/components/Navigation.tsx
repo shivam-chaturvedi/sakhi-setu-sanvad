@@ -1,17 +1,24 @@
 import { Link, useLocation } from "react-router-dom";
 import { Home, Activity, Users, BookOpen, User } from "lucide-react";
 import { motion } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Navigation = () => {
   const location = useLocation();
+  const { user } = useAuth();
+
+  // Don't show navigation if user is not authenticated
+  if (!user) {
+    return null;
+  }
   
-  const navItems = [
-    { path: "/", icon: Home, label: "Home" },
-    { path: "/tracker", icon: Activity, label: "Tracker" },
-    { path: "/community", icon: Users, label: "Community" },
-    { path: "/resources", icon: BookOpen, label: "Resources" },
-    { path: "/profile", icon: User, label: "Profile" },
-  ];
+        const navItems = [
+          { path: "/dashboard", icon: Home, label: "Home" },
+          { path: "/tracker", icon: Activity, label: "Tracker" },
+          { path: "/community", icon: Users, label: "Community" },
+          { path: "/resources", icon: BookOpen, label: "Resources" },
+          { path: "/profile", icon: User, label: "Profile" },
+        ];
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-card/80 backdrop-blur-lg border-t border-border z-50">

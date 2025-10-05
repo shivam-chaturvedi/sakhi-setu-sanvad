@@ -6,9 +6,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import Navigation from "@/components/Navigation";
-import { Activity, Moon, Smile, Droplets, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { SymptomTracker } from "@/components/SymptomTracker";
+import { AIAnalytics } from "@/components/AIAnalytics";
+import { Activity, Moon, Smile, Droplets, ArrowLeft, CheckCircle2, Brain, BarChart3 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Tracker = () => {
   const navigate = useNavigate();
@@ -58,8 +61,8 @@ const Tracker = () => {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">Log Symptoms</h1>
-            <p className="text-muted-foreground mt-1">Track your progress today</p>
+            <h1 className="text-3xl font-bold">Health Tracker</h1>
+            <p className="text-muted-foreground mt-1">Track symptoms and get AI insights</p>
           </div>
         </div>
       </motion.header>
@@ -68,99 +71,28 @@ const Tracker = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="px-6 space-y-6"
+        className="px-6"
       >
-        {symptoms.map((symptom, index) => {
-          const Icon = symptom.icon;
-          return (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 + index * 0.1 }}
-            >
-              <Card className="glass-card p-6 hover:shadow-lg transition-shadow">
-                <div className="flex items-center gap-3 mb-4">
-                  <motion.div 
-                    className={`p-2 bg-${symptom.color}/20 rounded-lg`}
-                    whileHover={{ scale: 1.1, rotate: 10 }}
-                  >
-                    <Icon className={`w-5 h-5 text-${symptom.color}`} />
-                  </motion.div>
-                  <Label className="text-lg font-semibold">{symptom.label}</Label>
-                </div>
-                <div className="space-y-4">
-                  <Slider
-                    value={symptom.value}
-                    onValueChange={symptom.setter}
-                    max={symptom.max}
-                    step={1}
-                    className="w-full"
-                  />
-                  <div className="flex justify-between text-sm text-muted-foreground">
-                    <span>0</span>
-                    <motion.span 
-                      className={`font-semibold text-${symptom.color} text-lg`}
-                      key={symptom.value[0]}
-                      initial={{ scale: 1.3 }}
-                      animate={{ scale: 1 }}
-                    >
-                      {symptom.value[0]}
-                    </motion.span>
-                    <span>{symptom.max}</span>
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
-          );
-        })}
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-        >
-          <Card className="glass-card p-6">
-            <Label className="text-lg font-semibold mb-4 block">Today's Notes</Label>
-            <Textarea
-              placeholder="How are you feeling today? Any observations or symptoms to note..."
-              className="min-h-32 resize-none"
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-            />
-          </Card>
-        </motion.div>
-
-        <motion.div 
-          whileHover={{ scale: 1.02 }} 
-          whileTap={{ scale: 0.98 }}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-        >
-          <Button 
-            className="w-full h-14 text-lg bg-primary hover:bg-primary/90 shadow-lg"
-            onClick={handleSave}
-            disabled={isSaving}
-          >
-            {isSaving ? (
-              <>
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                >
-                  <Activity className="w-5 h-5 mr-2" />
-                </motion.div>
-                Saving...
-              </>
-            ) : (
-              <>
-                <Activity className="w-5 h-5 mr-2" />
-                Save Entry
-              </>
-            )}
-          </Button>
-        </motion.div>
+        <Tabs defaultValue="tracker" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="tracker" className="flex items-center gap-2">
+              <Activity className="h-4 w-4" />
+              Track Symptoms
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="flex items-center gap-2">
+              <Brain className="h-4 w-4" />
+              AI Analytics
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="tracker" className="mt-6">
+            <SymptomTracker />
+          </TabsContent>
+          
+          <TabsContent value="analytics" className="mt-6">
+            <AIAnalytics />
+          </TabsContent>
+        </Tabs>
       </motion.div>
 
       <Navigation />

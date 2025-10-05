@@ -1,15 +1,42 @@
 import { motion } from "framer-motion";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Navigation from "@/components/Navigation";
-import { User, Settings, Bell, Shield, Heart, LogOut, ChevronRight } from "lucide-react";
+import { User, Settings, Bell, Shield, Heart, LogOut, ChevronRight, ArrowLeft, FileText, Clock, MapPin, Mic } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { LanguageSelector } from "@/components/LanguageSelector";
+import { useAuth } from "@/contexts/AuthContext";
+import { useEffect } from "react";
+import HealthReports from "@/components/HealthReports";
+import Reminders from "@/components/Reminders";
+import PHCDirectory from "@/components/PHCDirectory";
+import VoiceAssistant from "@/components/VoiceAssistant";
 
 const Profile = () => {
   const navigate = useNavigate();
+  const { user, signOut, loading } = useAuth();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/auth');
+    }
+  }, [user, loading, navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
   
   const menuItems = [
     { 
@@ -38,11 +65,11 @@ const Profile = () => {
     toast.success("Edit profile feature coming soon!");
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await signOut();
     toast.success("Logged out successfully!", {
       description: "See you soon! Take care of yourself.",
     });
-    setTimeout(() => navigate("/"), 1500);
   };
 
   return (
@@ -52,12 +79,23 @@ const Profile = () => {
         animate={{ y: 0, opacity: 1 }}
         className="pt-8 pb-6 px-6"
       >
-        <div className="flex items-center justify-between">
-          <div>
+        <div className="flex items-center gap-4 mb-4">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => navigate("/dashboard")}
+            className="hover:bg-primary/10"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <div className="flex-1">
             <h1 className="text-3xl font-bold">My Profile</h1>
             <p className="text-muted-foreground mt-1">Manage your information</p>
           </div>
-          <ThemeToggle />
+          <div className="flex gap-2">
+            <LanguageSelector />
+            <ThemeToggle />
+          </div>
         </div>
       </motion.header>
 
@@ -73,13 +111,13 @@ const Profile = () => {
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Avatar className="w-20 h-20 cursor-pointer">
                 <AvatarFallback className="bg-gradient-to-br from-primary to-secondary text-white text-2xl font-bold">
-                  P
+                  {user.user_metadata?.full_name?.charAt(0) || 'U'}
                 </AvatarFallback>
               </Avatar>
             </motion.div>
             <div className="flex-1">
-              <h2 className="text-xl font-bold">Priya Patil</h2>
-              <p className="text-sm text-muted-foreground">priya.patil@example.com</p>
+              <h2 className="text-xl font-bold">{user.user_metadata?.full_name || 'User'}</h2>
+              <p className="text-sm text-muted-foreground">{user.email}</p>
               <div className="flex gap-2 mt-2">
                 <motion.span 
                   className="text-xs bg-primary/20 text-primary px-3 py-1 rounded-full"
@@ -108,115 +146,160 @@ const Profile = () => {
         </Card>
       </motion.div>
 
-      {/* Stats */}
+      {/* Tabs for different sections */}
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2 }}
-        className="px-6 mb-8"
+        className="px-6"
       >
-        <div className="grid grid-cols-3 gap-4">
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Card className="glass-card p-4 text-center cursor-pointer hover:shadow-lg transition-all">
-              <motion.div 
-                className="text-2xl font-bold text-primary"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.3, type: "spring" }}
-              >
-                12
-              </motion.div>
-              <div className="text-xs text-muted-foreground mt-1">Days tracked</div>
-            </Card>
-          </motion.div>
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Card className="glass-card p-4 text-center cursor-pointer hover:shadow-lg transition-all">
-              <motion.div 
-                className="text-2xl font-bold text-energy"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.4, type: "spring" }}
-              >
-                8
-              </motion.div>
-              <div className="text-xs text-muted-foreground mt-1">Articles read</div>
-            </Card>
-          </motion.div>
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Card className="glass-card p-4 text-center cursor-pointer hover:shadow-lg transition-all">
-              <motion.div 
-                className="text-2xl font-bold text-secondary"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.5, type: "spring" }}
-              >
-                5
-              </motion.div>
-              <div className="text-xs text-muted-foreground mt-1">Community posts</div>
-            </Card>
-          </motion.div>
-        </div>
-      </motion.div>
+        <Tabs defaultValue="profile" className="w-full">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="profile" className="flex items-center gap-2">
+              <User className="h-4 w-4" />
+              Profile
+            </TabsTrigger>
+            <TabsTrigger value="reports" className="flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              Reports
+            </TabsTrigger>
+            <TabsTrigger value="reminders" className="flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              Reminders
+            </TabsTrigger>
+            <TabsTrigger value="assistant" className="flex items-center gap-2">
+              <Mic className="h-4 w-4" />
+              Assistant
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="profile" className="mt-6">
+            <div className="space-y-4">
+              {/* Stats */}
+              <div className="grid grid-cols-3 gap-4 mb-6">
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Card className="glass-card p-4 text-center cursor-pointer hover:shadow-lg transition-all">
+                    <motion.div 
+                      className="text-2xl font-bold text-primary"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: 0.3, type: "spring" }}
+                    >
+                      12
+                    </motion.div>
+                    <div className="text-xs text-muted-foreground mt-1">Days tracked</div>
+                  </Card>
+                </motion.div>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Card className="glass-card p-4 text-center cursor-pointer hover:shadow-lg transition-all">
+                    <motion.div 
+                      className="text-2xl font-bold text-energy"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: 0.4, type: "spring" }}
+                    >
+                      8
+                    </motion.div>
+                    <div className="text-xs text-muted-foreground mt-1">Articles read</div>
+                  </Card>
+                </motion.div>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Card className="glass-card p-4 text-center cursor-pointer hover:shadow-lg transition-all">
+                    <motion.div 
+                      className="text-2xl font-bold text-secondary"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: 0.5, type: "spring" }}
+                    >
+                      5
+                    </motion.div>
+                    <div className="text-xs text-muted-foreground mt-1">Community posts</div>
+                  </Card>
+                </motion.div>
+              </div>
 
-      {/* Menu Items */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
-        className="px-6 space-y-3"
-      >
-        {menuItems.map((item, index) => {
-          const Icon = item.icon;
-          return (
-            <motion.div
-              key={index}
-              initial={{ x: -20, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.4 + index * 0.1 }}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <Card 
-                className="glass-card p-4 cursor-pointer hover:shadow-lg transition-all group"
-                onClick={item.onClick}
-              >
-                <div className="flex items-center gap-4">
-                  <motion.div 
-                    className="p-2 bg-primary/10 rounded-lg"
-                    whileHover={{ scale: 1.1, rotate: 5 }}
-                  >
-                    <Icon className="w-5 h-5 text-primary" />
-                  </motion.div>
-                  <div className="flex-1">
-                    <p className="font-semibold group-hover:text-primary transition-colors">
-                      {item.label}
-                    </p>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+              {/* Menu Items */}
+              <Card className="glass-card">
+                <div className="p-4">
+                  {menuItems.map((item, index) => {
+                    const Icon = item.icon;
+                    return (
+                      <motion.div
+                        key={index}
+                        initial={{ x: -20, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: 0.4 + index * 0.1 }}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <div 
+                          className="flex items-center justify-between py-3 border-b border-border/50 last:border-b-0 cursor-pointer group"
+                          onClick={item.onClick}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+                              <Icon className="w-5 h-5 text-primary" />
+                            </div>
+                            <div>
+                              <h3 className="font-semibold group-hover:text-primary transition-colors">{item.label}</h3>
+                            </div>
+                          </div>
+                          <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                        </div>
+                      </motion.div>
+                    );
+                  })}
                 </div>
               </Card>
-            </motion.div>
-          );
-        })}
-      </motion.div>
 
-      {/* Logout Button */}
-      <motion.div
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.8 }}
-        className="px-6 mt-8"
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-      >
-        <Button 
-          variant="outline" 
-          className="w-full text-destructive hover:bg-destructive/10 hover:border-destructive transition-all"
-          onClick={handleLogout}
-        >
-          <LogOut className="w-4 h-4 mr-2" />
-          Log Out
-        </Button>
+              {/* PHC Directory */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <MapPin className="w-5 h-5" />
+                    Find Nearby Health Centers
+                  </CardTitle>
+                  <CardDescription>
+                    Locate Primary Health Centers and healthcare providers in your area
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <PHCDirectory />
+                </CardContent>
+              </Card>
+
+              {/* Logout Button */}
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.8 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Button 
+                  variant="outline" 
+                  className="w-full text-destructive hover:bg-destructive/10 hover:border-destructive transition-all"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Log Out
+                </Button>
+              </motion.div>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="reports" className="mt-6">
+            <HealthReports />
+          </TabsContent>
+          
+          <TabsContent value="reminders" className="mt-6">
+            <Reminders />
+          </TabsContent>
+          
+          <TabsContent value="assistant" className="mt-6">
+            <VoiceAssistant />
+          </TabsContent>
+        </Tabs>
       </motion.div>
 
       <Navigation />
