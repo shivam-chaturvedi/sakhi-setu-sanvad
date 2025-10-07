@@ -25,7 +25,6 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
 
 interface Reminder {
@@ -41,7 +40,6 @@ interface Reminder {
 
 const Reminders = () => {
   const { user } = useAuth();
-  const { translate } = useLanguage();
   const [reminders, setReminders] = useState<Reminder[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);

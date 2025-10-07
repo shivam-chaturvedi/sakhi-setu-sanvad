@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Eye, EyeOff, Heart, Sparkles, Users, Shield, ArrowLeft } from 'lucide-react';
 import { LoginForm } from '@/components/auth/LoginForm';
 import EnhancedSignupForm from '@/components/auth/EnhancedSignupForm';
-import { LanguageSelector } from '@/components/LanguageSelector';
+import GoogleTranslate from '@/components/GoogleTranslate';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -174,7 +174,7 @@ const AuthPage = () => {
             </div>
           </motion.div>
           <div className="flex items-center gap-4">
-            <LanguageSelector />
+            <GoogleTranslate />
             <ThemeToggle />
             <Button
               variant="ghost"
@@ -283,7 +283,7 @@ const AuthPage = () => {
         className="relative z-10 text-center pb-6"
       >
         <p className="text-sm text-gray-500 dark:text-gray-400">
-          © 2024 Sakhi Setu. Empowering women through their menopause journey.
+          © 2025 Sakhi Setu. Empowering women through their menopause journey.
         </p>
       </motion.footer>
     </div>

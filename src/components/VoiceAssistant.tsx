@@ -21,7 +21,6 @@ import {
   RotateCcw
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -47,7 +46,6 @@ const VoiceAssistant: React.FC = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   
   const { user } = useAuth();
-  const { language } = useLanguage();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -58,7 +56,7 @@ const VoiceAssistant: React.FC = () => {
       
       recognitionInstance.continuous = false;
       recognitionInstance.interimResults = true;
-      recognitionInstance.lang = language === 'hi' ? 'hi-IN' : language === 'mr' ? 'mr-IN' : 'en-US';
+      recognitionInstance.lang = 'en-US';
       
       recognitionInstance.onstart = () => {
         setIsListening(true);
@@ -106,7 +104,7 @@ const VoiceAssistant: React.FC = () => {
 
     // Load previous conversations
     loadConversations();
-  }, [language]);
+  }, []);
 
   const loadConversations = async () => {
     if (!user) return;
@@ -159,7 +157,7 @@ const VoiceAssistant: React.FC = () => {
             session_id: 'voice_session',
             message: text.trim(),
             is_user_message: true,
-            language: language
+            language: 'en'
           });
       }
 
@@ -184,7 +182,7 @@ const VoiceAssistant: React.FC = () => {
             session_id: 'voice_session',
             response: response,
             is_user_message: false,
-            language: language
+            language: 'en'
           });
       }
 
@@ -243,7 +241,7 @@ const VoiceAssistant: React.FC = () => {
     synthesis.cancel();
 
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = language === 'hi' ? 'hi-IN' : language === 'mr' ? 'mr-IN' : 'en-US';
+    utterance.lang = 'en-US';
     utterance.rate = 0.9;
     utterance.pitch = 1;
     utterance.volume = 0.8;
@@ -321,7 +319,7 @@ const VoiceAssistant: React.FC = () => {
             <Bot className="w-5 h-5 text-pink-500" />
             <CardTitle>Voice Assistant</CardTitle>
             <Badge variant="secondary" className="bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300">
-              {language === 'hi' ? 'हिंदी' : language === 'mr' ? 'मराठी' : 'English'}
+              English
             </Badge>
           </div>
           <div className="flex items-center gap-2">

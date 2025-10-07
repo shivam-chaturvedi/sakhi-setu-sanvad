@@ -10,7 +10,6 @@ import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useAuth } from '@/contexts/AuthContext';
-import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { 
@@ -63,7 +62,6 @@ export const SymptomTracker: React.FC = () => {
     recentTrend: 'stable'
   });
   const { user } = useAuth();
-  const { language, translate } = useLanguage();
 
   useEffect(() => {
     if (user) {

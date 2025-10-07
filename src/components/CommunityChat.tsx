@@ -27,7 +27,6 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
 
 interface Message {
@@ -54,18 +53,15 @@ export const CommunityChat: React.FC = () => {
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
-  const [onlineUsers, setOnlineUsers] = useState(0);
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyContent, setReplyContent] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
-  const { language, translate } = useLanguage();
 
   useEffect(() => {
     if (user) {
       fetchMessages();
       subscribeToMessages();
-      updateOnlineStatus();
     }
   }, [user]);
 
@@ -144,11 +140,6 @@ export const CommunityChat: React.FC = () => {
     };
   };
 
-  const updateOnlineStatus = async () => {
-    // Simulate online users count
-    const count = Math.floor(Math.random() * 50) + 10;
-    setOnlineUsers(count);
-  };
 
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -232,10 +223,6 @@ export const CommunityChat: React.FC = () => {
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Community Chat</h2>
           <p className="text-gray-600 dark:text-gray-300">Connect with other women on their menopause journey</p>
-        </div>
-        <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-          <Wifi className="w-4 h-4 text-green-500" />
-          <span>{onlineUsers} online</span>
         </div>
       </div>
 

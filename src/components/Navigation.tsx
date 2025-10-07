@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Activity, Users, BookOpen, User } from "lucide-react";
+import { Home, Activity, Users, BookOpen, User, Video } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -17,6 +17,7 @@ const Navigation = () => {
           { path: "/tracker", icon: Activity, label: "Tracker" },
           { path: "/community", icon: Users, label: "Community" },
           { path: "/resources", icon: BookOpen, label: "Resources" },
+          { path: "/library", icon: Video, label: "Library" },
           { path: "/profile", icon: User, label: "Profile" },
         ];
 

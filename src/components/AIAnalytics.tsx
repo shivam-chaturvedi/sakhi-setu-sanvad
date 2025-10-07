@@ -27,7 +27,6 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
 
 interface AnalyticsData {
@@ -55,7 +54,6 @@ export const AIAnalytics: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const { user } = useAuth();
-  const { language, translate } = useLanguage();
 
   useEffect(() => {
     if (user) {

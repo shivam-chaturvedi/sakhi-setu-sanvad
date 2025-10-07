@@ -20,7 +20,6 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
 
 interface PHC {
@@ -41,7 +40,6 @@ interface PHC {
 
 const PHCDirectory = () => {
   const { user } = useAuth();
-  const { translate } = useLanguage();
   const [phcs, setPhcs] = useState<PHC[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');

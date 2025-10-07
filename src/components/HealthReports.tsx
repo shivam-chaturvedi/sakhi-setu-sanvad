@@ -20,7 +20,6 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from 'sonner';
 
 interface HealthReport {
@@ -37,7 +36,6 @@ interface HealthReport {
 
 const HealthReports = () => {
   const { user } = useAuth();
-  const { translate } = useLanguage();
   const [reports, setReports] = useState<HealthReport[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);

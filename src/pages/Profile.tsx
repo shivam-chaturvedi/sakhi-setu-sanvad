@@ -3,18 +3,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Navigation from "@/components/Navigation";
-import { User, Settings, Bell, Shield, Heart, LogOut, ChevronRight, ArrowLeft, FileText, Clock, MapPin, Mic } from "lucide-react";
+import { User, Settings, Bell, Shield, Heart, LogOut, ChevronRight, ArrowLeft, FileText, Clock, MapPin, Mic, Video, MessageCircle } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { LanguageSelector } from "@/components/LanguageSelector";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
 import HealthReports from "@/components/HealthReports";
 import Reminders from "@/components/Reminders";
 import PHCDirectory from "@/components/PHCDirectory";
 import VoiceAssistant from "@/components/VoiceAssistant";
+import { EditProfileForm } from "@/components/EditProfileForm";
+import EnhancedProfile from "@/components/EnhancedProfile";
+import VideoLibrary from "@/components/VideoLibrary";
+import EnhancedChat from "@/components/EnhancedChat";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -93,7 +97,6 @@ const Profile = () => {
             <p className="text-muted-foreground mt-1">Manage your information</p>
           </div>
           <div className="flex gap-2">
-            <LanguageSelector />
             <ThemeToggle />
           </div>
         </div>
@@ -154,10 +157,22 @@ const Profile = () => {
         className="px-6"
       >
         <Tabs defaultValue="profile" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="profile" className="flex items-center gap-2">
               <User className="h-4 w-4" />
               Profile
+            </TabsTrigger>
+            <TabsTrigger value="edit" className="flex items-center gap-2">
+              <Settings className="h-4 w-4" />
+              Edit
+            </TabsTrigger>
+            <TabsTrigger value="library" className="flex items-center gap-2">
+              <Video className="h-4 w-4" />
+              Publish Videos
+            </TabsTrigger>
+            <TabsTrigger value="chat" className="flex items-center gap-2">
+              <MessageCircle className="h-4 w-4" />
+              Chat
             </TabsTrigger>
             <TabsTrigger value="reports" className="flex items-center gap-2">
               <FileText className="h-4 w-4" />
@@ -174,118 +189,19 @@ const Profile = () => {
           </TabsList>
           
           <TabsContent value="profile" className="mt-6">
-            <div className="space-y-4">
-              {/* Stats */}
-              <div className="grid grid-cols-3 gap-4 mb-6">
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Card className="glass-card p-4 text-center cursor-pointer hover:shadow-lg transition-all">
-                    <motion.div 
-                      className="text-2xl font-bold text-primary"
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ delay: 0.3, type: "spring" }}
-                    >
-                      12
-                    </motion.div>
-                    <div className="text-xs text-muted-foreground mt-1">Days tracked</div>
-                  </Card>
-                </motion.div>
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Card className="glass-card p-4 text-center cursor-pointer hover:shadow-lg transition-all">
-                    <motion.div 
-                      className="text-2xl font-bold text-energy"
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ delay: 0.4, type: "spring" }}
-                    >
-                      8
-                    </motion.div>
-                    <div className="text-xs text-muted-foreground mt-1">Articles read</div>
-                  </Card>
-                </motion.div>
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Card className="glass-card p-4 text-center cursor-pointer hover:shadow-lg transition-all">
-                    <motion.div 
-                      className="text-2xl font-bold text-secondary"
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ delay: 0.5, type: "spring" }}
-                    >
-                      5
-                    </motion.div>
-                    <div className="text-xs text-muted-foreground mt-1">Community posts</div>
-                  </Card>
-                </motion.div>
-              </div>
-
-              {/* Menu Items */}
-              <Card className="glass-card">
-                <div className="p-4">
-                  {menuItems.map((item, index) => {
-                    const Icon = item.icon;
-                    return (
-                      <motion.div
-                        key={index}
-                        initial={{ x: -20, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        transition={{ delay: 0.4 + index * 0.1 }}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        <div 
-                          className="flex items-center justify-between py-3 border-b border-border/50 last:border-b-0 cursor-pointer group"
-                          onClick={item.onClick}
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className="p-2 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
-                              <Icon className="w-5 h-5 text-primary" />
-                            </div>
-                            <div>
-                              <h3 className="font-semibold group-hover:text-primary transition-colors">{item.label}</h3>
-                            </div>
-                          </div>
-                          <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
-                        </div>
-                      </motion.div>
-                    );
-                  })}
-                </div>
-              </Card>
-
-              {/* PHC Directory */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <MapPin className="w-5 h-5" />
-                    Find Nearby Health Centers
-                  </CardTitle>
-                  <CardDescription>
-                    Locate Primary Health Centers and healthcare providers in your area
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <PHCDirectory />
-                </CardContent>
-              </Card>
-
-              {/* Logout Button */}
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.8 }}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <Button 
-                  variant="outline" 
-                  className="w-full text-destructive hover:bg-destructive/10 hover:border-destructive transition-all"
-                  onClick={handleLogout}
-                >
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Log Out
-                </Button>
-              </motion.div>
-            </div>
+            <EnhancedProfile />
+          </TabsContent>
+          
+          <TabsContent value="edit" className="mt-6">
+            <EditProfileForm />
+          </TabsContent>
+          
+          <TabsContent value="library" className="mt-6">
+            <VideoLibrary />
+          </TabsContent>
+          
+          <TabsContent value="chat" className="mt-6">
+            <EnhancedChat />
           </TabsContent>
           
           <TabsContent value="reports" className="mt-6">

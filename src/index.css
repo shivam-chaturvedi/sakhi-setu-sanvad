@@ -6,6 +6,96 @@
 All colors MUST be HSL.
 */
 
+
+/* Hide Google Translate top banner */
+.goog-te-banner-frame.skiptranslate {
+  display: none !important;
+}
+
+
+/* Hide Google logo link in widget dropdown */
+.goog-logo-link {
+  display: none !important;
+}
+
+/* Google Translate Widget Styling */
+.google-translate-container {
+  display: flex !important;
+  align-items: center !important;
+  min-height: 32px !important;
+}
+
+.goog-te-gadget {
+  font-family: inherit !important;
+  font-size: 14px !important;
+  display: block !important;
+}
+
+.goog-te-gadget-simple {
+  background: transparent !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 6px !important;
+  padding: 4px 8px !important;
+  min-width: 120px !important;
+  display: block !important;
+}
+
+.goog-te-gadget-simple .goog-te-menu-value {
+  color: #374151 !important;
+  font-size: 14px !important;
+}
+
+.goog-te-gadget-simple .goog-te-menu-value span:first-child {
+  display: none !important;
+}
+
+.goog-te-gadget-simple .goog-te-menu-value span:last-child {
+  display: inline !important;
+}
+
+/* Hide Google branding */
+.goog-te-gadget img {
+  display: none !important;
+}
+
+/* Style the dropdown */
+.goog-te-menu2 {
+  background: white !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 8px !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  margin-top: 4px !important;
+}
+
+.goog-te-menu2-item {
+  padding: 8px 12px !important;
+  font-size: 14px !important;
+}
+
+.goog-te-menu2-item:hover {
+  background: #f3f4f6 !important;
+}
+
+/* Dark mode support */
+.dark .goog-te-gadget-simple {
+  border-color: #4b5563 !important;
+  background: #374151 !important;
+}
+
+.dark .goog-te-gadget-simple .goog-te-menu-value {
+  color: #f9fafb !important;
+}
+
+.dark .goog-te-menu2 {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+.dark .goog-te-menu2-item:hover {
+  background: #374151 !important;
+}
+
+
 @layer base {
   :root {
     /* Soft, comforting colors for wellness */
@@ -144,4 +234,65 @@ All colors MUST be HSL.
     0%, 100% { opacity: 0.5; }
     50% { opacity: 1; }
   }
+}
+
+/* Google Translate Widget Styling */
+#google_translate_element {
+  font-size: 12px !important;
+}
+
+#google_translate_element select {
+  font-size: 12px !important;
+  padding: 4px 8px !important;
+  border-radius: 4px !important;
+  border: 1px solid #d1d5db !important;
+  background-color: white !important;
+  color: #374151 !important;
+}
+
+#google_translate_element .goog-te-gadget {
+  font-size: 12px !important;
+  color: #374151 !important;
+}
+
+#google_translate_element .goog-te-gadget-simple {
+  background-color: white !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 4px !important;
+  padding: 4px 8px !important;
+  font-size: 12px !important;
+}
+
+#google_translate_element .goog-te-gadget-simple .goog-te-menu-value {
+  color: #374151 !important;
+  font-size: 12px !important;
+}
+
+#google_translate_element .goog-te-gadget-simple .goog-te-menu-value span:first-child {
+  color: #374151 !important;
+  font-size: 12px !important;
+}
+
+/* Dark mode for Google Translate */
+.dark #google_translate_element select {
+  background-color: #1f2937 !important;
+  color: #f9fafb !important;
+  border-color: #374151 !important;
+}
+
+.dark #google_translate_element .goog-te-gadget {
+  color: #f9fafb !important;
+}
+
+.dark #google_translate_element .goog-te-gadget-simple {
+  background-color: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+.dark #google_translate_element .goog-te-gadget-simple .goog-te-menu-value {
+  color: #f9fafb !important;
+}
+
+.dark #google_translate_element .goog-te-gadget-simple .goog-te-menu-value span:first-child {
+  color: #f9fafb !important;
 }

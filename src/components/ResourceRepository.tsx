@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
-import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Play, BookOpen, FileText, Video, Calendar, Clock, ExternalLink } from 'lucide-react';
@@ -42,7 +41,6 @@ export const ResourceRepository: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedType, setSelectedType] = useState('all');
   const { user } = useAuth();
-  const { language, translate } = useLanguage();
   const { toast } = useToast();
 
   useEffect(() => {

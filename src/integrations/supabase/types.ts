@@ -156,6 +156,152 @@ export type Database = {
           created_at?: string
         }
       }
+      video_library: {
+        Row: {
+          id: string
+          user_id: string
+          title: string
+          description: string
+          video_url: string
+          thumbnail_url: string | null
+          category: string
+          tags: string[]
+          published_date: string
+          views: number
+          likes: number
+          is_public: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          title: string
+          description: string
+          video_url: string
+          thumbnail_url?: string | null
+          category: string
+          tags?: string[]
+          published_date: string
+          views?: number
+          likes?: number
+          is_public?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          title?: string
+          description?: string
+          video_url?: string
+          thumbnail_url?: string | null
+          category?: string
+          tags?: string[]
+          published_date?: string
+          views?: number
+          likes?: number
+          is_public?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      chat_messages: {
+        Row: {
+          id: string
+          user_id: string
+          content: string
+          message_type: string
+          room_id: string | null
+          reply_to: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          content: string
+          message_type?: string
+          room_id?: string | null
+          reply_to?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          content?: string
+          message_type?: string
+          room_id?: string | null
+          reply_to?: string | null
+          created_at?: string
+        }
+      }
+      chat_rooms: {
+        Row: {
+          id: string
+          name: string
+          description: string | null
+          is_public: boolean
+          created_by: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          description?: string | null
+          is_public?: boolean
+          created_by: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          description?: string | null
+          is_public?: boolean
+          created_by?: string
+          created_at?: string
+        }
+      }
+      user_profiles: {
+        Row: {
+          id: string
+          user_id: string
+          bio: string | null
+          location: string | null
+          website: string | null
+          social_links: Json | null
+          interests: string[]
+          privacy_settings: Json | null
+          profile_views: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          bio?: string | null
+          location?: string | null
+          website?: string | null
+          social_links?: Json | null
+          interests?: string[]
+          privacy_settings?: Json | null
+          profile_views?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          bio?: string | null
+          location?: string | null
+          website?: string | null
+          social_links?: Json | null
+          interests?: string[]
+          privacy_settings?: Json | null
+          profile_views?: number
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never

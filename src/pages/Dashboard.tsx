@@ -1,43 +1,25 @@
 import { motion } from "framer-motion";
-import { Heart, TrendingUp, Users, Sparkles, Bell, Calendar, LogOut, FileText, MapPin, Mic, Clock } from "lucide-react";
+import { Heart, TrendingUp, Users, Sparkles, Bell, Calendar, LogOut, FileText, MapPin, Mic, Clock, Video, MessageCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Navigation from "@/components/Navigation";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { LanguageSelector } from "@/components/LanguageSelector";
+import GoogleTranslate from "@/components/GoogleTranslate";
 import { useAuth } from "@/contexts/AuthContext";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useEffect } from "react";
-import { testSupabaseConnection, checkTablesExist } from "@/utils/testSupabase";
-import DatabaseSetupChecker from "@/components/DatabaseSetupChecker";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, signOut, loading } = useAuth();
-  const { language, translate } = useLanguage();
 
   useEffect(() => {
     if (!loading && !user) {
       navigate('/auth');
     }
   }, [user, loading, navigate]);
-
-  // Test Supabase connection on component mount
-  useEffect(() => {
-    const testConnection = async () => {
-      const isConnected = await testSupabaseConnection();
-      if (!isConnected) {
-        toast.error('Database connection failed. Please check your Supabase setup.');
-        console.log('🔍 Checking which tables exist...');
-        await checkTablesExist();
-      }
-    };
-    
-    testConnection();
-  }, []);
 
   if (loading) {
     return (
@@ -147,6 +129,22 @@ const Dashboard = () => {
       color: "text-indigo-500",
       bgColor: "bg-indigo-50",
       onClick: () => navigate("/profile")
+    },
+    {
+      icon: Video,
+      title: "Video Library",
+      description: "Publish and discover wellness videos",
+      color: "text-pink-500",
+      bgColor: "bg-pink-50",
+      onClick: () => navigate("/library")
+    },
+    {
+      icon: MessageCircle,
+      title: "Community Chat",
+      description: "Connect with others",
+      color: "text-teal-500",
+      bgColor: "bg-teal-50",
+      onClick: () => navigate("/profile")
     }
   ];
 
@@ -171,7 +169,7 @@ const Dashboard = () => {
             <p className="text-sm md:text-base text-muted-foreground mt-1">Your wellness journey starts here</p>
           </div>
           <div className="flex gap-2 flex-wrap">
-            <LanguageSelector />
+            <GoogleTranslate />
             <ThemeToggle />
             <Button 
               variant="ghost" 
@@ -193,16 +191,6 @@ const Dashboard = () => {
           </div>
         </div>
       </motion.header>
-
-      {/* Database Setup Checker */}
-      <motion.div
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.1 }}
-        className="px-6 mb-6"
-      >
-        <DatabaseSetupChecker />
-      </motion.div>
 
       {/* Hero Card */}
       <motion.div
@@ -290,7 +278,7 @@ const Dashboard = () => {
         className="px-6"
       >
         <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {quickActions.map((action, index) => {
             const Icon = action.icon;
             return (

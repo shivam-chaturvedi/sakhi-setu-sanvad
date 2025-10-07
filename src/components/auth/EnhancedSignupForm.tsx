@@ -81,7 +81,7 @@ const EnhancedSignupForm: React.FC = () => {
     agreedToPrivacy: false
   });
 
-  const [errors, setErrors] = useState<Partial<FormData>>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const steps = [
     { number: 1, title: 'Basic Info', description: 'Your account details' },
@@ -104,7 +104,7 @@ const EnhancedSignupForm: React.FC = () => {
   ];
 
   const validateStep = (step: number): boolean => {
-    const newErrors: Partial<FormData> = {};
+    const newErrors: Record<string, string> = {};
 
     switch (step) {
       case 1:
@@ -206,39 +206,56 @@ const EnhancedSignupForm: React.FC = () => {
   const progress = (passwordStrength / 5) * 100;
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      {/* Progress Bar */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          {steps.map((step) => (
-            <div key={step.number} className="flex items-center">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                currentStep >= step.number
-                  ? 'bg-pink-500 text-white'
-                  : 'bg-gray-200 text-gray-500'
-              }`}>
-                {currentStep > step.number ? <Check className="w-4 h-4" /> : step.number}
+    <div className="w-full max-w-6xl mx-auto px-4">
+      {/* Progress Bar - Mobile Responsive */}
+      <div className="mb-6 md:mb-8">
+        {/* Desktop Progress Bar */}
+        <div className="hidden md:flex items-center justify-center mb-4">
+          <div className="flex items-center max-w-md w-full">
+            {steps.map((step, index) => (
+              <div key={step.number} className="flex items-center flex-1">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                  currentStep >= step.number
+                    ? 'bg-pink-500 text-white'
+                    : 'bg-gray-200 text-gray-500'
+                }`}>
+                  {currentStep > step.number ? <Check className="w-4 h-4" /> : step.number}
+                </div>
+                {index < steps.length - 1 && (
+                  <div className={`flex-1 h-1 mx-2 ${
+                    currentStep > step.number ? 'bg-pink-500' : 'bg-gray-200'
+                  }`} />
+                )}
               </div>
-              {step.number < 5 && (
-                <div className={`w-16 h-1 mx-2 ${
-                  currentStep > step.number ? 'bg-pink-500' : 'bg-gray-200'
-                }`} />
-              )}
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
+
+        {/* Mobile Progress Bar */}
+        <div className="md:hidden mb-4">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+              Step {currentStep} of {steps.length}
+            </span>
+            <span className="text-sm text-gray-500">
+              {Math.round((currentStep / steps.length) * 100)}%
+            </span>
+          </div>
+          <Progress value={(currentStep / steps.length) * 100} className="h-2" />
+        </div>
+
         <div className="text-center">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+          <h3 className="text-lg md:text-xl font-semibold text-gray-900 dark:text-white">
             {steps[currentStep - 1].title}
           </h3>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
+          <p className="text-sm md:text-base text-gray-600 dark:text-gray-300">
             {steps[currentStep - 1].description}
           </p>
         </div>
       </div>
 
       <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 shadow-xl">
-        <CardContent className="p-8">
+        <CardContent className="p-4 md:p-8">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentStep}
@@ -258,9 +275,9 @@ const EnhancedSignupForm: React.FC = () => {
                     <p className="text-gray-600 dark:text-gray-300">Let's start with your basic information</p>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
                     <div className="space-y-2">
-                      <Label htmlFor="fullName">Full Name *</Label>
+                      <Label htmlFor="fullName" className="text-sm md:text-base">Full Name *</Label>
                       <div className="relative">
                         <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                         <Input
@@ -268,14 +285,14 @@ const EnhancedSignupForm: React.FC = () => {
                           value={formData.fullName}
                           onChange={(e) => handleInputChange('fullName', e.target.value)}
                           placeholder="Enter your full name"
-                          className="pl-10 bg-white/50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20"
+                          className="pl-10 h-11 md:h-12 bg-white/50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20"
                         />
                       </div>
                       {errors.fullName && <p className="text-sm text-red-500">{errors.fullName}</p>}
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="email">Email Address *</Label>
+                      <Label htmlFor="email" className="text-sm md:text-base">Email Address *</Label>
                       <div className="relative">
                         <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                         <Input
@@ -284,7 +301,7 @@ const EnhancedSignupForm: React.FC = () => {
                           value={formData.email}
                           onChange={(e) => handleInputChange('email', e.target.value)}
                           placeholder="Enter your email"
-                          className="pl-10 bg-white/50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20"
+                          className="pl-10 h-11 md:h-12 bg-white/50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20"
                         />
                       </div>
                       {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
@@ -292,7 +309,7 @@ const EnhancedSignupForm: React.FC = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="password">Password *</Label>
+                    <Label htmlFor="password" className="text-sm md:text-base">Password *</Label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <Input
@@ -301,7 +318,7 @@ const EnhancedSignupForm: React.FC = () => {
                         value={formData.password}
                         onChange={(e) => handleInputChange('password', e.target.value)}
                         placeholder="Create a strong password"
-                        className="pl-10 pr-10 bg-white/50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20"
+                        className="pl-10 pr-10 h-11 md:h-12 bg-white/50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20"
                       />
                       <button
                         type="button"
@@ -327,7 +344,7 @@ const EnhancedSignupForm: React.FC = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Confirm Password *</Label>
+                    <Label htmlFor="confirmPassword" className="text-sm md:text-base">Confirm Password *</Label>
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <Input
@@ -336,7 +353,7 @@ const EnhancedSignupForm: React.FC = () => {
                         value={formData.confirmPassword}
                         onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
                         placeholder="Confirm your password"
-                        className="pl-10 pr-10 bg-white/50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20"
+                        className="pl-10 pr-10 h-11 md:h-12 bg-white/50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20"
                       />
                       <button
                         type="button"
@@ -362,9 +379,9 @@ const EnhancedSignupForm: React.FC = () => {
                     <p className="text-gray-600 dark:text-gray-300">Tell us more about yourself</p>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
                     <div className="space-y-2">
-                      <Label htmlFor="age">Age *</Label>
+                      <Label htmlFor="age" className="text-sm md:text-base">Age *</Label>
                       <Input
                         id="age"
                         type="number"
@@ -373,13 +390,13 @@ const EnhancedSignupForm: React.FC = () => {
                         placeholder="Enter your age"
                         min="18"
                         max="100"
-                        className="bg-white/50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20"
+                        className="h-11 md:h-12 bg-white/50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20"
                       />
                       {errors.age && <p className="text-sm text-red-500">{errors.age}</p>}
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="location">Location *</Label>
+                      <Label htmlFor="location" className="text-sm md:text-base">Location *</Label>
                       <div className="relative">
                         <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                         <Input
@@ -387,16 +404,16 @@ const EnhancedSignupForm: React.FC = () => {
                           value={formData.location}
                           onChange={(e) => handleInputChange('location', e.target.value)}
                           placeholder="City, State"
-                          className="pl-10 bg-white/50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20"
+                          className="pl-10 h-11 md:h-12 bg-white/50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20"
                         />
                       </div>
                       {errors.location && <p className="text-sm text-red-500">{errors.location}</p>}
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
                     <div className="space-y-2">
-                      <Label htmlFor="phone">Phone Number</Label>
+                      <Label htmlFor="phone" className="text-sm md:text-base">Phone Number</Label>
                       <div className="relative">
                         <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                         <Input
@@ -405,19 +422,19 @@ const EnhancedSignupForm: React.FC = () => {
                           value={formData.phone}
                           onChange={(e) => handleInputChange('phone', e.target.value)}
                           placeholder="+91 9876543210"
-                          className="pl-10 bg-white/50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20"
+                          className="pl-10 h-11 md:h-12 bg-white/50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20"
                         />
                       </div>
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="emergencyContact">Emergency Contact</Label>
+                      <Label htmlFor="emergencyContact" className="text-sm md:text-base">Emergency Contact</Label>
                       <Input
                         id="emergencyContact"
                         value={formData.emergencyContact}
                         onChange={(e) => handleInputChange('emergencyContact', e.target.value)}
                         placeholder="Emergency contact name & number"
-                        className="bg-white/50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20"
+                        className="h-11 md:h-12 bg-white/50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20"
                       />
                     </div>
                   </div>
@@ -439,33 +456,33 @@ const EnhancedSignupForm: React.FC = () => {
                     <div>
                       <Label className="text-base font-medium">Medical Conditions (Optional)</Label>
                       <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">Select any conditions you currently have</p>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:gap-3">
                         {medicalConditionsOptions.map((condition) => (
                           <button
                             key={condition}
                             type="button"
                             onClick={() => handleArrayChange('medicalConditions', condition)}
-                            className={`p-2 rounded-lg text-sm border transition-all ${
+                            className={`p-2 md:p-3 rounded-lg text-xs md:text-sm border transition-all text-center ${
                               formData.medicalConditions.includes(condition)
                                 ? 'bg-pink-100 border-pink-500 text-pink-700 dark:bg-pink-900/30 dark:border-pink-400 dark:text-pink-300'
                                 : 'bg-gray-100 border-gray-200 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300'
                             }`}
                           >
-                            {condition}
+                            <span className="break-words">{condition}</span>
                           </button>
                         ))}
                       </div>
                     </div>
 
                     <div>
-                      <Label htmlFor="medications">Current Medications (Optional)</Label>
+                      <Label htmlFor="medications" className="text-sm md:text-base">Current Medications (Optional)</Label>
                       <Textarea
                         id="medications"
                         value={formData.currentMedications.join(', ')}
                         onChange={(e) => handleInputChange('currentMedications', e.target.value.split(',').map(m => m.trim()).filter(m => m))}
                         placeholder="List your current medications (comma separated)"
                         rows={3}
-                        className="bg-white/50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20"
+                        className="bg-white/50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20 text-sm md:text-base"
                       />
                     </div>
                   </div>
@@ -554,37 +571,77 @@ const EnhancedSignupForm: React.FC = () => {
                   </div>
 
                   <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-                        <h4 className="font-medium text-gray-900 dark:text-white mb-2">Basic Information</h4>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">Name: {formData.fullName}</p>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">Email: {formData.email}</p>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">Age: {formData.age} years</p>
+                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                      <div className="p-3 md:p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                        <h4 className="font-medium text-gray-900 dark:text-white mb-2 text-sm md:text-base">Basic Information</h4>
+                        <div className="space-y-1">
+                          <p className="text-xs md:text-sm text-gray-600 dark:text-gray-300">
+                            <span className="font-medium">Name:</span> {formData.fullName}
+                          </p>
+                          <p className="text-xs md:text-sm text-gray-600 dark:text-gray-300 break-all">
+                            <span className="font-medium">Email:</span> {formData.email}
+                          </p>
+                          <p className="text-xs md:text-sm text-gray-600 dark:text-gray-300">
+                            <span className="font-medium">Age:</span> {formData.age} years
+                          </p>
+                        </div>
                       </div>
 
-                      <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-                        <h4 className="font-medium text-gray-900 dark:text-white mb-2">Location & Contact</h4>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">Location: {formData.location}</p>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">Phone: {formData.phone || 'Not provided'}</p>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">Emergency: {formData.emergencyContact || 'Not provided'}</p>
+                      <div className="p-3 md:p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                        <h4 className="font-medium text-gray-900 dark:text-white mb-2 text-sm md:text-base">Location & Contact</h4>
+                        <div className="space-y-1">
+                          <p className="text-xs md:text-sm text-gray-600 dark:text-gray-300">
+                            <span className="font-medium">Location:</span> {formData.location}
+                          </p>
+                          <p className="text-xs md:text-sm text-gray-600 dark:text-gray-300">
+                            <span className="font-medium">Phone:</span> {formData.phone || 'Not provided'}
+                          </p>
+                          <p className="text-xs md:text-sm text-gray-600 dark:text-gray-300 break-words">
+                            <span className="font-medium">Emergency:</span> {formData.emergencyContact || 'Not provided'}
+                          </p>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-                      <h4 className="font-medium text-gray-900 dark:text-white mb-2">Health Information</h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">
-                        Medical Conditions: {formData.medicalConditions.length > 0 ? formData.medicalConditions.join(', ') : 'None specified'}
-                      </p>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">
-                        Medications: {formData.currentMedications.length > 0 ? formData.currentMedications.join(', ') : 'None specified'}
-                      </p>
+                    <div className="p-3 md:p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                      <h4 className="font-medium text-gray-900 dark:text-white mb-2 text-sm md:text-base">Health Information</h4>
+                      <div className="space-y-1">
+                        <p className="text-xs md:text-sm text-gray-600 dark:text-gray-300">
+                          <span className="font-medium">Medical Conditions:</span> 
+                          <span className="ml-1">
+                            {formData.medicalConditions.length > 0 ? (
+                              <span className="break-words">{formData.medicalConditions.join(', ')}</span>
+                            ) : (
+                              'None specified'
+                            )}
+                          </span>
+                        </p>
+                        <p className="text-xs md:text-sm text-gray-600 dark:text-gray-300">
+                          <span className="font-medium">Medications:</span> 
+                          <span className="ml-1">
+                            {formData.currentMedications.length > 0 ? (
+                              <span className="break-words">{formData.currentMedications.join(', ')}</span>
+                            ) : (
+                              'None specified'
+                            )}
+                          </span>
+                        </p>
+                      </div>
                     </div>
 
-                    <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-                      <h4 className="font-medium text-gray-900 dark:text-white mb-2">Preferences</h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">Language: {languages.find(l => l.value === formData.preferredLanguage)?.label}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">Notifications: {formData.notifications ? 'Enabled' : 'Disabled'}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">Data Sharing: {formData.dataSharing ? 'Enabled' : 'Disabled'}</p>
+                    <div className="p-3 md:p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                      <h4 className="font-medium text-gray-900 dark:text-white mb-2 text-sm md:text-base">Preferences</h4>
+                      <div className="space-y-1">
+                        <p className="text-xs md:text-sm text-gray-600 dark:text-gray-300">
+                          <span className="font-medium">Language:</span> {languages.find(l => l.value === formData.preferredLanguage)?.label}
+                        </p>
+                        <p className="text-xs md:text-sm text-gray-600 dark:text-gray-300">
+                          <span className="font-medium">Notifications:</span> {formData.notifications ? 'Enabled' : 'Disabled'}
+                        </p>
+                        <p className="text-xs md:text-sm text-gray-600 dark:text-gray-300">
+                          <span className="font-medium">Data Sharing:</span> {formData.dataSharing ? 'Enabled' : 'Disabled'}
+                        </p>
+                      </div>
                     </div>
                   </div>
 
@@ -628,26 +685,28 @@ const EnhancedSignupForm: React.FC = () => {
             </motion.div>
           </AnimatePresence>
 
-          {/* Navigation Buttons */}
-          <div className="flex justify-between mt-8">
+          {/* Navigation Buttons - Mobile Responsive */}
+          <div className="flex flex-col sm:flex-row justify-between gap-4 mt-6 md:mt-8">
             <Button
               type="button"
               variant="outline"
               onClick={handlePrevious}
               disabled={currentStep === 1}
-              className="flex items-center gap-2"
+              className="flex items-center justify-center gap-2 h-11 md:h-12 order-2 sm:order-1"
             >
               <ArrowLeft className="w-4 h-4" />
-              Previous
+              <span className="hidden sm:inline">Previous</span>
+              <span className="sm:hidden">Back</span>
             </Button>
 
             {currentStep < 5 ? (
               <Button
                 type="button"
                 onClick={handleNext}
-                className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white flex items-center gap-2"
+                className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white flex items-center justify-center gap-2 h-11 md:h-12 order-1 sm:order-2"
               >
-                Next
+                <span className="hidden sm:inline">Next</span>
+                <span className="sm:hidden">Continue</span>
                 <ArrowRight className="w-4 h-4" />
               </Button>
             ) : (
@@ -655,17 +714,19 @@ const EnhancedSignupForm: React.FC = () => {
                 type="button"
                 onClick={handleSubmit}
                 disabled={saving}
-                className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white flex items-center gap-2"
+                className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white flex items-center justify-center gap-2 h-11 md:h-12 order-1 sm:order-2"
               >
                 {saving ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    Creating Account...
+                    <span className="hidden sm:inline">Creating Account...</span>
+                    <span className="sm:hidden">Creating...</span>
                   </>
                 ) : (
                   <>
                     <CheckCircle className="w-4 h-4" />
-                    Create Account
+                    <span className="hidden sm:inline">Create Account</span>
+                    <span className="sm:hidden">Create</span>
                   </>
                 )}
               </Button>
