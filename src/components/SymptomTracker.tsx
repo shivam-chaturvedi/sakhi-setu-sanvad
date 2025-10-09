@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { useGemini } from '@/hooks/useGemini';
 import { toast } from 'sonner';
 import { 
   Calendar, 
@@ -27,7 +28,10 @@ import {
   Loader2,
   BarChart3,
   Clock,
-  Target
+  Target,
+  Bot,
+  Send,
+  MessageCircle
 } from 'lucide-react';
 
 const symptomTypes = [
@@ -55,6 +59,9 @@ export const SymptomTracker: React.FC = () => {
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [aiQuery, setAiQuery] = useState('');
+  const [aiResponse, setAiResponse] = useState('');
+  const [showAiChat, setShowAiChat] = useState(false);
   const [stats, setStats] = useState({
     totalEntries: 0,
     averageSeverity: 0,
@@ -62,6 +69,16 @@ export const SymptomTracker: React.FC = () => {
     recentTrend: 'stable'
   });
   const { user } = useAuth();
+  
+  const { 
+    isLoading: aiLoading, 
+    generateWellnessAdvice, 
+    analyzeSymptoms,
+    generateMotivation 
+  } = useGemini({
+    onSuccess: (response) => setAiResponse(response),
+    onError: (error) => console.error('AI Error:', error)
+  });
 
   useEffect(() => {
     if (user) {
@@ -145,7 +162,7 @@ export const SymptomTracker: React.FC = () => {
           severity: severity[0],
           notes: notes || null,
           recorded_at: new Date().toISOString(),
-        });
+        } as any);
 
       if (error) {
         if (error.code === 'PGRST205') {
@@ -204,6 +221,112 @@ export const SymptomTracker: React.FC = () => {
     }
   };
 
+  const handleAiQuery = async () => {
+    if (!aiQuery.trim()) return;
+
+    try {
+      const response = await generateWellnessAdvice(aiQuery, {
+        age: 45,
+        symptoms: symptoms.map(s => s.symptom_type),
+        concerns: ['symptom management', 'wellness optimization']
+      });
+      // Format response by removing markdown formatting
+      const formattedResponse = response
+        .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold formatting
+        .replace(/\*(.*?)\*/g, '$1') // Remove italic formatting
+        .replace(/#{1,6}\s*/g, '') // Remove headers
+        .replace(/\n{3,}/g, '\n\n') // Reduce multiple line breaks
+        .trim();
+      
+      setAiResponse(formattedResponse);
+      setShowAiChat(true);
+      
+      // Auto-scroll to AI response after a short delay
+      setTimeout(() => {
+        const aiResponseElement = document.querySelector('[data-ai-response]');
+        if (aiResponseElement) {
+          aiResponseElement.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+          });
+        }
+      }, 300);
+    } catch (error) {
+      console.error('Error generating AI response:', error);
+      toast.error('Failed to generate AI response');
+    }
+  };
+
+  const handleSymptomAnalysis = async () => {
+    if (symptoms.length === 0) {
+      toast.error('No symptoms to analyze. Please track some symptoms first.');
+      return;
+    }
+
+    try {
+      const symptomList = symptoms.map(s => s.symptom_type);
+      const response = await analyzeSymptoms(symptomList, `Recent symptoms with average severity ${stats.averageSeverity}/10`);
+      
+      // Format response by removing markdown formatting
+      const formattedResponse = response
+        .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold formatting
+        .replace(/\*(.*?)\*/g, '$1') // Remove italic formatting
+        .replace(/#{1,6}\s*/g, '') // Remove headers
+        .replace(/\n{3,}/g, '\n\n') // Reduce multiple line breaks
+        .trim();
+      
+      setAiResponse(formattedResponse);
+      setShowAiChat(true);
+      
+      // Auto-scroll to AI response after a short delay
+      setTimeout(() => {
+        const aiResponseElement = document.querySelector('[data-ai-response]');
+        if (aiResponseElement) {
+          aiResponseElement.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+          });
+        }
+      }, 300);
+    } catch (error) {
+      console.error('Error analyzing symptoms:', error);
+      toast.error('Failed to analyze symptoms');
+    }
+  };
+
+  const handleMotivation = async () => {
+    try {
+      const mood = stats.recentTrend === 'improving' ? 'feeling better' : 
+                   stats.recentTrend === 'worsening' ? 'struggling' : 'stable';
+      const response = await generateMotivation(mood, ['symptom management', 'wellness']);
+      
+      // Format response by removing markdown formatting
+      const formattedResponse = response
+        .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold formatting
+        .replace(/\*(.*?)\*/g, '$1') // Remove italic formatting
+        .replace(/#{1,6}\s*/g, '') // Remove headers
+        .replace(/\n{3,}/g, '\n\n') // Reduce multiple line breaks
+        .trim();
+      
+      setAiResponse(formattedResponse);
+      setShowAiChat(true);
+      
+      // Auto-scroll to AI response after a short delay
+      setTimeout(() => {
+        const aiResponseElement = document.querySelector('[data-ai-response]');
+        if (aiResponseElement) {
+          aiResponseElement.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+          });
+        }
+      }, 300);
+    } catch (error) {
+      console.error('Error generating motivation:', error);
+      toast.error('Failed to generate motivation');
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -221,6 +344,43 @@ export const SymptomTracker: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* AI Actions */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex flex-wrap gap-2 justify-center mb-6"
+      >
+        <Button
+          onClick={handleSymptomAnalysis}
+          disabled={aiLoading || symptoms.length === 0}
+          className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+        >
+          {aiLoading ? (
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+          ) : (
+            <Brain className="w-4 h-4 mr-2" />
+          )}
+          Analyze Symptoms
+        </Button>
+        <Button
+          onClick={handleMotivation}
+          disabled={aiLoading}
+          variant="outline"
+          className="border-purple-500 text-purple-500 hover:bg-purple-50"
+        >
+          <Heart className="w-4 h-4 mr-2" />
+          Get Motivation
+        </Button>
+        <Button
+          onClick={() => setShowAiChat(!showAiChat)}
+          variant="outline"
+          className="border-pink-500 text-pink-500 hover:bg-pink-50"
+        >
+          <MessageCircle className="w-4 h-4 mr-2" />
+          Ask AI
+        </Button>
+      </motion.div>
+
       {/* Stats Overview */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -459,6 +619,106 @@ export const SymptomTracker: React.FC = () => {
                     );
                   })}
                 </AnimatePresence>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
+      {/* AI Chat Section */}
+      {showAiChat && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+          <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 shadow-xl">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Bot className="w-5 h-5 text-purple-500" />
+                AI Symptom Assistant
+              </CardTitle>
+              <CardDescription>
+                Ask questions about your symptoms and get personalized AI recommendations
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex gap-2">
+                <Textarea
+                  value={aiQuery}
+                  onChange={(e) => setAiQuery(e.target.value)}
+                  placeholder="Ask me anything about your symptoms, wellness, or menopause..."
+                  className="flex-1 min-h-[100px]"
+                  disabled={aiLoading}
+                />
+                <Button
+                  onClick={handleAiQuery}
+                  disabled={aiLoading || !aiQuery.trim()}
+                  className="self-end"
+                >
+                  {aiLoading ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Send className="w-4 h-4" />
+                  )}
+                </Button>
+              </div>
+
+              {aiResponse && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg border border-purple-200 dark:border-purple-800"
+                  data-ai-response
+                >
+                  <div className="flex items-start gap-3">
+                    <Bot className="w-5 h-5 text-purple-500 mt-1 flex-shrink-0" />
+                    <div className="flex-1">
+                      <h4 className="font-semibold text-purple-900 dark:text-purple-100 mb-2">
+                        AI Recommendation
+                      </h4>
+                      <div className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
+                        {aiResponse}
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Quick Questions */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setAiQuery("What can I do to manage hot flashes?")}
+                  className="text-xs"
+                >
+                  Hot Flashes
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setAiQuery("How can I improve my sleep during menopause?")}
+                  className="text-xs"
+                >
+                  Sleep Issues
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setAiQuery("What exercises help with menopause symptoms?")}
+                  className="text-xs"
+                >
+                  Exercise
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setAiQuery("How can I manage mood changes?")}
+                  className="text-xs"
+                >
+                  Mood Support
+                </Button>
               </div>
             </CardContent>
           </Card>

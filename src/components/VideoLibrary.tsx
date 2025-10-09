@@ -5,9 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Play, Plus, Calendar, Eye, Heart, Share2, Search, Filter, Upload } from "lucide-react";
+import { Play, Plus, Calendar, Share2, Search, Filter, Upload, User, Trash2, Video } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -27,6 +28,7 @@ interface Video {
   is_public: boolean;
   user_id: string;
   created_at: string;
+  publisher_name?: string;
 }
 
 const VideoLibrary = () => {
@@ -57,22 +59,64 @@ const VideoLibrary = () => {
   ];
 
   useEffect(() => {
-    fetchVideos();
+    // Test database connection first
+    const testConnection = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('video_library')
+          .select('count', { count: 'exact', head: true });
+        
+        if (error) {
+          console.error('Database connection test failed:', error);
+          toast.error('Database connection failed');
+        } else {
+          console.log('Database connection successful, video count:', data);
+          fetchVideos();
+        }
+      } catch (err) {
+        console.error('Database test error:', err);
+        toast.error('Failed to connect to database');
+      }
+    };
+    
+    testConnection();
   }, []);
 
   const fetchVideos = async () => {
     try {
+      console.log('Fetching videos...');
       const { data, error } = await supabase
         .from('video_library')
         .select('*')
         .eq('is_public', true)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setVideos(data || []);
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+      
+      console.log('Fetched videos:', data);
+      
+      // If no videos in database, show empty array
+      if (!data || data.length === 0) {
+        console.log('No videos found in database');
+        setVideos([]);
+        return;
+      }
+      
+      // For now, use a simple approach without joins
+      const videosWithPublisher = (data || []).map((video: any) => ({
+        ...video,
+        publisher_name: 'Community Member' // Default publisher name
+      }));
+      
+      setVideos(videosWithPublisher);
     } catch (error) {
       console.error('Error fetching videos:', error);
       toast.error('Failed to load videos');
+      // Set empty array on error to prevent infinite loading
+      setVideos([]);
     } finally {
       setLoading(false);
     }
@@ -97,7 +141,7 @@ const VideoLibrary = () => {
           is_public: newVideo.is_public,
           views: 0,
           likes: 0
-        });
+        } as any);
 
       if (error) throw error;
 
@@ -119,23 +163,23 @@ const VideoLibrary = () => {
     }
   };
 
-  const handleLike = async (videoId: string) => {
+  const handleDeleteVideo = async (videoId: string) => {
+    if (!user) return;
+    
     try {
-      const video = videos.find(v => v.id === videoId);
-      if (!video) return;
-
       const { error } = await supabase
         .from('video_library')
-        .update({ likes: video.likes + 1 })
-        .eq('id', videoId);
+        .delete()
+        .eq('id', videoId)
+        .eq('user_id', user.id);
 
       if (error) throw error;
 
-      setVideos(videos.map(v => 
-        v.id === videoId ? { ...v, likes: v.likes + 1 } : v
-      ));
+      setVideos(videos.filter(v => v.id !== videoId));
+      toast.success('Video deleted successfully!');
     } catch (error) {
-      console.error('Error liking video:', error);
+      console.error('Error deleting video:', error);
+      toast.error('Failed to delete video');
     }
   };
 
@@ -325,10 +369,10 @@ const VideoLibrary = () => {
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
                     <Button
                       size="icon"
-                      className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 hover:bg-white"
+                      className="opacity-0 group-hover:opacity-100 transition-opacity bg-red-600 hover:bg-red-700 text-white rounded-full w-16 h-16 shadow-lg"
                       onClick={() => window.open(video.video_url, '_blank')}
                     >
-                      <Play className="w-4 h-4" />
+                      <Play className="w-6 h-6 ml-1" fill="currentColor" />
                     </Button>
                   </div>
                   <Badge className="absolute top-2 left-2 bg-primary/90">
@@ -347,27 +391,20 @@ const VideoLibrary = () => {
                       </Badge>
                     ))}
                   </div>
+                  {video.publisher_name && (
+                    <div className="flex items-center gap-1 text-xs text-gray-500 mb-3">
+                      <User className="h-3 w-3" />
+                      <span>Published by {video.publisher_name}</span>
+                    </div>
+                  )}
                   <div className="flex items-center justify-between text-sm text-muted-foreground">
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" />
                         {new Date(video.published_date).toLocaleDateString()}
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Eye className="w-3 h-3" />
-                        {video.views}
-                      </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleLike(video.id)}
-                        className="h-8 px-2"
-                      >
-                        <Heart className="w-3 h-3 mr-1" />
-                        {video.likes}
-                      </Button>
                       <Button
                         size="sm"
                         variant="ghost"
@@ -376,6 +413,36 @@ const VideoLibrary = () => {
                       >
                         <Share2 className="w-3 h-3" />
                       </Button>
+                      {user && video.user_id === user.id ? (
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-8 px-2 text-red-500 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This action cannot be undone. This will permanently delete the video "{video.title}" from the library.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleDeleteVideo(video.id)}
+                                className="bg-red-600 hover:bg-red-700"
+                              >
+                                Delete Video
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      ) : null}
                     </div>
                   </div>
                 </CardContent>
@@ -387,17 +454,33 @@ const VideoLibrary = () => {
 
       {filteredVideos.length === 0 && (
         <div className="text-center py-12">
-          <Upload className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-semibold mb-2">No videos found</h3>
-          <p className="text-muted-foreground mb-4">
+          <Video className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-xl font-semibold mb-2">
             {searchTerm || selectedCategory !== "all" 
-              ? "Try adjusting your search or filter criteria"
-              : "Be the first to publish a wellness video for the community!"
+              ? "No videos match your search"
+              : "No videos published yet"
+            }
+          </h3>
+          <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+            {searchTerm || selectedCategory !== "all" 
+              ? "Try adjusting your search terms or filter criteria to find more videos."
+              : "Be the first to share a wellness video with the community! Help others by publishing educational content about menopause, health, and wellness."
             }
           </p>
-          <Button onClick={() => setIsAddDialogOpen(true)}>
+          <Button 
+            onClick={() => {
+              if (searchTerm || selectedCategory !== "all") {
+                setSearchTerm("");
+                setSelectedCategory("all");
+              } else {
+                setIsAddDialogOpen(true);
+              }
+            }}
+            className="bg-primary hover:bg-primary/90"
+            size="lg"
+          >
             <Plus className="w-4 h-4 mr-2" />
-            Publish First Video
+            {searchTerm || selectedCategory !== "all" ? "Clear Filters" : "Publish First Video"}
           </Button>
         </div>
       )}

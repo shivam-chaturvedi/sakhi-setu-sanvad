@@ -17,43 +17,240 @@ import {
   Globe, 
   Heart, 
   MessageCircle, 
-  Share2, 
   Settings,
   Calendar,
-  Eye,
-  Users,
   BookOpen,
   Video,
+  Play,
   Image as ImageIcon,
   Link,
   Mail,
-  Phone
+  Phone,
+  Share
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { getAvatarUrl } from "@/lib/storage";
+import AvatarUpload from "@/components/AvatarUpload";
 import { toast } from "sonner";
+import RecentActivity from './RecentActivity';
 
 interface UserProfile {
   id: string;
   user_id: string;
+  full_name?: string;
   bio: string | null;
   location: string | null;
   website: string | null;
   social_links: any;
   interests: string[];
   privacy_settings: any;
-  profile_views: number;
+  avatar_url: string | null;
   created_at: string;
   updated_at: string;
 }
 
-const EnhancedProfile = () => {
+interface EnhancedProfileProps {
+  userProfile?: any;
+  onProfileUpdate?: () => void;
+}
+
+// UserVideos component to show only current user's videos
+const UserVideos = ({ onVideoCountChange }: { onVideoCountChange?: (count: number) => void }) => {
+  const { user } = useAuth();
+  const [videos, setVideos] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (user) {
+      fetchUserVideos();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (onVideoCountChange) {
+      onVideoCountChange(videos.length);
+    }
+  }, [videos.length, onVideoCountChange]);
+
+  const fetchUserVideos = async () => {
+    if (!user) return;
+
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('video_library')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setVideos(data || []);
+    } catch (error) {
+      console.error('Error fetching user videos:', error);
+      toast.error('Failed to load videos');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>My Videos</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (videos.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>My Videos</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8">
+            <Video className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+            <p className="text-muted-foreground">No videos uploaded yet.</p>
+            <Button className="mt-4" onClick={() => window.location.href = '/library'}>
+              Go to Library
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Helper function to get video thumbnail
+  const getVideoThumbnail = (videoUrl: string) => {
+    if (!videoUrl) return null;
+    
+    // For YouTube videos
+    if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
+      let videoId = '';
+      if (videoUrl.includes('youtube.com/watch?v=')) {
+        videoId = videoUrl.split('v=')[1].split('&')[0];
+      } else if (videoUrl.includes('youtu.be/')) {
+        videoId = videoUrl.split('youtu.be/')[1].split('?')[0];
+      }
+      return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+    }
+    // For Vimeo videos
+    if (videoUrl.includes('vimeo.com')) {
+      const videoId = videoUrl.split('vimeo.com/')[1];
+      return `https://vumbnail.com/${videoId}.jpg`;
+    }
+    return null;
+  };
+
+  return (
+    <div className="space-y-4">
+      <Card>
+        <CardHeader>
+          <CardTitle>My Videos ({videos.length})</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {videos.map((video) => {
+              const thumbnail = getVideoThumbnail(video.video_url);
+              return (
+                <motion.div
+                  key={video.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  whileHover={{ scale: 1.02 }}
+                  className="group"
+                >
+                  <Card className="overflow-hidden hover:shadow-lg transition-all duration-300">
+                    <div className="relative aspect-video bg-muted">
+                      {thumbnail ? (
+                        <img
+                          src={thumbnail}
+                          alt={video.title}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <Video className="w-12 h-12 text-muted-foreground" />
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                        <Button
+                          size="icon"
+                          className="opacity-0 group-hover:opacity-100 transition-opacity bg-red-600 hover:bg-red-700 text-white rounded-full w-16 h-16 shadow-lg"
+                          onClick={() => window.open(video.video_url, '_blank')}
+                        >
+                          <Play className="w-6 h-6 ml-1" fill="currentColor" />
+                        </Button>
+                      </div>
+                      <Badge className="absolute top-2 left-2 bg-primary/90">
+                        {video.category}
+                      </Badge>
+                    </div>
+                    <CardContent className="p-4">
+                      <h3 className="font-semibold line-clamp-2 mb-2">{video.title}</h3>
+                      <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                        {video.description}
+                      </p>
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        {video.tags && video.tags.slice(0, 3).map((tag, index) => (
+                          <Badge key={index} variant="secondary" className="text-xs">
+                            {tag}
+                          </Badge>
+                        ))}
+                      </div>
+                      <div className="flex items-center gap-1 text-xs text-gray-500 mb-3">
+                        <User className="h-3 w-3" />
+                        <span>Published by {video.publisher_name || 'You'}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm text-muted-foreground">
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            {new Date(video.published_date || video.created_at).toLocaleDateString()}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-8 px-2"
+                            onClick={() => navigator.share?.({ title: video.title, url: video.video_url })}
+                          >
+                            <Link className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+const EnhancedProfile = ({ userProfile: propUserProfile, onProfileUpdate }: EnhancedProfileProps) => {
   const { user } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isImageUploadOpen, setIsImageUploadOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    posts: 0,
+    videos: 0
+  });
   const [editForm, setEditForm] = useState({
     bio: "",
     location: "",
@@ -74,32 +271,131 @@ const EnhancedProfile = () => {
     "Community", "Education", "Technology", "Art", "Music", "Travel"
   ];
 
+  // Memoized callback for video count updates
+  const handleVideoCountChange = useCallback((count: number) => {
+    setStats(prev => ({ ...prev, videos: count }));
+  }, []);
+
   useEffect(() => {
+    if (propUserProfile) {
+      // Use prop data if available
+      setProfile(propUserProfile);
+      setEditForm({
+        bio: propUserProfile.bio || "",
+        location: propUserProfile.location || "",
+        website: propUserProfile.website || "",
+        interests: propUserProfile.interests || [],
+        social_links: propUserProfile.social_links || {
+          instagram: "",
+          twitter: "",
+          linkedin: "",
+          facebook: ""
+        }
+      });
+      setLoading(false);
+    } else {
     fetchProfile();
-  }, [user]);
+    }
+    
+    if (user) {
+      fetchStats();
+    }
+  }, [user, propUserProfile]);
+
+  const fetchStats = async () => {
+    if (!user) return;
+
+    try {
+      // Fetch posts count
+      const { count: postsCount, error: postsError } = await supabase
+        .from('community_posts')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+
+      // Fetch videos count
+      const { count: videosCount, error: videosError } = await supabase
+        .from('video_library')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+
+      // Also fetch actual videos to debug
+      const { data: videosData, error: videosDataError } = await supabase
+        .from('video_library')
+        .select('id, title, user_id')
+        .eq('user_id', user.id);
+
+      // Debug logging
+      console.log('Stats query results:', { 
+        postsCount, 
+        postsError, 
+        videosCount, 
+        videosError, 
+        videosData,
+        videosDataError,
+        userId: user.id 
+      });
+
+      // Ensure we have valid counts
+      const finalPostsCount = postsCount !== null ? postsCount : 0;
+      const finalVideosCount = videosCount !== null ? videosCount : (videosData ? videosData.length : 0);
+      
+      console.log('Final stats:', {
+        posts: finalPostsCount,
+        videos: finalVideosCount
+      });
+
+      setStats({
+        posts: finalPostsCount,
+        videos: finalVideosCount
+      });
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    }
+  };
 
   const fetchProfile = async () => {
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
+      // Fetch from both users and user_profiles tables
+      const [usersResult, profilesResult] = await Promise.all([
+        supabase
+          .from('users')
+          .select('*')
+          .eq('id', user.id)
+          .single(),
+        supabase
         .from('user_profiles')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+          .single()
+      ]);
 
-      if (error && error.code !== 'PGRST116') {
-        throw error;
-      }
+      const userData = usersResult.data;
+      const profileData = profilesResult.data;
 
-      if (data) {
-        setProfile(data);
+      if (userData) {
+        // Merge data from both tables
+        const mergedProfile = {
+          ...(profileData as any),
+          full_name: (userData as any).full_name,
+          avatar_url: (userData as any).avatar_url || (profileData as any)?.avatar_url,
+          location: (userData as any).location || (profileData as any)?.location,
+          age: (userData as any).age,
+          phone: (userData as any).phone,
+          emergency_contact: (userData as any).emergency_contact,
+          medical_conditions: (userData as any).medical_conditions,
+          current_medications: (userData as any).current_medications,
+          preferred_language: (userData as any).preferred_language
+        };
+
+        setProfile(mergedProfile);
         setEditForm({
-          bio: data.bio || "",
-          location: data.location || "",
-          website: data.website || "",
-          interests: data.interests || [],
-          social_links: data.social_links || {
+          bio: (profileData as any)?.bio || "",
+          location: (userData as any).location || (profileData as any)?.location || "",
+          website: (profileData as any)?.website || "",
+          interests: (profileData as any)?.interests || [],
+          social_links: (profileData as any)?.social_links || {
             instagram: "",
             twitter: "",
             linkedin: "",
@@ -132,8 +428,8 @@ const EnhancedProfile = () => {
           interests: [],
           social_links: {},
           privacy_settings: {},
-          profile_views: 0
-        })
+            avatar_url: null
+          } as any)
         .select()
         .single();
 
@@ -148,23 +444,29 @@ const EnhancedProfile = () => {
     if (!user || !profile) return;
 
     try {
-      const { error } = await supabase
-        .from('user_profiles')
-        .update({
+      const updateData = {
           bio: editForm.bio,
           location: editForm.location,
           website: editForm.website,
           interests: editForm.interests,
           social_links: editForm.social_links,
           updated_at: new Date().toISOString()
-        })
+      };
+
+      const { error } = await (supabase as any)
+        .from('user_profiles')
+        .update(updateData)
         .eq('user_id', user.id);
 
       if (error) throw error;
 
       toast.success('Profile updated successfully!');
       setIsEditOpen(false);
+      if (onProfileUpdate) {
+        onProfileUpdate();
+      } else {
       fetchProfile();
+      }
     } catch (error) {
       console.error('Error updating profile:', error);
       toast.error('Failed to update profile');
@@ -196,6 +498,14 @@ const EnhancedProfile = () => {
       });
 
       if (updateError) throw updateError;
+
+      // Update profile state with new avatar URL
+      setProfile(prev => prev ? { ...prev, avatar_url: publicUrl } : null);
+      
+      // Call onProfileUpdate if provided
+      if (onProfileUpdate) {
+        onProfileUpdate();
+      }
 
       toast.success('Avatar updated successfully!');
       setIsImageUploadOpen(false);
@@ -251,20 +561,13 @@ const EnhancedProfile = () => {
           <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4 -mt-16">
             <div className="relative">
               <Avatar className="w-24 h-24 border-4 border-background">
-                <AvatarImage src={user?.user_metadata?.avatar_url} />
+                <AvatarImage src={profile?.avatar_url || user?.user_metadata?.avatar_url} />
                 <AvatarFallback className="text-2xl">
-                  {user?.user_metadata?.full_name?.charAt(0) || 'U'}
+                  {(profile?.full_name || user?.user_metadata?.full_name || 'U').charAt(0)}
                 </AvatarFallback>
               </Avatar>
               <Dialog open={isImageUploadOpen} onOpenChange={setIsImageUploadOpen}>
-                <DialogTrigger asChild>
-                  <Button
-                    size="icon"
-                    className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full"
-                  >
-                    <Camera className="w-4 h-4" />
-                  </Button>
-                </DialogTrigger>
+            
                 <DialogContent>
                   <DialogHeader>
                     <DialogTitle>Update Profile Picture</DialogTitle>
@@ -308,57 +611,50 @@ const EnhancedProfile = () => {
                     </div>
                   )}
                 </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm">
-                    <Share2 className="w-4 h-4 mr-2" />
-                    Share
-                  </Button>
-                  <Button size="sm" onClick={() => setIsEditOpen(true)}>
-                    <Edit3 className="w-4 h-4 mr-2" />
-                    Edit Profile
-                  </Button>
-                </div>
               </div>
             </div>
           </div>
         </div>
       </Card>
 
+      {/* Avatar Upload */}
+      <Card className="text-center p-6">
+        <AvatarUpload
+          currentAvatar={profile?.avatar_url || null}
+          onAvatarUpdate={(avatarUrl) => {
+            setProfile(prev => prev ? { ...prev, avatar_url: avatarUrl } : null);
+            onProfileUpdate?.();
+          }}
+          size="lg"
+          className="mx-auto"
+        />
+        <p className="text-sm text-muted-foreground mt-4">
+          Click the camera icon to upload your profile picture
+        </p>
+      </Card>
+
       {/* Profile Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         <motion.div whileHover={{ scale: 1.05 }}>
           <Card className="text-center p-4">
-            <div className="text-2xl font-bold text-primary">{profile?.profile_views || 0}</div>
-            <div className="text-sm text-muted-foreground">Profile Views</div>
+            <div className="text-xl sm:text-2xl font-bold text-energy">{stats.posts}</div>
+            <div className="text-xs sm:text-sm text-muted-foreground">Posts</div>
           </Card>
         </motion.div>
         <motion.div whileHover={{ scale: 1.05 }}>
           <Card className="text-center p-4">
-            <div className="text-2xl font-bold text-energy">12</div>
-            <div className="text-sm text-muted-foreground">Posts</div>
-          </Card>
-        </motion.div>
-        <motion.div whileHover={{ scale: 1.05 }}>
-          <Card className="text-center p-4">
-            <div className="text-2xl font-bold text-secondary">8</div>
-            <div className="text-sm text-muted-foreground">Videos</div>
-          </Card>
-        </motion.div>
-        <motion.div whileHover={{ scale: 1.05 }}>
-          <Card className="text-center p-4">
-            <div className="text-2xl font-bold text-accent">24</div>
-            <div className="text-sm text-muted-foreground">Connections</div>
+            <div className="text-xl sm:text-2xl font-bold text-secondary">{stats.videos}</div>
+            <div className="text-xs sm:text-sm text-muted-foreground">Videos</div>
           </Card>
         </motion.div>
       </div>
 
       {/* Profile Content */}
       <Tabs defaultValue="about" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="about">About</TabsTrigger>
           <TabsTrigger value="activity">Activity</TabsTrigger>
           <TabsTrigger value="videos">Videos</TabsTrigger>
-          <TabsTrigger value="connections">Connections</TabsTrigger>
         </TabsList>
 
         <TabsContent value="about" className="space-y-6">
@@ -407,7 +703,7 @@ const EnhancedProfile = () => {
                     </a>
                   </div>
                 )}
-                {profile?.social_links && Object.entries(profile.social_links).map(([platform, url]) => (
+                {profile?.social_links && Object.entries(profile.social_links as Record<string, string>).map(([platform, url]) => (
                   url && (
                     <div key={platform} className="flex items-center gap-2">
                       <span className="capitalize">{platform}:</span>
@@ -423,61 +719,13 @@ const EnhancedProfile = () => {
         </TabsContent>
 
         <TabsContent value="activity">
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-sm">Shared a wellness video</span>
-                  <Badge variant="secondary" className="text-xs">2 hours ago</Badge>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <span className="text-sm">Joined a chat room</span>
-                  <Badge variant="secondary" className="text-xs">1 day ago</Badge>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                  <span className="text-sm">Updated profile</span>
-                  <Badge variant="secondary" className="text-xs">3 days ago</Badge>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <RecentActivity profile={profile} />
         </TabsContent>
 
         <TabsContent value="videos">
-          <Card>
-            <CardHeader>
-              <CardTitle>My Videos</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8">
-                <Video className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">No videos uploaded yet.</p>
-                <Button className="mt-4">Upload Video</Button>
-              </div>
-            </CardContent>
-          </Card>
+          <UserVideos onVideoCountChange={handleVideoCountChange} />
         </TabsContent>
 
-        <TabsContent value="connections">
-          <Card>
-            <CardHeader>
-              <CardTitle>Connections</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8">
-                <Users className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">No connections yet.</p>
-                <Button className="mt-4">Find Connections</Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
       </Tabs>
 
       {/* Edit Profile Dialog */}

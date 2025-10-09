@@ -97,18 +97,12 @@ export const LoginForm: React.FC = () => {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.3 }}
-          className="flex items-center justify-between"
+          className="flex items-center justify-start"
         >
           <label className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-300">
             <input type="checkbox" className="rounded border-gray-300 text-pink-500 focus:ring-pink-500" />
             <span>Remember me</span>
           </label>
-          <button
-            type="button"
-            className="text-sm text-pink-600 dark:text-pink-400 hover:underline"
-          >
-            Forgot password?
-          </button>
         </motion.div>
 
         <motion.div
@@ -121,17 +115,19 @@ export const LoginForm: React.FC = () => {
             disabled={loading}
             className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-medium py-3 rounded-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl"
           >
-            {loading ? (
-              <div className="flex items-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Signing in...
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Heart className="w-4 h-4" />
-                Sign In
-              </div>
-            )}
+            <div className="flex items-center gap-2">
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Signing in...
+                </>
+              ) : (
+                <>
+                  <Heart className="w-4 h-4" />
+                  Sign In
+                </>
+              )}
+            </div>
           </Button>
         </motion.div>
       </form>

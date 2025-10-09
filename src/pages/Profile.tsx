@@ -3,13 +3,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Navigation from "@/components/Navigation";
-import { User, Settings, Bell, Shield, Heart, LogOut, ChevronRight, ArrowLeft, FileText, Clock, MapPin, Mic, Video, MessageCircle } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { User, Settings, Bell, Shield, Heart, LogOut, ChevronRight, ArrowLeft, FileText, Clock, Mic, Video, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useAuth } from "@/contexts/AuthContext";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import HealthReports from "@/components/HealthReports";
 import Reminders from "@/components/Reminders";
 import PHCDirectory from "@/components/PHCDirectory";
@@ -23,14 +23,88 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 const Profile = () => {
   const navigate = useNavigate();
   const { user, signOut, loading } = useAuth();
+  const [activeTab, setActiveTab] = useState("profile");
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const [profileLoading, setProfileLoading] = useState(true);
 
+  const fetchUserProfile = async () => {
+    if (!user) return;
+    
+    try {
+      setProfileLoading(true);
+      // Fetch from users table
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (userError && userError.code !== 'PGRST116') {
+        throw userError;
+      }
+
+      // Fetch from user_profiles table
+      const { data: profileData, error: profileError } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (profileError && profileError.code !== 'PGRST116') {
+        throw profileError;
+      }
+
+      setUserProfile({
+        ...(userData || {}),
+        ...(profileData || {}),
+        email: user.email,
+        avatar_url: user.user_metadata?.avatar_url
+      });
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+      toast.error('Failed to load profile data');
+    } finally {
+      setProfileLoading(false);
+    }
+  };
+
+  const handleEditProfile = () => {
+    setActiveTab("edit");
+  };
+
+  const handleLogout = async () => {
+    await signOut();
+    toast.success("Logged out successfully!", {
+      description: "See you soon! Take care of yourself.",
+    });
+  };
+
+  // All hooks must be called before any conditional returns
   useEffect(() => {
     if (!loading && !user) {
       navigate('/auth');
     }
   }, [user, loading, navigate]);
 
-  if (loading) {
+  useEffect(() => {
+    if (user) {
+      fetchUserProfile();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    const handleSwitchToEditTab = () => {
+      setActiveTab('edit');
+    };
+
+    window.addEventListener('switchToEditTab', handleSwitchToEditTab);
+    return () => {
+      window.removeEventListener('switchToEditTab', handleSwitchToEditTab);
+    };
+  }, []);
+
+  // Now handle conditional rendering after all hooks
+  if (loading || profileLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -63,18 +137,13 @@ const Profile = () => {
       label: "Wellness Goals",
       onClick: () => toast.success("Set your wellness goals!"),
     },
+    { 
+      icon: LogOut, 
+      label: "Sign Out",
+      onClick: handleLogout,
+      isDestructive: true,
+    },
   ];
-
-  const handleEditProfile = () => {
-    toast.success("Edit profile feature coming soon!");
-  };
-
-  const handleLogout = async () => {
-    await signOut();
-    toast.success("Logged out successfully!", {
-      description: "See you soon! Take care of yourself.",
-    });
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary-glow/20 to-accent/30 pb-24">
@@ -98,56 +167,39 @@ const Profile = () => {
           </div>
           <div className="flex gap-2">
             <ThemeToggle />
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  title="Sign Out"
+                  className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                >
+                  <LogOut className="w-5 h-5" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you sure you want to sign out?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    You will be logged out of your account and redirected to the login page. Any unsaved changes will be lost.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleLogout}
+                    className="bg-red-600 hover:bg-red-700"
+                  >
+                    Sign Out
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </div>
       </motion.header>
 
-      {/* Profile Card */}
-      <motion.div
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.1 }}
-        className="px-6 mb-8"
-      >
-        <Card className="glass-card p-6 hover:shadow-xl transition-shadow">
-          <div className="flex items-center gap-4 mb-4">
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Avatar className="w-20 h-20 cursor-pointer">
-                <AvatarFallback className="bg-gradient-to-br from-primary to-secondary text-white text-2xl font-bold">
-                  {user.user_metadata?.full_name?.charAt(0) || 'U'}
-                </AvatarFallback>
-              </Avatar>
-            </motion.div>
-            <div className="flex-1">
-              <h2 className="text-xl font-bold">{user.user_metadata?.full_name || 'User'}</h2>
-              <p className="text-sm text-muted-foreground">{user.email}</p>
-              <div className="flex gap-2 mt-2">
-                <motion.span 
-                  className="text-xs bg-primary/20 text-primary px-3 py-1 rounded-full"
-                  whileHover={{ scale: 1.05 }}
-                >
-                  45 years old
-                </motion.span>
-                <motion.span 
-                  className="text-xs bg-energy/20 text-energy px-3 py-1 rounded-full"
-                  whileHover={{ scale: 1.05 }}
-                >
-                  7 days active
-                </motion.span>
-              </div>
-            </div>
-          </div>
-          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-            <Button 
-              variant="outline" 
-              className="w-full hover:bg-primary/5 hover:border-primary transition-all"
-              onClick={handleEditProfile}
-            >
-              Edit Profile
-            </Button>
-          </motion.div>
-        </Card>
-      </motion.div>
 
       {/* Tabs for different sections */}
       <motion.div
@@ -156,35 +208,31 @@ const Profile = () => {
         transition={{ delay: 0.2 }}
         className="px-6"
       >
-        <Tabs defaultValue="profile" className="w-full">
-          <TabsList className="grid w-full grid-cols-7">
-            <TabsTrigger value="profile" className="flex items-center gap-2">
-              <User className="h-4 w-4" />
-              Profile
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6 gap-1">
+            <TabsTrigger value="profile" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+              <User className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden xs:inline">Profile</span>
             </TabsTrigger>
-            <TabsTrigger value="edit" className="flex items-center gap-2">
-              <Settings className="h-4 w-4" />
-              Edit
+            <TabsTrigger value="edit" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+              <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden xs:inline">Edit</span>
             </TabsTrigger>
-            <TabsTrigger value="library" className="flex items-center gap-2">
-              <Video className="h-4 w-4" />
-              Publish Videos
+            <TabsTrigger value="library" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+              <Video className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Videos</span>
             </TabsTrigger>
-            <TabsTrigger value="chat" className="flex items-center gap-2">
-              <MessageCircle className="h-4 w-4" />
-              Chat
+            <TabsTrigger value="reports" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+              <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Reports</span>
             </TabsTrigger>
-            <TabsTrigger value="reports" className="flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              Reports
+            <TabsTrigger value="reminders" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+              <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Reminders</span>
             </TabsTrigger>
-            <TabsTrigger value="reminders" className="flex items-center gap-2">
-              <Clock className="h-4 w-4" />
-              Reminders
-            </TabsTrigger>
-            <TabsTrigger value="assistant" className="flex items-center gap-2">
-              <Mic className="h-4 w-4" />
-              Assistant
+            <TabsTrigger value="assistant" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+              <Mic className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Assistant</span>
             </TabsTrigger>
           </TabsList>
           
@@ -200,9 +248,10 @@ const Profile = () => {
             <VideoLibrary />
           </TabsContent>
           
-          <TabsContent value="chat" className="mt-6">
+          {/* Chat tab hidden but kept for future use */}
+          {/* <TabsContent value="chat" className="mt-6">
             <EnhancedChat />
-          </TabsContent>
+          </TabsContent> */}
           
           <TabsContent value="reports" className="mt-6">
             <HealthReports />

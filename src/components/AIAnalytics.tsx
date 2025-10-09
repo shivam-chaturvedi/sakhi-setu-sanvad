@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Textarea } from '@/components/ui/textarea';
 import { 
   Brain, 
   TrendingUp, 
@@ -23,10 +24,14 @@ import {
   Clock,
   Loader2,
   RefreshCw,
-  Sparkles
+  Sparkles,
+  Send,
+  Bot,
+  MessageCircle
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useGemini } from '@/hooks/useGemini';
 import { toast } from 'sonner';
 
 interface AnalyticsData {
@@ -53,7 +58,20 @@ export const AIAnalytics: React.FC = () => {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [aiQuery, setAiQuery] = useState('');
+  const [aiResponse, setAiResponse] = useState('');
+  const [showAiChat, setShowAiChat] = useState(false);
   const { user } = useAuth();
+  
+  const { 
+    isLoading: aiLoading, 
+    generateWellnessAdvice, 
+    analyzeSymptoms,
+    generateHealthReport 
+  } = useGemini({
+    onSuccess: (response) => setAiResponse(response),
+    onError: (error) => console.error('AI Error:', error)
+  });
 
   useEffect(() => {
     if (user) {
@@ -78,7 +96,7 @@ export const AIAnalytics: React.FC = () => {
       if (symptomsError) throw symptomsError;
 
       // Process analytics data
-      const analyticsData = processAnalyticsData(symptoms || []);
+      const analyticsData = await processAnalyticsData(symptoms || []);
       setAnalytics(analyticsData);
     } catch (error) {
       console.error('Error fetching analytics:', error);
@@ -88,7 +106,7 @@ export const AIAnalytics: React.FC = () => {
     }
   };
 
-  const processAnalyticsData = (symptoms: any[]): AnalyticsData => {
+  const processAnalyticsData = async (symptoms: any[]): Promise<AnalyticsData> => {
     const totalSymptoms = symptoms.length;
     const averageSeverity = symptoms.length > 0 
       ? symptoms.reduce((sum, s) => sum + s.severity, 0) / symptoms.length 
@@ -114,7 +132,7 @@ export const AIAnalytics: React.FC = () => {
       });
 
     // Generate AI recommendations
-    const recommendations = generateRecommendations(symptoms, averageSeverity);
+    const recommendations = await generateRecommendations(symptoms, averageSeverity);
     
     // Generate insights
     const insights = generateInsights(symptoms, averageSeverity, symptomTrends);
@@ -129,7 +147,68 @@ export const AIAnalytics: React.FC = () => {
     };
   };
 
-  const generateRecommendations = (symptoms: any[], avgSeverity: number) => {
+  const generateRecommendations = async (symptoms: any[], avgSeverity: number) => {
+    const recommendations = [];
+
+    // Get AI-powered recommendations
+    try {
+      const symptomList = symptoms.map(s => s.symptom_type).join(', ');
+      const aiAdvice = await generateWellnessAdvice(
+        `Based on these symptoms: ${symptomList}, with average severity ${avgSeverity}/10, provide specific recommendations for managing menopause symptoms.`,
+        {
+          age: 45, // You can make this dynamic
+          symptoms: symptoms.map(s => s.symptom_type),
+          concerns: ['symptom management', 'quality of life']
+        }
+      );
+
+      // Parse AI response and create recommendations
+      const aiLines = aiAdvice.split('\n').filter(line => line.trim());
+      aiLines.slice(0, 4).forEach((line, index) => {
+        if (line.includes('hot') || line.includes('flash')) {
+          recommendations.push({
+            category: 'Hot Flashes',
+            title: 'AI-Recommended Cooling',
+            description: line.trim(),
+            priority: 'high' as const,
+            icon: Thermometer
+          });
+        } else if (line.includes('sleep') || line.includes('insomnia')) {
+          recommendations.push({
+            category: 'Sleep',
+            title: 'AI Sleep Strategy',
+            description: line.trim(),
+            priority: 'high' as const,
+            icon: Moon
+          });
+        } else if (line.includes('mood') || line.includes('anxiety') || line.includes('stress')) {
+          recommendations.push({
+            category: 'Mood',
+            title: 'AI Mood Support',
+            description: line.trim(),
+            priority: 'medium' as const,
+            icon: Heart
+          });
+        } else {
+          recommendations.push({
+            category: 'General',
+            title: `AI Recommendation ${index + 1}`,
+            description: line.trim(),
+            priority: 'medium' as const,
+            icon: Brain
+          });
+        }
+      });
+    } catch (error) {
+      console.error('Error generating AI recommendations:', error);
+      // Fallback to static recommendations
+      return generateStaticRecommendations(symptoms, avgSeverity);
+    }
+
+    return recommendations.slice(0, 4);
+  };
+
+  const generateStaticRecommendations = (symptoms: any[], avgSeverity: number) => {
     const recommendations = [];
 
     // Hot flashes recommendations
@@ -277,6 +356,56 @@ export const AIAnalytics: React.FC = () => {
     }
   };
 
+  const handleAiQuery = async () => {
+    if (!aiQuery.trim()) return;
+
+    try {
+      const response = await generateWellnessAdvice(aiQuery, {
+        age: 45,
+        symptoms: analytics?.symptomTrends ? Object.keys(analytics.symptomTrends) : [],
+        concerns: ['symptom management', 'wellness optimization']
+      });
+      
+      // Format response by removing markdown formatting
+      const formattedResponse = response
+        .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold formatting
+        .replace(/\*(.*?)\*/g, '$1') // Remove italic formatting
+        .replace(/#{1,6}\s*/g, '') // Remove headers
+        .replace(/\n{3,}/g, '\n\n') // Reduce multiple line breaks
+        .trim();
+      
+      setAiResponse(formattedResponse);
+      
+      // Auto-scroll to AI response after a short delay
+      setTimeout(() => {
+        const aiResponseElement = document.querySelector('[data-ai-response]');
+        if (aiResponseElement) {
+          aiResponseElement.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+          });
+        }
+      }, 300);
+    } catch (error) {
+      console.error('Error generating AI response:', error);
+      toast.error('Failed to generate AI response');
+    }
+  };
+
+  const handleSymptomAnalysis = async () => {
+    if (!analytics) return;
+
+    try {
+      const symptoms = Object.keys(analytics.symptomTrends);
+      const response = await analyzeSymptoms(symptoms, `Average severity: ${analytics.averageSeverity}/10`);
+      setAiResponse(response);
+      setShowAiChat(true);
+    } catch (error) {
+      console.error('Error analyzing symptoms:', error);
+      toast.error('Failed to analyze symptoms');
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -319,22 +448,37 @@ export const AIAnalytics: React.FC = () => {
           </h2>
           <p className="text-gray-600 dark:text-gray-300">AI-powered insights from your symptom data</p>
         </div>
-        <Button
-          onClick={() => {
-            setRefreshing(true);
-            fetchAnalytics().finally(() => setRefreshing(false));
-          }}
-          disabled={refreshing}
-          variant="outline"
-          size="sm"
-        >
-          {refreshing ? (
-            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-          ) : (
-            <RefreshCw className="w-4 h-4 mr-2" />
-          )}
-          Refresh
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={handleSymptomAnalysis}
+            disabled={aiLoading || !analytics}
+            size="sm"
+            className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+          >
+            {aiLoading ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <Brain className="w-4 h-4 mr-2" />
+            )}
+            View Recommendations
+          </Button>
+          <Button
+            onClick={() => {
+              setRefreshing(true);
+              fetchAnalytics().finally(() => setRefreshing(false));
+            }}
+            disabled={refreshing}
+            variant="outline"
+            size="sm"
+          >
+            {refreshing ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <RefreshCw className="w-4 h-4 mr-2" />
+            )}
+            Refresh
+          </Button>
+        </div>
       </div>
 
       {/* Overview Stats */}
@@ -524,6 +668,104 @@ export const AIAnalytics: React.FC = () => {
                   </div>
                 </motion.div>
               ))}
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* AI Chat Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4 }}
+      >
+        <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 shadow-xl">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Bot className="w-5 h-5 text-purple-500" />
+              AI Health Assistant
+            </CardTitle>
+            <CardDescription>
+              Ask questions about your symptoms and get personalized AI recommendations
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex gap-2">
+              <Textarea
+                value={aiQuery}
+                onChange={(e) => setAiQuery(e.target.value)}
+                placeholder="Ask me anything about your symptoms, wellness, or menopause..."
+                className="flex-1 min-h-[100px]"
+                disabled={aiLoading}
+              />
+              <Button
+                onClick={handleAiQuery}
+                disabled={aiLoading || !aiQuery.trim()}
+                className="self-end"
+              >
+                {aiLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Send className="w-4 h-4" />
+                )}
+              </Button>
+            </div>
+
+            {aiResponse && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg border border-purple-200 dark:border-purple-800"
+                data-ai-response
+              >
+                <div className="flex items-start gap-3">
+                  <Bot className="w-5 h-5 text-purple-500 mt-1 flex-shrink-0" />
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-purple-900 dark:text-purple-100 mb-2">
+                      AI Recommendation
+                    </h4>
+                    <div className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
+                      {aiResponse}
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Quick Questions */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setAiQuery("What can I do to manage hot flashes?")}
+                className="text-xs"
+              >
+                Hot Flashes
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setAiQuery("How can I improve my sleep during menopause?")}
+                className="text-xs"
+              >
+                Sleep Issues
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setAiQuery("What exercises help with menopause symptoms?")}
+                className="text-xs"
+              >
+                Exercise
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setAiQuery("How can I manage mood changes?")}
+                className="text-xs"
+              >
+                Mood Support
+              </Button>
             </div>
           </CardContent>
         </Card>

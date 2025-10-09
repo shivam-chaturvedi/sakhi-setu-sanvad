@@ -22,17 +22,17 @@ const Navigation = () => {
         ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-card/80 backdrop-blur-lg border-t border-border z-50">
-      <div className="container mx-auto px-4">
-        <div className="flex justify-around items-center py-3">
+    <nav className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-lg border-t border-border z-50 safe-area-pb">
+      <div className="container mx-auto px-2 sm:px-4">
+        <div className="flex justify-around items-center py-2 sm:py-3">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             const Icon = item.icon;
             
             return (
-              <Link key={item.path} to={item.path} className="relative">
+              <Link key={item.path} to={item.path} className="relative flex-1">
                 <motion.div
-                  className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-colors ${
+                  className={`flex flex-col items-center gap-1 px-2 sm:px-4 py-2 rounded-xl transition-colors ${
                     isActive ? "text-primary" : "text-muted-foreground"
                   }`}
                   whileHover={{ scale: 1.05 }}
@@ -45,8 +45,8 @@ const Navigation = () => {
                       transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                     />
                   )}
-                  <Icon className="w-5 h-5 relative z-10" />
-                  <span className="text-xs font-medium relative z-10">{item.label}</span>
+                  <Icon className="w-4 h-4 sm:w-5 sm:h-5 relative z-10" />
+                  <span className="text-xs font-medium relative z-10 hidden xs:block">{item.label}</span>
                 </motion.div>
               </Link>
             );

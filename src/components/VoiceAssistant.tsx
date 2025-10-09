@@ -18,10 +18,13 @@ import {
   Play,
   Pause,
   Square,
-  RotateCcw
+  RotateCcw,
+  Brain,
+  Heart
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { useGemini } from '@/hooks/useGemini';
 import { toast } from 'sonner';
 
 interface VoiceMessage {
@@ -44,9 +47,50 @@ const VoiceAssistant: React.FC = () => {
   const [synthesis, setSynthesis] = useState<SpeechSynthesis | null>(null);
   const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [textInput, setTextInput] = useState('');
+  const [showTextInput, setShowTextInput] = useState(false);
   
   const { user } = useAuth();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  const { 
+    isLoading: aiLoading, 
+    generateWellnessAdvice, 
+    analyzeSymptoms,
+    generateMotivation 
+  } = useGemini({
+    onSuccess: (response) => {
+      // Format response by removing markdown formatting
+      const formattedResponse = response
+        .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold formatting
+        .replace(/\*(.*?)\*/g, '$1') // Remove italic formatting
+        .replace(/#{1,6}\s*/g, '') // Remove headers
+        .replace(/\n{3,}/g, '\n\n') // Reduce multiple line breaks
+        .trim();
+      
+      // Handle AI response for both voice and text
+      const botMessage: VoiceMessage = {
+        id: (Date.now() + 1).toString(),
+        text: formattedResponse,
+        isUser: false,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, botMessage]);
+      
+      // Speak the response if not muted
+      if (synthesis && !isMuted) {
+        speakText(formattedResponse);
+      }
+      
+      // Auto-scroll to bottom after a short delay
+      setTimeout(() => {
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 300);
+    },
+    onError: (error) => console.error('AI Error:', error)
+  });
 
   useEffect(() => {
     // Check for speech recognition support
@@ -161,7 +205,7 @@ const VoiceAssistant: React.FC = () => {
           });
       }
 
-      // Generate AI response
+      // Generate AI response using Gemini
       const response = await generateAIResponse(text.trim());
       
       const botMessage: VoiceMessage = {
@@ -199,39 +243,117 @@ const VoiceAssistant: React.FC = () => {
     }
   };
 
+  const handleTextInput = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!textInput.trim()) return;
+
+    const userMessage: VoiceMessage = {
+      id: Date.now().toString(),
+      text: textInput.trim(),
+      isUser: true,
+      timestamp: new Date()
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setTextInput('');
+    setIsProcessing(true);
+
+    try {
+      // Save user message to database
+      if (user) {
+        await supabase
+          .from('chatbot_conversations')
+          .insert({
+            user_id: user.id,
+            session_id: 'text_session',
+            message: textInput.trim(),
+            is_user_message: true,
+            language: 'en'
+          });
+      }
+
+      // Generate AI response using Gemini
+      const response = await generateAIResponse(textInput.trim());
+      
+      const botMessage: VoiceMessage = {
+        id: (Date.now() + 1).toString(),
+        text: response,
+        isUser: false,
+        timestamp: new Date()
+      };
+
+      setMessages(prev => [...prev, botMessage]);
+
+      // Save bot response to database
+      if (user) {
+        await supabase
+          .from('chatbot_conversations')
+          .insert({
+            user_id: user.id,
+            session_id: 'text_session',
+            response: response,
+            is_user_message: false,
+            language: 'en'
+          });
+      }
+
+      // Speak the response
+      if (synthesis && !isMuted) {
+        speakText(response);
+      }
+
+    } catch (error) {
+      console.error('Error processing text input:', error);
+      toast.error('Error processing your request. Please try again.');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   const generateAIResponse = async (input: string): Promise<string> => {
-    // Simple AI responses based on keywords
-    const lowerInput = input.toLowerCase();
-    
-    if (lowerInput.includes('symptom') || lowerInput.includes('pain') || lowerInput.includes('ache')) {
-      return "I understand you're experiencing symptoms. Please track them in the symptom tracker for better insights. Would you like me to help you log your symptoms?";
+    try {
+      // Use Gemini AI for intelligent responses
+      const response = await generateWellnessAdvice(input, {
+        age: 45, // You can make this dynamic
+        symptoms: [], // You can fetch from user's tracked symptoms
+        concerns: ['menopause support', 'wellness guidance']
+      });
+      return response;
+    } catch (error) {
+      console.error('Error generating AI response:', error);
+      // Fallback to simple responses
+      const lowerInput = input.toLowerCase();
+      
+      if (lowerInput.includes('symptom') || lowerInput.includes('pain') || lowerInput.includes('ache')) {
+        return "I understand you're experiencing symptoms. Please track them in the symptom tracker for better insights. Would you like me to help you log your symptoms?";
+      }
+      
+      if (lowerInput.includes('hot flash') || lowerInput.includes('hot flush')) {
+        return "Hot flashes are common during menopause. Try deep breathing exercises, stay hydrated, and wear light clothing. The meditation section has guided breathing exercises.";
+      }
+      
+      if (lowerInput.includes('sleep') || lowerInput.includes('insomnia')) {
+        return "Sleep issues are common during menopause. Try maintaining a regular sleep schedule, avoid caffeine in the evening, and practice relaxation techniques before bed.";
+      }
+      
+      if (lowerInput.includes('mood') || lowerInput.includes('anxiety') || lowerInput.includes('depression')) {
+        return "Mood changes are normal during menopause. Consider talking to a healthcare provider and try the community chat for support from other women going through similar experiences.";
+      }
+      
+      if (lowerInput.includes('exercise') || lowerInput.includes('workout')) {
+        return "Regular exercise can help with menopause symptoms. Try gentle yoga, walking, or swimming. Check the resources section for guided exercise videos.";
+      }
+      
+      if (lowerInput.includes('diet') || lowerInput.includes('food') || lowerInput.includes('nutrition')) {
+        return "A balanced diet with calcium, vitamin D, and phytoestrogens can help. Include leafy greens, soy products, and limit caffeine and alcohol. Check our recipe section for healthy meal ideas.";
+      }
+      
+      if (lowerInput.includes('help') || lowerInput.includes('support')) {
+        return "I'm here to help! You can track symptoms, get wellness tips, connect with the community, or find nearby health centers. What would you like to know more about?";
+      }
+      
+      return "I understand you're looking for support. This app offers symptom tracking, wellness tips, community support, and resources. How can I help you today?";
     }
-    
-    if (lowerInput.includes('hot flash') || lowerInput.includes('hot flush')) {
-      return "Hot flashes are common during menopause. Try deep breathing exercises, stay hydrated, and wear light clothing. The meditation section has guided breathing exercises.";
-    }
-    
-    if (lowerInput.includes('sleep') || lowerInput.includes('insomnia')) {
-      return "Sleep issues are common during menopause. Try maintaining a regular sleep schedule, avoid caffeine in the evening, and practice relaxation techniques before bed.";
-    }
-    
-    if (lowerInput.includes('mood') || lowerInput.includes('anxiety') || lowerInput.includes('depression')) {
-      return "Mood changes are normal during menopause. Consider talking to a healthcare provider and try the community chat for support from other women going through similar experiences.";
-    }
-    
-    if (lowerInput.includes('exercise') || lowerInput.includes('workout')) {
-      return "Regular exercise can help with menopause symptoms. Try gentle yoga, walking, or swimming. Check the resources section for guided exercise videos.";
-    }
-    
-    if (lowerInput.includes('diet') || lowerInput.includes('food') || lowerInput.includes('nutrition')) {
-      return "A balanced diet with calcium, vitamin D, and phytoestrogens can help. Include leafy greens, soy products, and limit caffeine and alcohol. Check our recipe section for healthy meal ideas.";
-    }
-    
-    if (lowerInput.includes('help') || lowerInput.includes('support')) {
-      return "I'm here to help! You can track symptoms, get wellness tips, connect with the community, or find nearby health centers. What would you like to know more about?";
-    }
-    
-    return "I understand you're looking for support. This app offers symptom tracking, wellness tips, community support, and resources. How can I help you today?";
   };
 
   const speakText = (text: string) => {
@@ -456,6 +578,53 @@ const VoiceAssistant: React.FC = () => {
             ))
           )}
           <div ref={messagesEndRef} />
+        </div>
+
+        {/* Text Input Section */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Or type your question:
+            </h3>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowTextInput(!showTextInput)}
+              className="text-xs"
+            >
+              {showTextInput ? 'Hide' : 'Show'} Text Input
+            </Button>
+          </div>
+          
+          {showTextInput && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="space-y-2"
+            >
+              <form onSubmit={handleTextInput} className="flex gap-2">
+                <Textarea
+                  value={textInput}
+                  onChange={(e) => setTextInput(e.target.value)}
+                  placeholder="Type your question about menopause, symptoms, or wellness..."
+                  className="flex-1 min-h-[80px]"
+                  disabled={isProcessing}
+                />
+                <Button
+                  type="submit"
+                  disabled={isProcessing || !textInput.trim()}
+                  className="self-end"
+                >
+                  {isProcessing ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Send className="w-4 h-4" />
+                  )}
+                </Button>
+              </form>
+            </motion.div>
+          )}
         </div>
 
         {/* Quick Actions */}

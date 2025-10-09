@@ -15,7 +15,8 @@ import {
   Save,
   Loader2,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  FileText
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -30,11 +31,16 @@ interface UserProfile {
   medical_conditions?: string[];
   current_medications?: string[];
   preferred_language?: string;
-  notifications_enabled?: boolean;
-  data_sharing_consent?: boolean;
+  avatar_url?: string;
+  bio?: string;
 }
 
-export const EditProfileForm: React.FC = () => {
+interface EditProfileFormProps {
+  userProfile?: any;
+  onProfileUpdate?: () => void;
+}
+
+export const EditProfileForm: React.FC<EditProfileFormProps> = ({ userProfile: propUserProfile, onProfileUpdate }) => {
   const { user } = useAuth();
   const [profile, setProfile] = useState<UserProfile>({
     full_name: '',
@@ -45,8 +51,8 @@ export const EditProfileForm: React.FC = () => {
     medical_conditions: [],
     current_medications: [],
     preferred_language: 'en',
-    notifications_enabled: true,
-    data_sharing_consent: false
+    avatar_url: '',
+    bio: ''
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -64,36 +70,62 @@ export const EditProfileForm: React.FC = () => {
   ];
 
   useEffect(() => {
-    if (user) {
+    if (propUserProfile) {
+      // Use prop data if available
+      setProfile({
+        full_name: (propUserProfile as any).full_name || '',
+        age: (propUserProfile as any).age || undefined,
+        location: (propUserProfile as any).location || '',
+        phone: (propUserProfile as any).phone || '',
+        emergency_contact: (propUserProfile as any).emergency_contact || '',
+        medical_conditions: (propUserProfile as any).medical_conditions || [],
+        current_medications: (propUserProfile as any).current_medications || [],
+        preferred_language: (propUserProfile as any).preferred_language || 'en',
+        avatar_url: (propUserProfile as any).avatar_url || '',
+        bio: (propUserProfile as any).bio || ''
+      });
+      setLoading(false);
+    } else if (user) {
       fetchProfile();
     }
-  }, [user]);
+  }, [user, propUserProfile]);
 
   const fetchProfile = async () => {
     if (!user) return;
     
     try {
       setLoading(true);
-      const { data, error } = await supabase
+      // Fetch from both users and user_profiles tables
+      const [usersResult, profilesResult] = await Promise.all([
+        supabase
         .from('users')
         .select('*')
         .eq('id', user.id)
-        .single();
+          .single(),
+        supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('user_id', user.id)
+          .single()
+      ]);
 
-      if (error) throw error;
+      if (usersResult.error) throw usersResult.error;
 
-      if (data) {
+      const userData = usersResult.data;
+      const profileData = profilesResult.data;
+
+      if (userData) {
         setProfile({
-          full_name: data.full_name || '',
-          age: data.age || undefined,
-          location: data.location || '',
-          phone: data.phone || '',
-          emergency_contact: data.emergency_contact || '',
-          medical_conditions: data.medical_conditions || [],
-          current_medications: data.current_medications || [],
-          preferred_language: data.preferred_language || 'en',
-          notifications_enabled: data.notifications_enabled ?? true,
-          data_sharing_consent: data.data_sharing_consent ?? false
+          full_name: (userData as any).full_name || '',
+          age: (userData as any).age || undefined,
+          location: (userData as any).location || '',
+          phone: (userData as any).phone || '',
+          emergency_contact: (userData as any).emergency_contact || '',
+          medical_conditions: (userData as any).medical_conditions || [],
+          current_medications: (userData as any).current_medications || [],
+          preferred_language: (userData as any).preferred_language || 'en',
+          avatar_url: (userData as any).avatar_url || '',
+          bio: (profileData as any)?.bio || ''
         });
       }
     } catch (error) {
@@ -145,26 +177,68 @@ export const EditProfileForm: React.FC = () => {
 
     try {
       setSaving(true);
-      const { error } = await supabase
+      
+      // Update users table
+      const updateData = {
+        full_name: profile.full_name,
+        age: profile.age,
+        location: profile.location,
+        phone: profile.phone,
+        emergency_contact: profile.emergency_contact,
+        medical_conditions: profile.medical_conditions,
+        current_medications: profile.current_medications,
+        preferred_language: profile.preferred_language,
+        avatar_url: profile.avatar_url,
+        updated_at: new Date().toISOString()
+      };
+
+      const { error: usersError } = await (supabase as any)
         .from('users')
-        .update({
-          full_name: profile.full_name,
-          age: profile.age,
-          location: profile.location,
-          phone: profile.phone,
-          emergency_contact: profile.emergency_contact,
-          medical_conditions: profile.medical_conditions,
-          current_medications: profile.current_medications,
-          preferred_language: profile.preferred_language,
-          notifications_enabled: profile.notifications_enabled,
-          data_sharing_consent: profile.data_sharing_consent,
-          updated_at: new Date().toISOString()
-        })
+        .update(updateData)
         .eq('id', user.id);
 
-      if (error) throw error;
+      if (usersError) throw usersError;
+
+      // Update or create user_profiles table
+      const profileData = {
+        bio: profile.bio,
+        location: profile.location,
+        avatar_url: profile.avatar_url,
+        updated_at: new Date().toISOString()
+      };
+
+      // First try to update existing record
+      const { error: updateError } = await (supabase as any)
+        .from('user_profiles')
+        .update(profileData)
+        .eq('user_id', user.id);
+
+      // If no record exists (PGRST116 = no rows found), create one
+      if (updateError && updateError.code === 'PGRST116') {
+        console.log('No existing user_profiles record found, creating new one...');
+        const { error: insertError } = await (supabase as any)
+          .from('user_profiles')
+          .insert({
+            user_id: user.id,
+            ...profileData
+          });
+        
+        if (insertError) {
+          console.error('Error creating user_profiles record:', insertError);
+          throw insertError;
+        }
+        console.log('Successfully created user_profiles record');
+      } else if (updateError) {
+        console.error('Error updating user_profiles record:', updateError);
+        throw updateError;
+      } else {
+        console.log('Successfully updated user_profiles record');
+      }
 
       toast.success('Profile updated successfully!');
+      if (onProfileUpdate) {
+        onProfileUpdate();
+      }
     } catch (error) {
       console.error('Error updating profile:', error);
       toast.error('Failed to update profile');
@@ -254,6 +328,22 @@ export const EditProfileForm: React.FC = () => {
                   />
                 </div>
                 {errors.location && <p className="text-sm text-red-500">{errors.location}</p>}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="bio" className="text-sm md:text-base">About Me</Label>
+                <div className="relative">
+                  <FileText className="absolute left-3 top-3 text-gray-400 w-4 h-4" />
+                  <Textarea
+                    id="bio"
+                    value={profile.bio}
+                    onChange={(e) => handleInputChange('bio', e.target.value)}
+                    placeholder="Tell us about yourself..."
+                    rows={4}
+                    className="pl-10 bg-white/50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20 resize-none"
+                  />
+                </div>
+                {errors.bio && <p className="text-sm text-red-500">{errors.bio}</p>}
               </div>
             </div>
 
@@ -349,31 +439,7 @@ export const EditProfileForm: React.FC = () => {
               </div>
 
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 md:p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-                  <div className="flex-1">
-                    <Label className="text-sm md:text-base font-medium">Notifications</Label>
-                    <p className="text-xs md:text-sm text-gray-600 dark:text-gray-300">Receive wellness tips and reminders</p>
-                  </div>
-                  <input
-                    type="checkbox"
-                    checked={profile.notifications_enabled}
-                    onChange={(e) => handleInputChange('notifications_enabled', e.target.checked)}
-                    className="w-4 h-4 text-pink-600 bg-gray-100 border-gray-300 rounded focus:ring-pink-500 dark:focus:ring-pink-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                  />
-                </div>
 
-                <div className="flex items-center justify-between p-3 md:p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-                  <div className="flex-1">
-                    <Label className="text-sm md:text-base font-medium">Data Sharing</Label>
-                    <p className="text-xs md:text-sm text-gray-600 dark:text-gray-300">Help improve our AI recommendations</p>
-                  </div>
-                  <input
-                    type="checkbox"
-                    checked={profile.data_sharing_consent}
-                    onChange={(e) => handleInputChange('data_sharing_consent', e.target.checked)}
-                    className="w-4 h-4 text-pink-600 bg-gray-100 border-gray-300 rounded focus:ring-pink-500 dark:focus:ring-pink-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                  />
-                </div>
               </div>
             </div>
 

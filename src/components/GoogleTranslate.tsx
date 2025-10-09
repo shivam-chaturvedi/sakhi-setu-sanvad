@@ -1,4 +1,24 @@
 import { useEffect, useState } from "react";
+import { Volume2, Languages } from "lucide-react";
+
+// Type declarations for Google Translate
+declare global {
+  interface Window {
+    google: {
+      translate: {
+        TranslateElement: {
+          new (options: any, elementId: string): any;
+          InlineLayout: {
+            SIMPLE: number;
+            HORIZONTAL: number;
+            VERTICAL: number;
+          };
+        };
+      };
+    };
+    googleTranslateElementInit: () => void;
+  }
+}
 
 const GoogleTranslate = () => {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -8,19 +28,192 @@ const GoogleTranslate = () => {
 
     // Define init function globally before script runs
     window.googleTranslateElementInit = function () {
-      if (document.getElementById("google_translate_element")) {
+      if (document.getElementById("google_translate_element") && window.google && window.google.translate) {
+        try {
         new window.google.translate.TranslateElement(
           {
             pageLanguage: "en",
             includedLanguages: "en,hi,mr", // English, Hindi, Marathi
-            layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
+              layout: window.google.translate.TranslateElement.InlineLayout?.SIMPLE || 0,
             autoDisplay: false,
             multilanguagePage: true,
           },
           "google_translate_element"
         );
         setIsLoaded(true);
+          
+          // Apply custom styling after Google Translate loads
+          setTimeout(() => {
+            applyCustomStyles();
+          }, 200);
+        } catch (error) {
+          console.error('Google Translate initialization error:', error);
+          setIsLoaded(false);
+        }
       }
+    };
+
+    // Function to apply custom styling to Google Translate elements
+    const applyCustomStyles = () => {
+      const translateElement = document.getElementById("google_translate_element");
+      if (!translateElement) return;
+
+      // Check if dark mode is active
+      const isDarkMode = document.documentElement.classList.contains('dark') || 
+                        document.documentElement.getAttribute('data-theme') === 'dark' ||
+                        window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+      // Create style element if it doesn't exist
+      let styleElement = document.getElementById('google-translate-custom-styles');
+      if (!styleElement) {
+        styleElement = document.createElement('style');
+        styleElement.id = 'google-translate-custom-styles';
+        document.head.appendChild(styleElement);
+      }
+
+      // Apply theme-specific styles
+      const styles = isDarkMode ? `
+        .goog-te-banner-frame {
+          display: none !important;
+        }
+        .goog-te-gadget {
+          color: white !important;
+          font-size: 14px !important;
+          font-weight: bold !important;
+        }
+        .goog-te-gadget .goog-te-combo {
+          background-color: white !important;
+          color: #1f2937 !important;
+          border: 2px solid #059669 !important;
+          border-radius: 8px !important;
+          padding: 6px 10px !important;
+          font-size: 14px !important;
+          font-weight: bold !important;
+          min-width: 150px !important;
+          max-width: 200px !important;
+        }
+        .goog-te-gadget .goog-te-combo:focus {
+          outline: 3px solid #059669 !important;
+          outline-offset: 2px !important;
+          border-color: #10b981 !important;
+        }
+        .goog-te-gadget .goog-te-combo option {
+          background-color: white !important;
+          color: #1f2937 !important;
+          font-size: 14px !important;
+          font-weight: bold !important;
+          padding: 6px !important;
+        }
+        .goog-te-gadget-simple {
+          background-color: transparent !important;
+          border: none !important;
+        }
+        @media (max-width: 640px) {
+          .goog-te-gadget .goog-te-combo {
+            min-width: 120px !important;
+            max-width: 150px !important;
+            font-size: 12px !important;
+            padding: 4px 8px !important;
+          }
+          .goog-te-gadget {
+            font-size: 12px !important;
+          }
+        }
+        .goog-te-gadget-simple .goog-te-menu-value {
+          color: #1f2937 !important;
+          font-size: 16px !important;
+          font-weight: bold !important;
+          background-color: white !important;
+          padding: 8px 12px !important;
+          border-radius: 8px !important;
+        }
+        .goog-te-gadget-simple .goog-te-menu-value span:first-child {
+          color: #1f2937 !important;
+          font-size: 16px !important;
+          font-weight: bold !important;
+        }
+        .goog-te-gadget-simple .goog-te-menu-value span:last-child {
+          color: #6b7280 !important;
+          font-size: 16px !important;
+          font-weight: bold !important;
+        }
+        .goog-te-gadget-simple .goog-te-menu-value:before {
+          content: "Select Language: " !important;
+          color: #059669 !important;
+          font-weight: bold !important;
+          font-size: 16px !important;
+        }
+      ` : `
+        .goog-te-banner-frame {
+          display: none !important;
+        }
+        .goog-te-gadget {
+          color: #1f2937 !important;
+          font-size: 14px !important;
+          font-weight: bold !important;
+        }
+        .goog-te-gadget .goog-te-combo {
+          background-color: white !important;
+          color: #1f2937 !important;
+          border: 2px solid #059669 !important;
+          border-radius: 8px !important;
+          padding: 6px 10px !important;
+          font-size: 14px !important;
+          font-weight: bold !important;
+          min-width: 150px !important;
+          max-width: 200px !important;
+        }
+        .goog-te-gadget .goog-te-combo:focus {
+          outline: 3px solid #059669 !important;
+          outline-offset: 2px !important;
+          border-color: #10b981 !important;
+        }
+        .goog-te-gadget .goog-te-combo option {
+          background-color: white !important;
+          color: #1f2937 !important;
+          font-size: 14px !important;
+          font-weight: bold !important;
+          padding: 6px !important;
+        }
+        .goog-te-gadget-simple {
+          background-color: transparent !important;
+          border: none !important;
+        }
+        @media (max-width: 640px) {
+          .goog-te-gadget .goog-te-combo {
+            min-width: 120px !important;
+            max-width: 150px !important;
+            font-size: 12px !important;
+            padding: 4px 8px !important;
+          }
+          .goog-te-gadget {
+            font-size: 12px !important;
+          }
+        }
+        .goog-te-gadget-simple .goog-te-menu-value {
+          color: #1f2937 !important;
+          font-size: 16px !important;
+          font-weight: bold !important;
+        }
+        .goog-te-gadget-simple .goog-te-menu-value span:first-child {
+          color: #1f2937 !important;
+          font-size: 16px !important;
+          font-weight: bold !important;
+        }
+        .goog-te-gadget-simple .goog-te-menu-value span:last-child {
+          color: white !important;
+          font-size: 16px !important;
+          font-weight: bold !important;
+        }
+        .goog-te-gadget-simple .goog-te-menu-value:before {
+          content: "Select Language: " !important;
+          color:white !important;
+          font-weight: bold !important;
+          font-size: 16px !important;
+        }
+      `;
+
+      styleElement.textContent = styles;
     };
 
     // Only add script if not already added
@@ -34,9 +227,15 @@ const GoogleTranslate = () => {
 
       // Wait for window to be ready — helps on mobile
       script.onload = () => {
-        if (window.google && window.google.translate) {
+        // Add a small delay to ensure Google Translate is fully loaded
+        setTimeout(() => {
+          if (window.google && window.google.translate && window.google.translate.TranslateElement) {
           window.googleTranslateElementInit();
+          } else {
+            console.error('Google Translate not fully loaded');
+            setIsLoaded(false);
         }
+        }, 100);
       };
 
       document.body.appendChild(script);
@@ -50,15 +249,48 @@ const GoogleTranslate = () => {
         window.googleTranslateElementInit();
       }
     };
+
+    // Listen for theme changes
+    const handleThemeChange = () => {
+      setTimeout(() => {
+        applyCustomStyles();
+      }, 100);
+    };
+
+    // Listen for theme changes using MutationObserver
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && 
+            (mutation.attributeName === 'class' || mutation.attributeName === 'data-theme')) {
+          handleThemeChange();
+        }
+      });
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class', 'data-theme']
+    });
+
     window.addEventListener("resize", handleResize);
 
-    return () => window.removeEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      observer.disconnect();
+    };
   }, []);
 
   return (
-    <div className="google-translate-container">
+    <div className="fixed top-2 right-2 sm:top-4 sm:right-4 z-30 google-translate-container flex items-center gap-2 sm:gap-3">
+      {/* Language Icon */}
+      <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-green-600 to-green-700 dark:from-green-500 dark:to-green-600 rounded-full shadow-lg z-40 relative">
+        <Languages className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+      </div>
+      
+      {/* Google Translate Widget */}
       <div
         id="google_translate_element"
+        className="translate-widget"
         style={{
           minHeight: "20px",
           overflow: "visible",
@@ -66,8 +298,10 @@ const GoogleTranslate = () => {
         }}
       ></div>
       {!isLoaded && (
-        <div className="text-xs text-gray-500 dark:text-gray-400 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded">
-          Translate
+        <div className="text-xs sm:text-sm font-bold text-gray-800 dark:text-white px-2 sm:px-3 py-1 sm:py-2 border-2 border-green-600 dark:border-green-500 rounded-lg bg-white dark:bg-gray-800 min-w-[120px] sm:min-w-[150px] text-center shadow-lg">
+          <Languages className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
+          <span className="hidden xs:inline">Select Language</span>
+          <span className="xs:hidden">Language</span>
         </div>
       )}
     </div>

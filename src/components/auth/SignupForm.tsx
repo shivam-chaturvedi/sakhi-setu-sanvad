@@ -247,17 +247,19 @@ export const SignupForm: React.FC = () => {
             disabled={loading || !agreedToTerms}
             className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-medium py-3 rounded-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? (
-              <div className="flex items-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Creating account...
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Heart className="w-4 h-4" />
-                Create Account
-              </div>
-            )}
+            <div className="flex items-center gap-2">
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Creating account...
+                </>
+              ) : (
+                <>
+                  <Heart className="w-4 h-4" />
+                  Create Account
+                </>
+              )}
+            </div>
           </Button>
         </motion.div>
       </form>

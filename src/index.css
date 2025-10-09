@@ -156,44 +156,44 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 270 40% 8%;
+    --background: 270 30% 15%;
     --foreground: 270 20% 95%;
 
-    --card: 270 35% 12%;
+    --card: 270 25% 20%;
     --card-foreground: 270 20% 95%;
 
-    --popover: 270 35% 12%;
+    --popover: 270 25% 20%;
     --popover-foreground: 270 20% 95%;
 
-    --primary: 270 60% 70%;
+    --primary: 270 60% 75%;
     --primary-foreground: 270 20% 95%;
-    --primary-light: 270 50% 60%;
-    --primary-glow: 270 40% 50%;
+    --primary-light: 270 50% 65%;
+    --primary-glow: 270 40% 55%;
 
-    --secondary: 340 60% 65%;
+    --secondary: 340 60% 70%;
     --secondary-foreground: 270 20% 95%;
-    --secondary-light: 340 50% 55%;
+    --secondary-light: 340 50% 60%;
 
-    --accent: 30 30% 25%;
+    --accent: 270 30% 30%;
     --accent-foreground: 270 20% 95%;
 
-    --energy: 25 70% 60%;
+    --energy: 25 70% 65%;
     --energy-foreground: 270 20% 95%;
-    --energy-light: 25 60% 50%;
+    --energy-light: 25 60% 55%;
 
-    --muted: 270 30% 20%;
-    --muted-foreground: 270 20% 70%;
+    --muted: 270 25% 25%;
+    --muted-foreground: 270 20% 75%;
 
     --destructive: 0 70% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 270 30% 20%;
-    --input: 270 30% 20%;
-    --ring: 270 60% 70%;
+    --border: 270 25% 25%;
+    --input: 270 25% 25%;
+    --ring: 270 60% 75%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(270 50% 30%) 0%, hsl(340 50% 30%) 100%);
-    --gradient-warm: linear-gradient(180deg, hsl(270 40% 10%) 0%, hsl(270 35% 15%) 100%);
-    --gradient-glow: radial-gradient(circle at top right, hsl(270 60% 40% / 0.2), transparent 70%);
+    --gradient-primary: linear-gradient(135deg, hsl(270 50% 35%) 0%, hsl(340 50% 35%) 100%);
+    --gradient-warm: linear-gradient(180deg, hsl(270 30% 15%) 0%, hsl(270 25% 20%) 100%);
+    --gradient-glow: radial-gradient(circle at top right, hsl(270 60% 45% / 0.3), transparent 70%);
   }
 }
 

@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
-import { Heart, TrendingUp, Users, Sparkles, Bell, Calendar, LogOut, FileText, MapPin, Mic, Clock, Video, MessageCircle } from "lucide-react";
+import { Heart, TrendingUp, Users, Sparkles, Calendar, LogOut, FileText, MapPin, Mic, Clock, Video, MessageCircle } from "lucide-react";
+import NotificationBell from '@/components/NotificationBell';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +12,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useEffect } from "react";
+import RecentActivity from "@/components/RecentActivity";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -144,7 +147,7 @@ const Dashboard = () => {
       description: "Connect with others",
       color: "text-teal-500",
       bgColor: "bg-teal-50",
-      onClick: () => navigate("/profile")
+      onClick: () => navigate("/community")
     }
   ];
 
@@ -171,23 +174,35 @@ const Dashboard = () => {
           <div className="flex gap-2 flex-wrap">
             <GoogleTranslate />
             <ThemeToggle />
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="relative"
-              onClick={() => toast.info("No new notifications")}
-            >
-              <Bell className="w-4 h-4 md:w-5 md:h-5" />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-energy rounded-full animate-pulse" />
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="icon"
-              onClick={signOut}
-              title="Sign Out"
-            >
-              <LogOut className="w-4 h-4 md:w-5 md:h-5" />
-            </Button>
+            <NotificationBell />
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  title="Sign Out"
+                >
+                  <LogOut className="w-4 h-4 md:w-5 md:h-5" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you sure you want to sign out?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    You will be logged out of your account and redirected to the login page. Any unsaved changes will be lost.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={signOut}
+                    className="bg-red-600 hover:bg-red-700"
+                  >
+                    Sign Out
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </div>
       </motion.header>
@@ -314,26 +329,7 @@ const Dashboard = () => {
         transition={{ delay: 0.5 }}
         className="px-6"
       >
-        <h3 className="text-lg font-semibold mb-4">Recent Activity</h3>
-        <Card className="p-4">
-          <div className="space-y-3">
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span className="text-sm">Logged sleep quality: 8/10</span>
-              <Badge variant="secondary" className="text-xs">2 hours ago</Badge>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-              <span className="text-sm">Completed morning meditation</span>
-              <Badge variant="secondary" className="text-xs">4 hours ago</Badge>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-              <span className="text-sm">Shared experience in community</span>
-              <Badge variant="secondary" className="text-xs">1 day ago</Badge>
-            </div>
-          </div>
-        </Card>
+        <RecentActivity />
       </motion.div>
 
       <Navigation />

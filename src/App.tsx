@@ -20,11 +20,11 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <ThemeProvider defaultTheme="dark">
+      <ThemeProvider defaultTheme="light">
         <TooltipProvider>
+          <GoogleTranslate />
           <Toaster />
           <Sonner />
-          <GoogleTranslate />
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<LandingPage />} />
