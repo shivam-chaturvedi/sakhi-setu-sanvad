@@ -281,11 +281,7 @@ const GoogleTranslate = () => {
   }, []);
 
   return (
-    <div className="fixed top-2 right-2 sm:top-4 sm:right-4 z-30 google-translate-container flex items-center gap-2 sm:gap-3">
-      {/* Language Icon */}
-      <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-green-600 to-green-700 dark:from-green-500 dark:to-green-600 rounded-full shadow-lg z-40 relative">
-        <Languages className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-      </div>
+    <div className="absolute mt-4 top-20 right-8 z-30 google-translate-container flex items-center gap-2 sm:gap-3">
       
       {/* Google Translate Widget */}
       <div
@@ -297,13 +293,6 @@ const GoogleTranslate = () => {
           zIndex: 9999,
         }}
       ></div>
-      {!isLoaded && (
-        <div className="text-xs sm:text-sm font-bold text-gray-800 dark:text-white px-2 sm:px-3 py-1 sm:py-2 border-2 border-green-600 dark:border-green-500 rounded-lg bg-white dark:bg-gray-800 min-w-[120px] sm:min-w-[150px] text-center shadow-lg">
-          <Languages className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
-          <span className="hidden xs:inline">Select Language</span>
-          <span className="xs:hidden">Language</span>
-        </div>
-      )}
     </div>
   );
 };

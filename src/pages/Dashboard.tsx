@@ -173,7 +173,7 @@ const Dashboard = () => {
           </div>
           <div className="flex gap-2 flex-wrap">
             <GoogleTranslate />
-            <ThemeToggle />
+            {/* <ThemeToggle /> */}
             <NotificationBell />
             <AlertDialog>
               <AlertDialogTrigger asChild>
