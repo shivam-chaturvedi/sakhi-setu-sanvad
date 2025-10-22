@@ -114,6 +114,16 @@ const Reminders = () => {
 
         if (error) throw error;
         toast.success('Reminder updated successfully!');
+        
+        // Create notification for reminder update
+        if ((window as any).createNotification) {
+          (window as any).createNotification(
+            'Reminder Updated',
+            `"${formData.title}" reminder has been updated`,
+            'reminder',
+            '/profile?tab=reminders'
+          );
+        }
       } else {
         const { error } = await supabase
           .from('reminders')
@@ -121,6 +131,17 @@ const Reminders = () => {
 
         if (error) throw error;
         toast.success('Reminder created successfully!');
+        
+        // Create notification for reminder creation
+        if ((window as any).createNotification) {
+          const reminderTypeLabel = reminderTypes.find(r => r.value === formData.reminder_type)?.label || formData.reminder_type;
+          (window as any).createNotification(
+            'Reminder Created',
+            `New ${reminderTypeLabel.toLowerCase()} reminder "${formData.title}" has been created`,
+            'reminder',
+            '/profile?tab=reminders'
+          );
+        }
       }
 
       await fetchReminders();

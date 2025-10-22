@@ -162,16 +162,16 @@ const Dashboard = () => {
       <motion.header
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="pt-8 pb-6 px-6"
+        className="pt-4 sm:pt-8 pb-4 sm:pb-6 px-4 sm:px-6"
       >
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2 gap-4">
-          <div className="flex-1">
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2 gap-3 sm:gap-4">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground truncate">
               Welcome {user.user_metadata?.full_name || 'User'} 🌸
             </h1>
-            <p className="text-sm md:text-base text-muted-foreground mt-1">Your wellness journey starts here</p>
+            <p className="text-xs sm:text-sm md:text-base text-muted-foreground mt-1">Your wellness journey starts here</p>
           </div>
-          <div className="flex gap-2 flex-wrap">
+          <div className="flex gap-1 sm:gap-2 flex-wrap">
             <GoogleTranslate />
             {/* <ThemeToggle /> */}
             <NotificationBell />
@@ -181,22 +181,23 @@ const Dashboard = () => {
                   variant="ghost" 
                   size="icon"
                   title="Sign Out"
+                  className="h-8 w-8 sm:h-10 sm:w-10"
                 >
-                  <LogOut className="w-4 h-4 md:w-5 md:h-5" />
+                  <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
                 </Button>
               </AlertDialogTrigger>
-              <AlertDialogContent>
+              <AlertDialogContent className="mx-4 max-w-sm sm:max-w-md">
                 <AlertDialogHeader>
                   <AlertDialogTitle>Are you sure you want to sign out?</AlertDialogTitle>
                   <AlertDialogDescription>
                     You will be logged out of your account and redirected to the login page. Any unsaved changes will be lost.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+                  <AlertDialogCancel className="w-full sm:w-auto">Cancel</AlertDialogCancel>
                   <AlertDialogAction
                     onClick={signOut}
-                    className="bg-red-600 hover:bg-red-700"
+                    className="bg-red-600 hover:bg-red-700 w-full sm:w-auto"
                   >
                     Sign Out
                   </AlertDialogAction>
@@ -212,31 +213,31 @@ const Dashboard = () => {
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.2 }}
-        className="px-6 mb-8"
+        className="px-4 sm:px-6 mb-6 sm:mb-8"
       >
-        <Card className="glass-card p-6 relative overflow-hidden group cursor-pointer hover:shadow-xl transition-all duration-300">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+        <Card className="glass-card p-4 sm:p-6 relative overflow-hidden group cursor-pointer hover:shadow-xl transition-all duration-300">
+          <div className="absolute top-0 right-0 w-24 h-24 sm:w-32 sm:h-32 bg-primary/10 rounded-full blur-3xl animate-pulse" />
           <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
           <div className="relative z-10">
-            <div className="flex items-center gap-3 mb-4">
+            <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
               <motion.div 
-                className="p-3 bg-primary/20 rounded-2xl"
+                className="p-2 sm:p-3 bg-primary/20 rounded-2xl flex-shrink-0"
                 whileHover={{ rotate: 360, scale: 1.1 }}
                 transition={{ duration: 0.6 }}
               >
-                <Sparkles className="w-6 h-6 text-primary" />
+                <Sparkles className="w-4 h-4 sm:w-6 sm:h-6 text-primary" />
               </motion.div>
-              <div>
-                <h2 className="text-xl font-bold">Today's Wellness Tip</h2>
-                <p className="text-sm text-muted-foreground">AI-powered insight</p>
+              <div className="min-w-0 flex-1">
+                <h2 className="text-lg sm:text-xl font-bold">Today's Wellness Tip</h2>
+                <p className="text-xs sm:text-sm text-muted-foreground">AI-powered insight</p>
               </div>
             </div>
-            <p className="text-foreground leading-relaxed">
+            <p className="text-sm sm:text-base text-foreground leading-relaxed">
               Your sleep quality is excellent! Continue with 15 minutes of morning yoga practice today.
             </p>
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button 
-                className="mt-4 bg-primary hover:bg-primary/90"
+                className="mt-3 sm:mt-4 bg-primary hover:bg-primary/90 text-sm sm:text-base w-full sm:w-auto"
                 onClick={handleLearnMore}
               >
                 Learn More
@@ -251,31 +252,31 @@ const Dashboard = () => {
         variants={container}
         initial="hidden"
         animate="show"
-        className="px-6 mb-8"
+        className="px-4 sm:px-6 mb-6 sm:mb-8"
       >
-        <h3 className="text-lg font-semibold mb-4">Quick Insights</h3>
-        <div className="grid grid-cols-1 gap-4">
+        <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Quick Insights</h3>
+        <div className="grid grid-cols-1 gap-3 sm:gap-4">
           {insights.map((insight, index) => {
             const Icon = insight.icon;
             return (
               <motion.div key={index} variants={item}>
                 <Card 
-                  className="glass-card p-5 hover:shadow-lg transition-all cursor-pointer group"
+                  className="glass-card p-3 sm:p-5 hover:shadow-lg transition-all cursor-pointer group"
                   onClick={insight.onClick}
                 >
-                  <div className="flex items-start gap-4">
+                  <div className="flex items-start gap-3 sm:gap-4">
                     <motion.div 
-                      className={`p-3 ${insight.bgColor} rounded-xl`}
+                      className={`p-2 sm:p-3 ${insight.bgColor} rounded-xl flex-shrink-0`}
                       whileHover={{ scale: 1.1, rotate: 5 }}
                       transition={{ type: "spring", stiffness: 400 }}
                     >
-                      <Icon className={`w-5 h-5 ${insight.iconColor}`} />
+                      <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${insight.iconColor}`} />
                     </motion.div>
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors">
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-semibold text-sm sm:text-base text-foreground group-hover:text-primary transition-colors">
                         {insight.title}
                       </h4>
-                      <p className="text-sm text-muted-foreground mt-1">{insight.description}</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground mt-1">{insight.description}</p>
                     </div>
                   </div>
                 </Card>
@@ -290,10 +291,10 @@ const Dashboard = () => {
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.4 }}
-        className="px-6"
+        className="px-4 sm:px-6"
       >
-        <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Quick Actions</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4">
           {quickActions.map((action, index) => {
             const Icon = action.icon;
             return (
@@ -303,16 +304,16 @@ const Dashboard = () => {
                 whileTap={{ scale: 0.98 }}
               >
                 <Card 
-                  className="p-4 cursor-pointer hover:shadow-lg transition-all group"
+                  className="p-3 sm:p-4 cursor-pointer hover:shadow-lg transition-all group"
                   onClick={action.onClick}
                 >
-                  <div className="flex flex-col items-center text-center gap-2">
-                    <div className={`p-3 rounded-full ${action.bgColor} group-hover:scale-110 transition-transform`}>
-                      <Icon className={`w-6 h-6 ${action.color}`} />
+                  <div className="flex flex-col items-center text-center gap-1 sm:gap-2">
+                    <div className={`p-2 sm:p-3 rounded-full ${action.bgColor} group-hover:scale-110 transition-transform`}>
+                      <Icon className={`w-4 h-4 sm:w-6 sm:h-6 ${action.color}`} />
                     </div>
-                    <div>
-                      <h4 className="font-medium text-sm">{action.title}</h4>
-                      <p className="text-xs text-gray-600">{action.description}</p>
+                    <div className="min-w-0">
+                      <h4 className="font-medium text-xs sm:text-sm truncate">{action.title}</h4>
+                      <p className="text-xs text-gray-600 line-clamp-2">{action.description}</p>
                     </div>
                   </div>
                 </Card>
@@ -327,7 +328,7 @@ const Dashboard = () => {
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.5 }}
-        className="px-6"
+        className="px-4 sm:px-6"
       >
         <RecentActivity />
       </motion.div>

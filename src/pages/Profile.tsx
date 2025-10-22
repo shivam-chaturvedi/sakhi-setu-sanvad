@@ -6,7 +6,6 @@ import Navigation from "@/components/Navigation";
 import { User, Settings, Bell, Shield, Heart, LogOut, ChevronRight, ArrowLeft, FileText, Clock, Mic, Video, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -150,46 +149,45 @@ const Profile = () => {
       <motion.header
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="pt-8 pb-6 px-6"
+        className="pt-4 sm:pt-8 pb-4 sm:pb-6 px-4 sm:px-6"
       >
-        <div className="flex items-center gap-4 mb-4">
+        <div className="flex items-center gap-2 sm:gap-4 mb-4">
           <Button 
             variant="ghost" 
             size="icon" 
             onClick={() => navigate("/dashboard")}
-            className="hover:bg-primary/10"
+            className="hover:bg-primary/10 h-8 w-8 sm:h-10 sm:w-10"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
           </Button>
-          <div className="flex-1">
-            <h1 className="text-3xl font-bold">My Profile</h1>
-            <p className="text-muted-foreground mt-1">Manage your information</p>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-xl sm:text-3xl font-bold">My Profile</h1>
+            <p className="text-sm sm:text-base text-muted-foreground mt-1">Manage your information</p>
           </div>
-          <div className="flex gap-2">
-            <ThemeToggle />
+          <div className="flex gap-1 sm:gap-2">
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button 
                   variant="ghost" 
                   size="icon"
                   title="Sign Out"
-                  className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                  className="text-red-500 hover:text-red-700 hover:bg-red-50 h-8 w-8 sm:h-10 sm:w-10"
                 >
-                  <LogOut className="w-5 h-5" />
+                  <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
                 </Button>
               </AlertDialogTrigger>
-              <AlertDialogContent>
+              <AlertDialogContent className="mx-4 max-w-sm sm:max-w-md">
                 <AlertDialogHeader>
                   <AlertDialogTitle>Are you sure you want to sign out?</AlertDialogTitle>
                   <AlertDialogDescription>
                     You will be logged out of your account and redirected to the login page. Any unsaved changes will be lost.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+                  <AlertDialogCancel className="w-full sm:w-auto">Cancel</AlertDialogCancel>
                   <AlertDialogAction
                     onClick={handleLogout}
-                    className="bg-red-600 hover:bg-red-700"
+                    className="bg-red-600 hover:bg-red-700 w-full sm:w-auto"
                   >
                     Sign Out
                   </AlertDialogAction>
@@ -206,32 +204,32 @@ const Profile = () => {
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2 }}
-        className="px-6"
+        className="px-4 sm:px-6"
       >
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6 gap-1">
-            <TabsTrigger value="profile" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
-              <User className="h-3 w-3 sm:h-4 sm:w-4" />
+          <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 gap-1 h-auto overflow-x-auto">
+            <TabsTrigger value="profile" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 px-2 sm:px-4">
+              <User className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
               <span className="hidden xs:inline">Profile</span>
             </TabsTrigger>
-            <TabsTrigger value="edit" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
-              <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
+            <TabsTrigger value="edit" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 px-2 sm:px-4">
+              <Settings className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
               <span className="hidden xs:inline">Edit</span>
             </TabsTrigger>
-            <TabsTrigger value="library" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
-              <Video className="h-3 w-3 sm:h-4 sm:w-4" />
+            <TabsTrigger value="library" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 px-2 sm:px-4">
+              <Video className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
               <span className="hidden sm:inline">Videos</span>
             </TabsTrigger>
-            <TabsTrigger value="reports" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
-              <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
+            <TabsTrigger value="reports" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 px-2 sm:px-4">
+              <FileText className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
               <span className="hidden sm:inline">Reports</span>
             </TabsTrigger>
-            <TabsTrigger value="reminders" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
-              <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
+            <TabsTrigger value="reminders" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 px-2 sm:px-4">
+              <Clock className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
               <span className="hidden sm:inline">Reminders</span>
             </TabsTrigger>
-            <TabsTrigger value="assistant" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
-              <Mic className="h-3 w-3 sm:h-4 sm:w-4" />
+            <TabsTrigger value="assistant" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 px-2 sm:px-4">
+              <Mic className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
               <span className="hidden sm:inline">Assistant</span>
             </TabsTrigger>
           </TabsList>

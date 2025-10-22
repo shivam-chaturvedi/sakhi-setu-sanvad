@@ -280,28 +280,30 @@ export const ResourceRepository: React.FC = () => {
             Educational content, videos, and articles to support your menopause journey
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4 sm:p-6">
           <Tabs value={selectedType} onValueChange={setSelectedType} className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-3 h-auto">
               {resourceTypes.map((type) => {
                 const Icon = type.icon;
                 return (
-                  <TabsTrigger key={type.value} value={type.value} className="flex items-center gap-2">
-                    <Icon className="h-4 w-4" />
-                    {type.label}
+                  <TabsTrigger key={type.value} value={type.value} className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 px-2 sm:px-4">
+                    <Icon className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="hidden xs:inline">{type.label}</span>
+                    <span className="xs:hidden">{type.label.charAt(0)}</span>
                   </TabsTrigger>
                 );
               })}
             </TabsList>
 
-            <div className="mt-6">
-              <div className="flex flex-wrap gap-2 mb-4">
+            <div className="mt-4 sm:mt-6">
+              <div className="flex flex-wrap gap-1 sm:gap-2 mb-4">
                 {categories.map((category) => (
                   <Button
                     key={category}
                     variant={selectedCategory === category ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => setSelectedCategory(category)}
+                    className="text-xs sm:text-sm h-7 sm:h-8 px-2 sm:px-3"
                   >
                     {category}
                   </Button>
@@ -321,62 +323,63 @@ export const ResourceRepository: React.FC = () => {
                       className="hover:shadow-lg transition-shadow cursor-pointer"
                       onClick={() => handleResourceClick(resource)}
                     >
-                      <CardContent className="p-4">
-                        <div className="flex items-start gap-4">
+                      <CardContent className="p-3 sm:p-4">
+                        <div className="flex items-start gap-3 sm:gap-4">
                           <div className="flex-shrink-0">
-                            <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                            <div className="w-8 h-8 sm:w-12 sm:h-12 bg-primary/10 rounded-lg flex items-center justify-center">
                               {getTypeIcon(resource.type)}
                             </div>
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1">
-                                <h3 className="font-semibold text-lg mb-2 line-clamp-2">
+                            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
+                              <div className="flex-1 min-w-0">
+                                <h3 className="font-semibold text-sm sm:text-lg mb-1 sm:mb-2 line-clamp-2">
                                   {resource.title}
                                 </h3>
-                                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                                <p className="text-gray-600 text-xs sm:text-sm mb-2 sm:mb-3 line-clamp-2">
                                   {resource.description}
                                 </p>
-                                <div className="flex items-center gap-2 mb-2">
-                                  <Badge className={getCategoryColor(resource.category)}>
+                                <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-2">
+                                  <Badge className={`${getCategoryColor(resource.category)} text-xs`}>
                                     {resource.category}
                                   </Badge>
-                                  <Badge variant="outline" className="flex items-center gap-1">
+                                  <Badge variant="outline" className="flex items-center gap-1 text-xs">
                                     {getTypeIcon(resource.type)}
-                                    {resource.type}
+                                    <span className="hidden sm:inline">{resource.type}</span>
+                                    <span className="sm:hidden">{resource.type.charAt(0)}</span>
                                   </Badge>
                                 </div>
                                 {resource.publisher && (
                                   <div className="flex items-center gap-1 text-xs text-gray-500 mb-2">
-                                    <User className="h-3 w-3" />
-                                    <span>Published by {resource.publisher}</span>
+                                    <User className="h-3 w-3 flex-shrink-0" />
+                                    <span className="truncate">Published by {resource.publisher}</span>
                                   </div>
                                 )}
                               </div>
-                              <div className="flex-shrink-0 ml-4 flex flex-col gap-2">
+                              <div className="flex-shrink-0 flex flex-row sm:flex-col gap-2">
                                 {user && resource.user_id === user.id && (
                                   <AlertDialog>
                                     <AlertDialogTrigger asChild>
                                       <Button 
                                         variant="ghost" 
                                         size="sm"
-                                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                                        className="text-red-500 hover:text-red-700 hover:bg-red-50 h-7 w-7 p-0"
                                       >
-                                        <Trash2 className="h-4 w-4" />
+                                        <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                                       </Button>
                                     </AlertDialogTrigger>
-                                    <AlertDialogContent>
+                                    <AlertDialogContent className="mx-4 max-w-sm sm:max-w-md">
                                       <AlertDialogHeader>
                                         <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                                         <AlertDialogDescription>
                                           This action cannot be undone. This will permanently delete the resource "{resource.title}" from the library.
                                         </AlertDialogDescription>
                                       </AlertDialogHeader>
-                                      <AlertDialogFooter>
-                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                      <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+                                        <AlertDialogCancel className="w-full sm:w-auto">Cancel</AlertDialogCancel>
                                         <AlertDialogAction
                                           onClick={() => handleDeleteResource(resource.id)}
-                                          className="bg-red-600 hover:bg-red-700"
+                                          className="bg-red-600 hover:bg-red-700 w-full sm:w-auto"
                                         >
                                           Delete Resource
                                         </AlertDialogAction>
@@ -386,13 +389,13 @@ export const ResourceRepository: React.FC = () => {
                                 )}
                               </div>
                             </div>
-                            <div className="flex items-center gap-4 text-xs text-gray-500">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-xs text-gray-500 mt-2">
                               <div className="flex items-center gap-1">
-                                <Calendar className="h-3 w-3" />
+                                <Calendar className="h-3 w-3 flex-shrink-0" />
                                 {new Date(resource.created_at).toLocaleDateString()}
                               </div>
                               <div className="flex items-center gap-1">
-                                <Clock className="h-3 w-3" />
+                                <Clock className="h-3 w-3 flex-shrink-0" />
                                 {resource.type === 'video' ? '20 min' : '5 min read'}
                               </div>
                             </div>

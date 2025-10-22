@@ -9,7 +9,6 @@ import { Eye, EyeOff, Heart, Sparkles, Users, Shield, ArrowLeft } from 'lucide-r
 import { LoginForm } from '@/components/auth/LoginForm';
 import EnhancedSignupForm from '@/components/auth/EnhancedSignupForm';
 import GoogleTranslate from '@/components/GoogleTranslate';
-import { ThemeToggle } from '@/components/ThemeToggle';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -169,13 +168,12 @@ const AuthPage = () => {
               <Heart className="w-8 h-8 text-pink-500" />
             </motion.div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Sakhi Setu</h1>
-              <p className="text-sm text-gray-600 dark:text-gray-300">Your Menopause Companion</p>
+              <h1 className="text-2xl font-bold text-gray-900">Sakhi Setu</h1>
+              <p className="text-sm text-gray-600">Your Menopause Companion</p>
             </div>
           </motion.div>
           <div className="flex items-center gap-4">
             <GoogleTranslate />
-            <ThemeToggle />
             <Button
               variant="ghost"
               onClick={() => navigate('/')}

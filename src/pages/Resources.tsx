@@ -34,27 +34,27 @@ const Resources = () => {
       <motion.header
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="pt-8 pb-6 px-6"
+        className="pt-4 sm:pt-8 pb-4 sm:pb-6 px-4 sm:px-6"
       >
-        <div className="flex items-center gap-4 mb-4">
+        <div className="flex items-center gap-2 sm:gap-4 mb-4">
           <Button 
             variant="ghost" 
             size="icon" 
             onClick={() => navigate("/")}
-            className="hover:bg-primary/10"
+            className="hover:bg-primary/10 h-8 w-8 sm:h-10 sm:w-10"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
           </Button>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
             <motion.div 
-              className="p-2 bg-energy/20 rounded-xl"
+              className="p-1.5 sm:p-2 bg-energy/20 rounded-xl flex-shrink-0"
               whileHover={{ scale: 1.1, rotate: 5 }}
             >
-              <BookOpen className="w-6 h-6 text-energy" />
+              <BookOpen className="w-4 h-4 sm:w-6 sm:h-6 text-energy" />
             </motion.div>
-            <div>
-              <h1 className="text-3xl font-bold">Resource Center</h1>
-              <p className="text-muted-foreground mt-1">Learn and grow</p>
+            <div className="min-w-0 flex-1">
+              <h1 className="text-xl sm:text-3xl font-bold truncate">Resource Center</h1>
+              <p className="text-sm sm:text-base text-muted-foreground mt-1">Learn and grow</p>
             </div>
           </div>
         </div>

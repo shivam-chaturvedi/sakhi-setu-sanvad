@@ -280,6 +280,16 @@ export const CommunityChat: React.FC = () => {
 
       setNewMessage('');
       toast.success('Message sent!');
+      
+      // Create notification for community post
+      if ((window as any).createNotification) {
+        (window as any).createNotification(
+          'Community Post Shared',
+          'Your message has been shared with the community',
+          'post',
+          '/community'
+        );
+      }
     } catch (error) {
       console.error('Error sending message:', error);
       toast.error('Failed to send message');
@@ -449,7 +459,7 @@ export const CommunityChat: React.FC = () => {
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   placeholder="Share your thoughts with the community..."
-                  className="pr-12 min-h-[60px] max-h-[120px] resize-none text-base bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20 rounded-xl"
+                  className="pr-12 min-h-[60px] max-h-[120px] resize-none text-base bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 focus:border-neon-pink focus:ring-neon-pink/20 rounded-xl text-black dark:text-white"
                   disabled={sending}
                   rows={2}
                 />

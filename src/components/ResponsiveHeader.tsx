@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Heart, Menu, X, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { ThemeToggle } from '@/components/ThemeToggle';
 import GoogleTranslate from '@/components/GoogleTranslate';
 
 const ResponsiveHeader = () => {
@@ -57,11 +56,11 @@ const ResponsiveHeader = () => {
             onClick={() => scrollToSection('#home')}
           >
             <motion.div
-              className="p-2 bg-pink-100 dark:bg-pink-900/30 rounded-xl"
+              className="p-2 bg-neon-pink/10 dark:bg-neon-pink/20 rounded-xl"
               whileHover={{ rotate: 360 }}
               transition={{ duration: 0.6 }}
             >
-              <Heart className="w-6 h-6 sm:w-8 sm:h-8 text-pink-500" />
+              <Heart className="w-6 h-6 sm:w-8 sm:h-8 text-neon-pink" />
             </motion.div>
             <div className="hidden sm:block">
               <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
@@ -84,7 +83,7 @@ const ResponsiveHeader = () => {
               <motion.button
                 key={index}
                 onClick={() => scrollToSection(item.href)}
-                className="text-gray-700 dark:text-gray-300 hover:text-pink-500 dark:hover:text-pink-400 transition-colors duration-200 font-medium"
+                className="text-gray-700 dark:text-gray-300 hover:text-neon-pink dark:hover:text-neon-pink transition-colors duration-200 font-medium"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -98,13 +97,12 @@ const ResponsiveHeader = () => {
             {/* Language and Theme Controls */}
             <div className="flex items-center gap-2">
               <GoogleTranslate />
-              {/* <ThemeToggle /> */}
             </div>
 
             {/* CTA Button */}
             <Button
               onClick={() => navigate('/auth')}
-              className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 text-sm sm:text-base px-3 sm:px-6 py-2"
+              className="bg-gradient-to-r from-neon-purple to-neon-pink hover:from-purple-dark hover:to-pink-dark text-white shadow-lg hover:shadow-xl transition-all duration-300 text-sm sm:text-base px-3 sm:px-6 py-2"
             >
               Get Started
             </Button>
@@ -139,7 +137,7 @@ const ResponsiveHeader = () => {
                   <motion.button
                     key={index}
                     onClick={() => scrollToSection(item.href)}
-                    className="block w-full text-left px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-pink-500 dark:hover:text-pink-400 hover:bg-pink-50 dark:hover:bg-pink-900/20 transition-colors duration-200 font-medium"
+                    className="block w-full text-left px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-neon-pink dark:hover:text-neon-pink hover:bg-neon-pink/10 dark:hover:bg-neon-pink/20 transition-colors duration-200 font-medium"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >

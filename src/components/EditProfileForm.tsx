@@ -236,6 +236,17 @@ export const EditProfileForm: React.FC<EditProfileFormProps> = ({ userProfile: p
       }
 
       toast.success('Profile updated successfully!');
+      
+      // Create notification for profile update
+      if ((window as any).createNotification) {
+        (window as any).createNotification(
+          'Profile Updated',
+          'Your profile information has been updated successfully',
+          'profile',
+          '/profile?tab=edit'
+        );
+      }
+      
       if (onProfileUpdate) {
         onProfileUpdate();
       }
@@ -264,7 +275,7 @@ export const EditProfileForm: React.FC<EditProfileFormProps> = ({ userProfile: p
 
   return (
     <div className="space-y-6">
-      <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 shadow-xl">
+      <Card className="bg-white dark:bg-gray-800 backdrop-blur-sm border-0 shadow-xl">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-xl">
             <User className="h-6 w-6 text-pink-500" />
@@ -290,7 +301,7 @@ export const EditProfileForm: React.FC<EditProfileFormProps> = ({ userProfile: p
                       value={profile.full_name}
                       onChange={(e) => handleInputChange('full_name', e.target.value)}
                       placeholder="Enter your full name"
-                      className="pl-10 h-11 md:h-12 bg-white/50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20"
+                      className="pl-10 h-11 md:h-12 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-neon-pink focus:ring-neon-pink/20 text-black dark:text-white"
                     />
                   </div>
                   {errors.full_name && <p className="text-sm text-red-500">{errors.full_name}</p>}
@@ -308,7 +319,7 @@ export const EditProfileForm: React.FC<EditProfileFormProps> = ({ userProfile: p
                       placeholder="Enter your age"
                       min="18"
                       max="100"
-                      className="pl-10 h-11 md:h-12 bg-white/50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20"
+                      className="pl-10 h-11 md:h-12 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-neon-pink focus:ring-neon-pink/20 text-black dark:text-white"
                     />
                   </div>
                   {errors.age && <p className="text-sm text-red-500">{errors.age}</p>}
@@ -340,7 +351,7 @@ export const EditProfileForm: React.FC<EditProfileFormProps> = ({ userProfile: p
                     onChange={(e) => handleInputChange('bio', e.target.value)}
                     placeholder="Tell us about yourself..."
                     rows={4}
-                    className="pl-10 bg-white/50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20 resize-none"
+                    className="pl-10 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-neon-pink focus:ring-neon-pink/20 text-black dark:text-white resize-none"
                   />
                 </div>
                 {errors.bio && <p className="text-sm text-red-500">{errors.bio}</p>}
@@ -362,7 +373,7 @@ export const EditProfileForm: React.FC<EditProfileFormProps> = ({ userProfile: p
                       value={profile.phone}
                       onChange={(e) => handleInputChange('phone', e.target.value)}
                       placeholder="+91 9876543210"
-                      className="pl-10 h-11 md:h-12 bg-white/50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20"
+                      className="pl-10 h-11 md:h-12 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-neon-pink focus:ring-neon-pink/20 text-black dark:text-white"
                     />
                   </div>
                 </div>
@@ -374,7 +385,7 @@ export const EditProfileForm: React.FC<EditProfileFormProps> = ({ userProfile: p
                     value={profile.emergency_contact}
                     onChange={(e) => handleInputChange('emergency_contact', e.target.value)}
                     placeholder="Emergency contact name & number"
-                    className="h-11 md:h-12 bg-white/50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20"
+                    className="h-11 md:h-12 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-neon-pink focus:ring-neon-pink/20 text-black dark:text-white"
                   />
                 </div>
               </div>
@@ -413,7 +424,7 @@ export const EditProfileForm: React.FC<EditProfileFormProps> = ({ userProfile: p
                   onChange={(e) => handleInputChange('current_medications', e.target.value.split(',').map(m => m.trim()).filter(m => m))}
                   placeholder="List your current medications (comma separated)"
                   rows={3}
-                  className="bg-white/50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20 text-sm md:text-base"
+                  className="bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-neon-pink focus:ring-neon-pink/20 text-black dark:text-white text-sm md:text-base"
                 />
               </div>
             </div>
@@ -425,7 +436,7 @@ export const EditProfileForm: React.FC<EditProfileFormProps> = ({ userProfile: p
               <div className="space-y-2">
                 <Label htmlFor="language" className="text-sm md:text-base">Preferred Language</Label>
                 <Select value={profile.preferred_language} onValueChange={(value) => handleInputChange('preferred_language', value)}>
-                  <SelectTrigger className="h-11 md:h-12 bg-white/50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20">
+                  <SelectTrigger className="h-11 md:h-12 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-neon-pink focus:ring-neon-pink/20 text-black dark:text-white">
                     <SelectValue placeholder="Select your preferred language" />
                   </SelectTrigger>
                   <SelectContent>

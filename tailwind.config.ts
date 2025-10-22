@@ -1,7 +1,7 @@
 import type { Config } from "tailwindcss";
 
 export default {
-  darkMode: ["class"],
+  darkMode: false,
   content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
   prefix: "",
   theme: {
@@ -62,6 +62,15 @@ export default {
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
+        },
+        // Neon colors for direct use
+        neon: {
+          pink: "#ff0080",
+          purple: "#8b00ff",
+          "pink-light": "#ff66b3",
+          "purple-light": "#b366ff",
+          "pink-dark": "#cc0066",
+          "purple-dark": "#6600cc",
         },
       },
       borderRadius: {

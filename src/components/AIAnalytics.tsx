@@ -150,11 +150,11 @@ export const AIAnalytics: React.FC = () => {
   const generateRecommendations = async (symptoms: any[], avgSeverity: number) => {
     const recommendations = [];
 
-    // Get AI-powered recommendations
+    // Get AI-powered recommendations based on actual symptoms
     try {
-      const symptomList = symptoms.map(s => s.symptom_type).join(', ');
+      const symptomList = symptoms.map(s => `${s.symptom_type.replace('_', ' ')} (severity: ${s.severity}/10)`).join(', ');
       const aiAdvice = await generateWellnessAdvice(
-        `Based on these symptoms: ${symptomList}, with average severity ${avgSeverity}/10, provide specific recommendations for managing menopause symptoms.`,
+        `Based on these logged symptoms: ${symptomList}, with average severity ${avgSeverity}/10, provide specific recommendations for managing menopause symptoms.`,
         {
           age: 45, // You can make this dynamic
           symptoms: symptoms.map(s => s.symptom_type),
@@ -201,7 +201,7 @@ export const AIAnalytics: React.FC = () => {
       });
     } catch (error) {
       console.error('Error generating AI recommendations:', error);
-      // Fallback to static recommendations
+      // Fallback to static recommendations based on actual symptoms
       return generateStaticRecommendations(symptoms, avgSeverity);
     }
 
@@ -331,10 +331,10 @@ export const AIAnalytics: React.FC = () => {
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high': return 'text-red-600 bg-red-100 dark:bg-red-900/30';
-      case 'medium': return 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900/30';
-      case 'low': return 'text-green-600 bg-green-100 dark:bg-green-900/30';
-      default: return 'text-gray-600 bg-gray-100 dark:bg-gray-900/30';
+      case 'high': return 'text-red-600 bg-red-100';
+      case 'medium': return 'text-yellow-600 bg-yellow-100';
+      case 'low': return 'text-green-600 bg-green-100';
+      default: return 'text-gray-600 bg-gray-100';
     }
   };
 
@@ -349,10 +349,10 @@ export const AIAnalytics: React.FC = () => {
 
   const getInsightColor = (type: string) => {
     switch (type) {
-      case 'positive': return 'border-green-200 bg-green-50 dark:bg-green-900/20 dark:border-green-800';
-      case 'warning': return 'border-orange-200 bg-orange-50 dark:bg-orange-900/20 dark:border-orange-800';
-      case 'info': return 'border-blue-200 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-800';
-      default: return 'border-gray-200 bg-gray-50 dark:bg-gray-900/20 dark:border-gray-800';
+      case 'positive': return 'border-green-200 bg-green-50';
+      case 'warning': return 'border-orange-200 bg-orange-50';
+      case 'info': return 'border-blue-200 bg-blue-50';
+      default: return 'border-gray-200 bg-gray-50';
     }
   };
 
@@ -414,8 +414,8 @@ export const AIAnalytics: React.FC = () => {
           animate={{ opacity: 1, scale: 1 }}
           className="flex flex-col items-center gap-4"
         >
-          <Loader2 className="w-8 h-8 animate-spin text-pink-500" />
-          <p className="text-gray-600 dark:text-gray-300">Analyzing your data...</p>
+          <Loader2 className="w-8 h-8 animate-spin text-neon-pink" />
+          <p className="text-gray-600">Analyzing your data...</p>
         </motion.div>
       </div>
     );
@@ -426,7 +426,7 @@ export const AIAnalytics: React.FC = () => {
       <div className="text-center p-8">
         <Brain className="w-16 h-16 mx-auto mb-4 text-gray-400" />
         <h3 className="text-lg font-semibold mb-2">No Data Available</h3>
-        <p className="text-gray-600 dark:text-gray-300 mb-4">
+        <p className="text-gray-600 mb-4">
           Start tracking your symptoms to get AI-powered insights
         </p>
         <Button onClick={fetchAnalytics}>
@@ -442,18 +442,18 @@ export const AIAnalytics: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-            <Brain className="w-6 h-6 text-purple-500" />
+          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <Brain className="w-6 h-6 text-neon-purple" />
             AI Analytics
           </h2>
-          <p className="text-gray-600 dark:text-gray-300">AI-powered insights from your symptom data</p>
+          <p className="text-gray-600">AI-powered insights from your symptom data</p>
         </div>
         <div className="flex gap-2">
           <Button
             onClick={handleSymptomAnalysis}
             disabled={aiLoading || !analytics}
             size="sm"
-            className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+            className="bg-gradient-to-r from-neon-purple to-neon-pink hover:from-purple-dark hover:to-pink-dark text-white shadow-lg shadow-neon-purple/25"
           >
             {aiLoading ? (
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -487,33 +487,33 @@ export const AIAnalytics: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         className="grid grid-cols-1 md:grid-cols-3 gap-6"
       >
-        <Card className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20">
+        <Card className="bg-gradient-to-br from-purple-light/20 to-pink-light/20 border border-neon-purple/20">
           <CardContent className="p-6 text-center">
             <div className="flex items-center justify-center mb-3">
-              <BarChart3 className="w-8 h-8 text-purple-500" />
+              <BarChart3 className="w-8 h-8 text-neon-purple" />
             </div>
-            <div className="text-3xl font-bold text-purple-600 mb-1">{analytics.totalSymptoms}</div>
-            <div className="text-sm text-gray-600 dark:text-gray-300">Symptoms Tracked</div>
+            <div className="text-3xl font-bold text-neon-purple mb-1">{analytics.totalSymptoms}</div>
+            <div className="text-sm text-gray-600">Symptoms Tracked</div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20">
+        <Card className="bg-gradient-to-br from-purple-light/20 to-pink-light/20 border border-neon-pink/20">
           <CardContent className="p-6 text-center">
             <div className="flex items-center justify-center mb-3">
-              <Activity className="w-8 h-8 text-blue-500" />
+              <Activity className="w-8 h-8 text-neon-pink" />
             </div>
-            <div className="text-3xl font-bold text-blue-600 mb-1">{analytics.averageSeverity}/10</div>
-            <div className="text-sm text-gray-600 dark:text-gray-300">Average Severity</div>
+            <div className="text-3xl font-bold text-neon-pink mb-1">{analytics.averageSeverity}/10</div>
+            <div className="text-sm text-gray-600">Average Severity</div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20">
+        <Card className="bg-gradient-to-br from-purple-light/20 to-pink-light/20 border border-neon-purple/20">
           <CardContent className="p-6 text-center">
             <div className="flex items-center justify-center mb-3">
-              <Sparkles className="w-8 h-8 text-green-500" />
+              <Sparkles className="w-8 h-8 text-neon-purple" />
             </div>
-            <div className="text-3xl font-bold text-green-600 mb-1">{analytics.recommendations.length}</div>
-            <div className="text-sm text-gray-600 dark:text-gray-300">AI Recommendations</div>
+            <div className="text-3xl font-bold text-neon-purple mb-1">{analytics.recommendations.length}</div>
+            <div className="text-sm text-gray-600">AI Recommendations</div>
           </CardContent>
         </Card>
       </motion.div>
@@ -524,7 +524,7 @@ export const AIAnalytics: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
       >
-        <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 shadow-xl">
+        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Lightbulb className="w-5 h-5 text-yellow-500" />
@@ -548,10 +548,10 @@ export const AIAnalytics: React.FC = () => {
                     <div className="flex items-start gap-3">
                       {getInsightIcon(insight.type)}
                       <div className="flex-1">
-                        <h4 className="font-semibold text-gray-900 dark:text-white mb-1">
+                        <h4 className="font-semibold text-gray-900 mb-1">
                           {insight.title}
                         </h4>
-                        <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+                        <p className="text-sm text-gray-600 mb-2">
                           {insight.description}
                         </p>
                         {insight.action && (
@@ -575,10 +575,10 @@ export const AIAnalytics: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
       >
-        <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 shadow-xl">
+        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Target className="w-5 h-5 text-pink-500" />
+              <Target className="w-5 h-5 text-neon-pink" />
               Personalized Recommendations
             </CardTitle>
             <CardDescription>
@@ -596,25 +596,25 @@ export const AIAnalytics: React.FC = () => {
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: index * 0.1 }}
-                      className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-md transition-all duration-300"
+                      className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-all duration-300"
                     >
                       <div className="flex items-start gap-3">
-                        <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
-                          <Icon className="w-5 h-5 text-pink-500" />
+                        <div className="p-2 bg-gray-100 rounded-lg">
+                          <Icon className="w-5 h-5 text-neon-pink" />
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
-                            <h4 className="font-semibold text-gray-900 dark:text-white">
+                            <h4 className="font-semibold text-gray-900">
                               {rec.title}
                             </h4>
                             <Badge className={`text-xs ${getPriorityColor(rec.priority)}`}>
                               {rec.priority}
                             </Badge>
                           </div>
-                          <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+                          <p className="text-sm text-gray-600 mb-2">
                             {rec.description}
                           </p>
-                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                          <div className="text-xs text-gray-500">
                             {rec.category}
                           </div>
                         </div>
@@ -634,7 +634,7 @@ export const AIAnalytics: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
       >
-        <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 shadow-xl">
+        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="w-5 h-5 text-blue-500" />
@@ -654,7 +654,7 @@ export const AIAnalytics: React.FC = () => {
                   transition={{ delay: index * 0.05 }}
                   className="flex items-center gap-4"
                 >
-                  <div className="w-20 text-sm font-medium text-gray-600 dark:text-gray-300">
+                  <div className="w-20 text-sm font-medium text-gray-600">
                     {day.day}
                   </div>
                   <div className="flex-1">
@@ -663,7 +663,7 @@ export const AIAnalytics: React.FC = () => {
                       className="h-2"
                     />
                   </div>
-                  <div className="w-12 text-sm text-gray-500 dark:text-gray-400 text-right">
+                  <div className="w-12 text-sm text-gray-500 text-right">
                     {day.severity.toFixed(1)}
                   </div>
                 </motion.div>
@@ -679,10 +679,10 @@ export const AIAnalytics: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
       >
-        <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 shadow-xl">
+        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Bot className="w-5 h-5 text-purple-500" />
+              <Bot className="w-5 h-5 text-neon-purple" />
               AI Health Assistant
             </CardTitle>
             <CardDescription>
@@ -715,16 +715,16 @@ export const AIAnalytics: React.FC = () => {
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg border border-purple-200 dark:border-purple-800"
+                className="p-4 bg-gradient-to-r from-purple-light/20 to-pink-light/20 rounded-lg border border-neon-purple/30 shadow-lg shadow-neon-purple/10"
                 data-ai-response
               >
                 <div className="flex items-start gap-3">
-                  <Bot className="w-5 h-5 text-purple-500 mt-1 flex-shrink-0" />
+                  <Bot className="w-5 h-5 text-neon-purple mt-1 flex-shrink-0" />
                   <div className="flex-1">
-                    <h4 className="font-semibold text-purple-900 dark:text-purple-100 mb-2">
+                    <h4 className="font-semibold text-neon-purple mb-2">
                       AI Recommendation
                     </h4>
-                    <div className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
+                    <div className="text-gray-700 whitespace-pre-wrap leading-relaxed">
                       {aiResponse}
                     </div>
                   </div>

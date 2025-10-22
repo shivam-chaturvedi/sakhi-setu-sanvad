@@ -76,124 +76,65 @@ All colors MUST be HSL.
   background: #f3f4f6 !important;
 }
 
-/* Dark mode support */
-.dark .goog-te-gadget-simple {
-  border-color: #4b5563 !important;
-  background: #374151 !important;
-}
-
-.dark .goog-te-gadget-simple .goog-te-menu-value {
-  color: #f9fafb !important;
-}
-
-.dark .goog-te-menu2 {
-  background: #1f2937 !important;
-  border-color: #374151 !important;
-}
-
-.dark .goog-te-menu2-item:hover {
-  background: #374151 !important;
-}
 
 
 @layer base {
   :root {
-    /* Soft, comforting colors for wellness */
-    --background: 30 20% 98%;
-    --foreground: 270 30% 20%;
+    /* Light mode only - Neon pink and purple theme */
+    --background: 0 0% 100%;
+    --foreground: 320 30% 20%;
 
     --card: 0 0% 100%;
-    --card-foreground: 270 30% 20%;
+    --card-foreground: 320 30% 20%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 270 30% 20%;
+    --popover-foreground: 320 30% 20%;
 
-    /* Primary: Soft lavender for calm and trust */
-    --primary: 270 60% 75%;
-    --primary-foreground: 270 30% 20%;
-    --primary-light: 270 70% 85%;
-    --primary-glow: 270 70% 90%;
+    /* Primary: Bright neon purple */
+    --primary: 280 100% 70%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 280 100% 95%;
+    --primary-glow: 280 100% 98%;
 
-    /* Secondary: Muted pink for warmth */
-    --secondary: 340 70% 80%;
-    --secondary-foreground: 270 30% 20%;
-    --secondary-light: 340 80% 90%;
+    /* Secondary: Bright neon pink */
+    --secondary: 320 100% 70%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-light: 320 100% 95%;
 
-    /* Accent: Warm beige for comfort */
-    --accent: 30 40% 85%;
-    --accent-foreground: 270 30% 20%;
+    /* Accent: Electric cyan */
+    --accent: 180 100% 50%;
+    --accent-foreground: 0 0% 100%;
 
-    /* Energy: Pastel orange for motivation */
-    --energy: 25 80% 75%;
-    --energy-foreground: 270 30% 20%;
-    --energy-light: 25 90% 85%;
+    /* Energy: Neon orange */
+    --energy: 30 100% 60%;
+    --energy-foreground: 0 0% 100%;
+    --energy-light: 30 100% 90%;
 
-    --muted: 30 30% 92%;
-    --muted-foreground: 270 20% 50%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 320 20% 50%;
 
-    --destructive: 0 70% 65%;
+    --destructive: 0 100% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 270 30% 90%;
-    --input: 270 30% 90%;
-    --ring: 270 60% 75%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 280 100% 60%;
 
     --radius: 1rem;
 
-    /* Gradients for beautiful backgrounds */
-    --gradient-primary: linear-gradient(135deg, hsl(270 70% 85%) 0%, hsl(340 70% 85%) 100%);
-    --gradient-warm: linear-gradient(180deg, hsl(30 40% 95%) 0%, hsl(340 60% 95%) 100%);
-    --gradient-glow: radial-gradient(circle at top right, hsl(270 70% 90% / 0.3), transparent 70%);
+    /* Light mode gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(280 100% 70%) 0%, hsl(320 100% 70%) 100%);
+    --gradient-warm: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(280 50% 95%) 100%);
+    --gradient-glow: radial-gradient(circle at top right, hsl(280 100% 70% / 0.15), transparent 70%);
     
-    /* Shadows */
-    --shadow-soft: 0 4px 20px hsl(270 60% 75% / 0.15);
-    --shadow-card: 0 8px 30px hsl(270 60% 75% / 0.12);
-    --shadow-glow: 0 0 40px hsl(270 70% 90% / 0.4);
+    /* Light mode shadows */
+    --shadow-soft: 0 4px 20px hsl(280 100% 70% / 0.15);
+    --shadow-card: 0 8px 30px hsl(280 100% 70% / 0.12);
+    --shadow-glow: 0 0 40px hsl(280 100% 70% / 0.3);
 
     /* Animation timings */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-spring: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-
-  .dark {
-    --background: 270 30% 15%;
-    --foreground: 270 20% 95%;
-
-    --card: 270 25% 20%;
-    --card-foreground: 270 20% 95%;
-
-    --popover: 270 25% 20%;
-    --popover-foreground: 270 20% 95%;
-
-    --primary: 270 60% 75%;
-    --primary-foreground: 270 20% 95%;
-    --primary-light: 270 50% 65%;
-    --primary-glow: 270 40% 55%;
-
-    --secondary: 340 60% 70%;
-    --secondary-foreground: 270 20% 95%;
-    --secondary-light: 340 50% 60%;
-
-    --accent: 270 30% 30%;
-    --accent-foreground: 270 20% 95%;
-
-    --energy: 25 70% 65%;
-    --energy-foreground: 270 20% 95%;
-    --energy-light: 25 60% 55%;
-
-    --muted: 270 25% 25%;
-    --muted-foreground: 270 20% 75%;
-
-    --destructive: 0 70% 60%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 270 25% 25%;
-    --input: 270 25% 25%;
-    --ring: 270 60% 75%;
-
-    --gradient-primary: linear-gradient(135deg, hsl(270 50% 35%) 0%, hsl(340 50% 35%) 100%);
-    --gradient-warm: linear-gradient(180deg, hsl(270 30% 15%) 0%, hsl(270 25% 20%) 100%);
-    --gradient-glow: radial-gradient(circle at top right, hsl(270 60% 45% / 0.3), transparent 70%);
   }
 }
 
@@ -210,7 +151,7 @@ All colors MUST be HSL.
 
 @layer utilities {
   .glass-card {
-    @apply backdrop-blur-md bg-white/70 dark:bg-card/70 border border-white/20;
+    @apply backdrop-blur-md bg-white/70 border border-white/20;
   }
 
   .glow-effect {
@@ -271,28 +212,4 @@ All colors MUST be HSL.
 #google_translate_element .goog-te-gadget-simple .goog-te-menu-value span:first-child {
   color: #374151 !important;
   font-size: 12px !important;
-}
-
-/* Dark mode for Google Translate */
-.dark #google_translate_element select {
-  background-color: #1f2937 !important;
-  color: #f9fafb !important;
-  border-color: #374151 !important;
-}
-
-.dark #google_translate_element .goog-te-gadget {
-  color: #f9fafb !important;
-}
-
-.dark #google_translate_element .goog-te-gadget-simple {
-  background-color: #1f2937 !important;
-  border-color: #374151 !important;
-}
-
-.dark #google_translate_element .goog-te-gadget-simple .goog-te-menu-value {
-  color: #f9fafb !important;
-}
-
-.dark #google_translate_element .goog-te-gadget-simple .goog-te-menu-value span:first-child {
-  color: #f9fafb !important;
 }

@@ -109,6 +109,16 @@ const HealthReports = () => {
       if (error) throw error;
 
       toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} report generated successfully!`);
+
+      // Create notification for report generation
+      if ((window as any).createNotification) {
+        (window as any).createNotification(
+          'Wellness Report Generated',
+          `Your ${type} wellness report has been generated successfully`,
+          'report',
+          '/profile?tab=reports'
+        );
+      }
     } catch (error) {
       console.error('Error generating report:', error);
       toast.error('Failed to generate health report');
@@ -133,10 +143,10 @@ const HealthReports = () => {
         {/* Controls */}
         <div className="flex flex-col sm:flex-row gap-3">
           {/* Period Selection */}
-          <div className="flex bg-gray-100 dark:bg-gray-800 rounded-lg p-1 w-full sm:w-auto">
+          <div className="flex bg-white dark:bg-gray-800 rounded-lg p-1 w-full sm:w-auto border border-gray-200 dark:border-gray-600">
             <Button
               onClick={() => setSelectedPeriod('weekly')}
-              variant={selectedPeriod === 'weekly' ? 'default' : 'ghost'}
+              variant={selectedPeriod === 'weekly' ? 'default' : 'outline'}
               size="sm"
               className="flex-1 sm:flex-none h-9 text-xs sm:text-sm"
             >
@@ -144,7 +154,7 @@ const HealthReports = () => {
             </Button>
           <Button
               onClick={() => setSelectedPeriod('monthly')}
-              variant={selectedPeriod === 'monthly' ? 'default' : 'ghost'}
+              variant={selectedPeriod === 'monthly' ? 'default' : 'outline'}
             size="sm"
               className="flex-1 sm:flex-none h-9 text-xs sm:text-sm"
           >
@@ -156,7 +166,7 @@ const HealthReports = () => {
           <Button
             onClick={() => generateReport(selectedPeriod)}
             disabled={generating || aiLoading}
-            className="w-full sm:w-auto bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 h-9 text-xs sm:text-sm"
+            className="w-full sm:w-auto bg-white from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 h-9 text-xs sm:text-sm"
           >
             {generating || aiLoading ? (
               <Clock className="w-3 h-3 sm:w-4 sm:h-4 mr-2 animate-spin" />
@@ -174,7 +184,7 @@ const HealthReports = () => {
 
       {/* AI Generated Wellness Report */}
       {aiReport && (
-        <Card className="mt-6">
+        <Card className="mt-6 bg-white  border-0 shadow-xl">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
               <Heart className="w-4 h-4 sm:w-5 sm:h-5 text-pink-500" />
@@ -185,8 +195,8 @@ const HealthReports = () => {
                       </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="bg-gradient-to-r from-pink-50 to-purple-50 dark:from-pink-900/20 dark:to-purple-900/20 rounded-lg p-4 sm:p-6">
-              <div className="whitespace-pre-wrap text-gray-800 dark:text-gray-200 leading-relaxed text-sm sm:text-base overflow-x-auto">
+            <div className="bg-white dark:bg-gray-700 rounded-lg p-4 sm:p-6 border border-gray-200 dark:border-gray-600">
+              <div className="whitespace-pre-wrap text-black dark:text-white leading-relaxed text-sm sm:text-base overflow-x-auto">
                 {aiReport}
               </div>
                     </div>

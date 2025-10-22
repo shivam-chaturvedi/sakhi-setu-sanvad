@@ -229,10 +229,20 @@ const PDFReportGenerator: React.FC<PDFReportGeneratorProps> = ({ userProfile, ai
     doc.save(fileName);
     
     toast.success('Report generated and downloaded successfully!');
+
+    // Create notification for PDF report generation
+    if ((window as any).createNotification) {
+      (window as any).createNotification(
+        'PDF Report Downloaded',
+        'Your comprehensive wellness report has been downloaded',
+        'report',
+        '/profile?tab=reports'
+      );
+    }
   };
 
   return (
-    <Card>
+    <Card className="bg-white dark:bg-gray-800 border-0 shadow-xl">
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
           <FileText className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -246,27 +256,27 @@ const PDFReportGenerator: React.FC<PDFReportGeneratorProps> = ({ userProfile, ai
         </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-          <div className="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+          <div className="flex items-center gap-2 p-3 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
             <Activity className="w-4 h-4 text-blue-600 flex-shrink-0" />
             <div className="min-w-0">
-              <div className="text-sm font-medium">Activity Stats</div>
-              <div className="text-xs text-muted-foreground">Posts, videos, views</div>
+              <div className="text-sm font-medium text-black dark:text-white">Activity Stats</div>
+              <div className="text-xs text-gray-600 dark:text-gray-300">Posts, videos, views</div>
             </div>
           </div>
           
-          <div className="flex items-center gap-2 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+          <div className="flex items-center gap-2 p-3 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
             <MessageCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
             <div className="min-w-0">
-              <div className="text-sm font-medium">Recent Posts</div>
-              <div className="text-xs text-muted-foreground">Community activity</div>
+              <div className="text-sm font-medium text-black dark:text-white">Recent Posts</div>
+              <div className="text-xs text-gray-600 dark:text-gray-300">Community activity</div>
             </div>
           </div>
           
-          <div className="flex items-center gap-2 p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+          <div className="flex items-center gap-2 p-3 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
             <Video className="w-4 h-4 text-purple-600 flex-shrink-0" />
             <div className="min-w-0">
-              <div className="text-sm font-medium">Video Content</div>
-              <div className="text-xs text-muted-foreground">Published videos</div>
+              <div className="text-sm font-medium text-black dark:text-white">Video Content</div>
+              <div className="text-xs text-gray-600 dark:text-gray-300">Published videos</div>
             </div>
           </div>
         </div>

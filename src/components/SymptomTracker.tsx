@@ -117,7 +117,16 @@ export const SymptomTracker: React.FC = () => {
   };
 
   const calculateStats = (symptomData: any[]) => {
-    if (symptomData.length === 0) return;
+    if (symptomData.length === 0) {
+      // Set empty stats for new users - no premade data
+      setStats({
+        totalEntries: 0,
+        averageSeverity: 0,
+        mostCommonSymptom: '',
+        recentTrend: 'stable'
+      });
+      return;
+    }
 
     const totalEntries = symptomData.length;
     const averageSeverity = symptomData.reduce((sum, s) => sum + s.severity, 0) / totalEntries;
@@ -130,15 +139,30 @@ export const SymptomTracker: React.FC = () => {
     const mostCommonSymptom = Object.entries(symptomCounts)
       .sort(([,a], [,b]) => b - a)[0]?.[0] || '';
 
-    // Calculate trend (simplified)
-    const recent = symptomData.slice(0, 7);
-    const older = symptomData.slice(7, 14);
-    const recentAvg = recent.reduce((sum, s) => sum + s.severity, 0) / recent.length;
-    const olderAvg = older.reduce((sum, s) => sum + s.severity, 0) / older.length;
-    
+    // Calculate trend with improved algorithm
     let recentTrend = 'stable';
-    if (recentAvg > olderAvg * 1.1) recentTrend = 'worsening';
-    else if (recentAvg < olderAvg * 0.9) recentTrend = 'improving';
+    if (symptomData.length >= 3) {
+      // Compare last 3 entries with previous 3 entries for better trend detection
+      const recent = symptomData.slice(0, 3);
+      const older = symptomData.slice(3, 6);
+      
+      if (older.length > 0) {
+        const recentAvg = recent.reduce((sum, s) => sum + s.severity, 0) / recent.length;
+        const olderAvg = older.reduce((sum, s) => sum + s.severity, 0) / older.length;
+        
+        // More sensitive thresholds for trend detection
+        const threshold = 0.5; // Half point difference
+        if (recentAvg > olderAvg + threshold) recentTrend = 'worsening';
+        else if (recentAvg < olderAvg - threshold) recentTrend = 'improving';
+      }
+    } else if (symptomData.length === 2) {
+      // For just 2 entries, compare them directly
+      const recent = symptomData[0].severity;
+      const older = symptomData[1].severity;
+      const threshold = 1; // One point difference for 2 entries
+      if (recent > older + threshold) recentTrend = 'worsening';
+      else if (recent < older - threshold) recentTrend = 'improving';
+    }
 
     setStats({
       totalEntries,
@@ -177,6 +201,17 @@ export const SymptomTracker: React.FC = () => {
         description: 'Your data has been saved and will be used for AI insights.'
       });
 
+      // Create notification for symptom logging
+      if ((window as any).createNotification) {
+        const symptomLabel = symptomTypes.find(s => s.value === selectedSymptom)?.label || selectedSymptom;
+        (window as any).createNotification(
+          'Symptom Tracked',
+          `${symptomLabel} (Severity: ${severity[0]}/10) recorded successfully`,
+          'symptom',
+          '/tracker'
+        );
+      }
+
       setSelectedSymptom('');
       setSeverity([5]);
       setNotes('');
@@ -198,11 +233,11 @@ export const SymptomTracker: React.FC = () => {
   };
 
   const getSeverityColor = (value: number) => {
-    if (value <= 2) return 'text-green-600 bg-green-100 dark:bg-green-900/30';
-    if (value <= 4) return 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900/30';
-    if (value <= 6) return 'text-orange-600 bg-orange-100 dark:bg-orange-900/30';
-    if (value <= 8) return 'text-red-600 bg-red-100 dark:bg-red-900/30';
-    return 'text-red-800 bg-red-200 dark:bg-red-900/50';
+    if (value <= 2) return 'text-green-600 bg-green-100';
+    if (value <= 4) return 'text-yellow-600 bg-yellow-100';
+    if (value <= 6) return 'text-orange-600 bg-orange-100';
+    if (value <= 8) return 'text-red-600 bg-red-100';
+    return 'text-red-800 bg-red-200';
   };
 
   const getTrendIcon = (trend: string) => {
@@ -264,8 +299,19 @@ export const SymptomTracker: React.FC = () => {
     }
 
     try {
-      const symptomList = symptoms.map(s => s.symptom_type);
-      const response = await analyzeSymptoms(symptomList, `Recent symptoms with average severity ${stats.averageSeverity}/10`);
+      // Create detailed symptom analysis based on actual logged symptoms
+      const symptomDetails = symptoms.map(s => 
+        `${s.symptom_type.replace('_', ' ')} (severity: ${s.severity}/10)`
+      ).join(', ');
+      
+      const analysisPrompt = `Based on these logged symptoms: ${symptomDetails}. 
+      Total entries: ${stats.totalEntries}, Average severity: ${stats.averageSeverity}/10.
+      Please provide specific recommendations for managing these menopause symptoms.`;
+      
+      const response = await analyzeSymptoms(
+        symptoms.map(s => s.symptom_type), 
+        analysisPrompt
+      );
       
       // Format response by removing markdown formatting
       const formattedResponse = response
@@ -336,7 +382,7 @@ export const SymptomTracker: React.FC = () => {
           className="flex flex-col items-center gap-4"
         >
           <Loader2 className="w-8 h-8 animate-spin text-pink-500" />
-          <p className="text-gray-600 dark:text-gray-300">Loading your symptoms...</p>
+          <p className="text-gray-600">Loading your symptoms...</p>
         </motion.div>
       </div>
     );
@@ -348,36 +394,41 @@ export const SymptomTracker: React.FC = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex flex-wrap gap-2 justify-center mb-6"
+        className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center mb-6"
       >
         <Button
           onClick={handleSymptomAnalysis}
           disabled={aiLoading || symptoms.length === 0}
-          className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+          className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white text-sm sm:text-base"
         >
           {aiLoading ? (
             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
           ) : (
             <Brain className="w-4 h-4 mr-2" />
           )}
-          Analyze Symptoms
+          <span className="hidden xs:inline">Analyze Symptoms</span>
+          <span className="xs:hidden">Analyze</span>
         </Button>
         <Button
           onClick={handleMotivation}
           disabled={aiLoading}
           variant="outline"
-          className="border-purple-500 text-purple-500 hover:bg-purple-50"
+          className="border-purple-500 text-purple-500 hover:bg-purple-50 text-sm sm:text-base"
         >
           <Heart className="w-4 h-4 mr-2" />
-          Get Motivation
+          <span className="hidden xs:inline">Get Motivation</span>
+          <span className="xs:hidden">Motivation</span>
         </Button>
         <Button
-          onClick={() => setShowAiChat(!showAiChat)}
+          onClick={() => {
+            console.log('Ask AI button clicked, current showAiChat:', showAiChat);
+            setShowAiChat(!showAiChat);
+          }}
           variant="outline"
-          className="border-pink-500 text-pink-500 hover:bg-pink-50"
+          className="border-pink-500 text-pink-500 hover:bg-pink-50 text-sm sm:text-base"
         >
           <MessageCircle className="w-4 h-4 mr-2" />
-          Ask AI
+          {showAiChat ? 'Hide AI Chat' : 'Ask AI'}
         </Button>
       </motion.div>
 
@@ -385,49 +436,49 @@ export const SymptomTracker: React.FC = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="grid grid-cols-1 md:grid-cols-4 gap-4"
+        className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4"
       >
-        <Card className="bg-gradient-to-br from-pink-50 to-purple-50 dark:from-pink-900/20 dark:to-purple-900/20">
-          <CardContent className="p-4 text-center">
-            <div className="flex items-center justify-center mb-2">
-              <Calendar className="w-6 h-6 text-pink-500" />
+        <Card className="bg-gradient-to-br from-pink-50 to-purple-50">
+          <CardContent className="p-3 sm:p-4 text-center">
+            <div className="flex items-center justify-center mb-1 sm:mb-2">
+              <Calendar className="w-4 h-4 sm:w-6 sm:h-6 text-pink-500" />
             </div>
-            <div className="text-2xl font-bold text-pink-600">{stats.totalEntries}</div>
-            <div className="text-sm text-gray-600 dark:text-gray-300">Total Entries</div>
+            <div className="text-lg sm:text-2xl font-bold text-pink-600">{stats.totalEntries}</div>
+            <div className="text-xs sm:text-sm text-gray-600">Total Entries</div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20">
-          <CardContent className="p-4 text-center">
-            <div className="flex items-center justify-center mb-2">
-              <BarChart3 className="w-6 h-6 text-blue-500" />
+        <Card className="bg-gradient-to-br from-blue-50 to-cyan-50">
+          <CardContent className="p-3 sm:p-4 text-center">
+            <div className="flex items-center justify-center mb-1 sm:mb-2">
+              <BarChart3 className="w-4 h-4 sm:w-6 sm:h-6 text-blue-500" />
             </div>
-            <div className="text-2xl font-bold text-blue-600">{stats.averageSeverity}/10</div>
-            <div className="text-sm text-gray-600 dark:text-gray-300">Avg Severity</div>
+            <div className="text-lg sm:text-2xl font-bold text-blue-600">{stats.averageSeverity}/10</div>
+            <div className="text-xs sm:text-sm text-gray-600">Avg Severity</div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20">
-          <CardContent className="p-4 text-center">
-            <div className="flex items-center justify-center mb-2">
+        <Card className="bg-gradient-to-br from-green-50 to-emerald-50">
+          <CardContent className="p-3 sm:p-4 text-center">
+            <div className="flex items-center justify-center mb-1 sm:mb-2">
               {getTrendIcon(stats.recentTrend)}
             </div>
-            <div className={`text-lg font-bold ${getTrendColor(stats.recentTrend)} capitalize`}>
+            <div className={`text-sm sm:text-lg font-bold ${getTrendColor(stats.recentTrend)} capitalize`}>
               {stats.recentTrend}
             </div>
-            <div className="text-sm text-gray-600 dark:text-gray-300">Recent Trend</div>
+            <div className="text-xs sm:text-sm text-gray-600">Recent Trend</div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20">
-          <CardContent className="p-4 text-center">
-            <div className="flex items-center justify-center mb-2">
-              <Target className="w-6 h-6 text-orange-500" />
+        <Card className="bg-gradient-to-br from-orange-50 to-red-50">
+          <CardContent className="p-3 sm:p-4 text-center">
+            <div className="flex items-center justify-center mb-1 sm:mb-2">
+              <Target className="w-4 h-4 sm:w-6 sm:h-6 text-orange-500" />
             </div>
-            <div className="text-lg font-bold text-orange-600 truncate">
+            <div className="text-sm sm:text-lg font-bold text-orange-600 truncate">
               {stats.mostCommonSymptom.replace('_', ' ')}
             </div>
-            <div className="text-sm text-gray-600 dark:text-gray-300">Most Common</div>
+            <div className="text-xs sm:text-sm text-gray-600">Most Common</div>
           </CardContent>
         </Card>
       </motion.div>
@@ -438,7 +489,7 @@ export const SymptomTracker: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
       >
-        <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 shadow-xl">
+        <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-xl">
               <Activity className="h-6 w-6 text-pink-500" />
@@ -458,7 +509,7 @@ export const SymptomTracker: React.FC = () => {
               >
                 <Label htmlFor="symptom" className="text-base font-medium">Symptom Type</Label>
                 <Select value={selectedSymptom} onValueChange={setSelectedSymptom}>
-                  <SelectTrigger className="h-12 bg-white/50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20">
+                  <SelectTrigger className="h-12 bg-white/50 border-gray-200 focus:border-pink-500 focus:ring-pink-500/20">
                     <SelectValue placeholder="Select a symptom to track" />
                   </SelectTrigger>
                   <SelectContent>
@@ -520,7 +571,7 @@ export const SymptomTracker: React.FC = () => {
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Any additional details about your symptoms, triggers, or context..."
                   rows={4}
-                  className="bg-white/50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20"
+                  className="bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-neon-pink focus:ring-neon-pink/20 text-black dark:text-white"
                 />
               </motion.div>
 
@@ -559,7 +610,7 @@ export const SymptomTracker: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
         >
-          <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 shadow-xl">
+          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-xl">
                 <TrendingUp className="h-6 w-6 text-purple-500" />
@@ -584,33 +635,38 @@ export const SymptomTracker: React.FC = () => {
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: 20 }}
                         transition={{ delay: index * 0.05 }}
-                        className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-xl hover:shadow-md transition-all duration-300 bg-white/50 dark:bg-gray-700/50"
+                        className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 border border-gray-200 rounded-xl hover:shadow-md transition-all duration-300 bg-white/50 gap-3"
                       >
-                        <div className="flex items-center gap-4 flex-1">
-                          <div className={`p-2 rounded-lg bg-gray-100 dark:bg-gray-600`}>
-                            <Icon className={`w-5 h-5 ${color}`} />
+                        <div className="flex items-center gap-3 sm:gap-4 flex-1">
+                          <div className={`p-2 rounded-lg bg-gray-100 flex-shrink-0`}>
+                            <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${color}`} />
                           </div>
-                          <div className="flex-1">
-                            <div className="font-medium text-gray-900 dark:text-white">
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium text-gray-900 text-sm sm:text-base">
                               {symptomType?.label || symptom.symptom_type.replace('_', ' ')}
                             </div>
-                            <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
-                              <Clock className="w-3 h-3" />
-                              {new Date(symptom.recorded_at).toLocaleDateString()} at {new Date(symptom.recorded_at).toLocaleTimeString()}
+                            <div className="text-xs sm:text-sm text-gray-500 flex items-center gap-2">
+                              <Clock className="w-3 h-3 flex-shrink-0" />
+                              <span className="hidden sm:inline">
+                                {new Date(symptom.recorded_at).toLocaleDateString()} at {new Date(symptom.recorded_at).toLocaleTimeString()}
+                              </span>
+                              <span className="sm:hidden">
+                                {new Date(symptom.recorded_at).toLocaleDateString()}
+                              </span>
                             </div>
                             {symptom.notes && (
-                              <div className="text-sm text-gray-600 dark:text-gray-300 mt-1 italic">
+                              <div className="text-xs sm:text-sm text-gray-600 mt-1 italic line-clamp-2">
                                 "{symptom.notes}"
                               </div>
                             )}
                           </div>
                         </div>
-                        <div className="flex items-center gap-3">
-                          <Badge className={`px-3 py-1 ${getSeverityColor(symptom.severity)}`}>
+                        <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-3">
+                          <Badge className={`px-2 sm:px-3 py-1 text-xs sm:text-sm ${getSeverityColor(symptom.severity)}`}>
                             {symptom.severity}/10
                           </Badge>
                           <div className="text-right">
-                            <div className="text-sm font-medium text-gray-900 dark:text-white">
+                            <div className="text-xs sm:text-sm font-medium text-gray-900">
                               {getSeverityLabel(symptom.severity)}
                             </div>
                           </div>
@@ -631,35 +687,54 @@ export const SymptomTracker: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
+          className="mt-6"
         >
-          <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 shadow-xl">
+          <Card className="bg-gradient-to-br from-purple-50/80 to-pink-50/80 backdrop-blur-sm border border-purple-200 shadow-xl">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Bot className="w-5 h-5 text-purple-500" />
-                AI Symptom Assistant
-              </CardTitle>
-              <CardDescription>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Bot className="w-6 h-6 text-purple-500" />
+                  <CardTitle className="text-xl">AI Symptom Assistant</CardTitle>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowAiChat(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  ✕
+                </Button>
+              </div>
+              <CardDescription className="text-base">
                 Ask questions about your symptoms and get personalized AI recommendations
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <Textarea
                   value={aiQuery}
                   onChange={(e) => setAiQuery(e.target.value)}
                   placeholder="Ask me anything about your symptoms, wellness, or menopause..."
-                  className="flex-1 min-h-[100px]"
+                  className="flex-1 min-h-[80px] sm:min-h-[100px] bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-neon-pink focus:ring-neon-pink/20 text-black dark:text-white"
                   disabled={aiLoading}
                 />
                 <Button
                   onClick={handleAiQuery}
                   disabled={aiLoading || !aiQuery.trim()}
-                  className="self-end"
+                  className="self-end sm:self-end bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-4 sm:px-6 py-2 text-sm sm:text-base"
                 >
                   {aiLoading ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      <span className="hidden sm:inline">Thinking...</span>
+                      <span className="sm:hidden">...</span>
+                    </>
                   ) : (
-                    <Send className="w-4 h-4" />
+                    <>
+                      <Send className="w-4 h-4 mr-2" />
+                      <span className="hidden sm:inline">Ask AI</span>
+                      <span className="sm:hidden">Ask</span>
+                    </>
                   )}
                 </Button>
               </div>
@@ -668,16 +743,16 @@ export const SymptomTracker: React.FC = () => {
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="p-4 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg border border-purple-200 dark:border-purple-800"
+                  className="p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200"
                   data-ai-response
                 >
-                  <div className="flex items-start gap-3">
-                    <Bot className="w-5 h-5 text-purple-500 mt-1 flex-shrink-0" />
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-purple-900 dark:text-purple-100 mb-2">
+                  <div className="flex items-start gap-2 sm:gap-3">
+                    <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500 mt-1 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-semibold text-purple-900 mb-1 sm:mb-2 text-sm sm:text-base">
                         AI Recommendation
                       </h4>
-                      <div className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
+                      <div className="text-xs sm:text-sm text-gray-700 whitespace-pre-wrap leading-relaxed break-words">
                         {aiResponse}
                       </div>
                     </div>
@@ -686,7 +761,7 @@ export const SymptomTracker: React.FC = () => {
               )}
 
               {/* Quick Questions */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
                 <Button
                   variant="outline"
                   size="sm"

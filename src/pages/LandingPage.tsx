@@ -23,14 +23,14 @@ const LandingPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-light/20 via-pink-light/20 to-neon-purple/10 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900">
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           className="flex flex-col items-center gap-4"
         >
-          <div className="w-16 h-16 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin"></div>
-          <p className="text-pink-600 dark:text-pink-400 font-medium">Loading...</p>
+          <div className="w-16 h-16 border-4 border-neon-pink/30 border-t-neon-pink rounded-full animate-spin"></div>
+          <p className="text-neon-pink dark:text-neon-pink font-medium">Loading...</p>
         </motion.div>
       </div>
     );
@@ -45,15 +45,15 @@ const LandingPage = () => {
       icon: Heart,
       title: 'Symptom Tracking',
       description: 'Track your menopause symptoms with AI-powered insights',
-      color: 'text-pink-500',
-      bgColor: 'bg-pink-50 dark:bg-pink-900/20'
+      color: 'text-neon-pink',
+      bgColor: 'bg-neon-pink/10 dark:bg-neon-pink/20'
     },
     {
       icon: Brain,
       title: 'AI Analytics',
       description: 'Get personalized recommendations based on your data',
-      color: 'text-purple-500',
-      bgColor: 'bg-purple-50 dark:bg-purple-900/20'
+      color: 'text-neon-purple',
+      bgColor: 'bg-neon-purple/10 dark:bg-neon-purple/20'
     },
     {
       icon: Users,
@@ -95,7 +95,7 @@ const LandingPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-purple-light/20 via-pink-light/20 to-neon-purple/10 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900 relative overflow-hidden">
 
       {/* Responsive Header */}
       <ResponsiveHeader />
@@ -110,7 +110,7 @@ const LandingPage = () => {
       <div className="absolute inset-0 overflow-hidden">
         {/* Gradient Orbs */}
         <motion.div
-          className="absolute top-20 left-20 w-96 h-96 bg-pink-300/20 dark:bg-pink-500/10 rounded-full blur-3xl"
+          className="absolute top-20 left-20 w-96 h-96 bg-neon-pink/20 dark:bg-neon-pink/10 rounded-full blur-3xl"
           animate={{
             x: [0, 100, 0],
             y: [0, -50, 0],
@@ -123,7 +123,7 @@ const LandingPage = () => {
           }}
         />
         <motion.div
-          className="absolute top-40 right-20 w-80 h-80 bg-purple-300/20 dark:bg-purple-500/10 rounded-full blur-3xl"
+          className="absolute top-40 right-20 w-80 h-80 bg-neon-purple/20 dark:bg-neon-purple/10 rounded-full blur-3xl"
           animate={{
             x: [0, -80, 0],
             y: [0, 60, 0],
@@ -155,7 +155,7 @@ const LandingPage = () => {
           return (
             <motion.div
               key={index}
-              className={`absolute text-pink-400/30 dark:text-pink-300/20 ${element.size}`}
+              className={`absolute text-neon-pink/30 dark:text-neon-pink/20 ${element.size}`}
               style={{
                 left: `${element.x}%`,
                 top: `${element.y}%`,
@@ -181,7 +181,7 @@ const LandingPage = () => {
         {[...Array(30)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-1 h-1 bg-pink-400/40 dark:bg-pink-300/30 rounded-full"
+            className="absolute w-1 h-1 bg-neon-pink/40 dark:bg-neon-pink/30 rounded-full"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
@@ -224,7 +224,7 @@ const LandingPage = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
               >
-                <Badge className="mb-4 bg-pink-100 dark:bg-pink-900/30 text-pink-800 dark:text-pink-200 border-pink-200 dark:border-pink-700">
+                <Badge className="mb-4 bg-neon-pink/10 dark:bg-neon-pink/20 text-neon-pink dark:text-neon-pink border-neon-pink/30 dark:border-neon-pink/50">
                   🛡️ Trusted by 10,000+ Women
                 </Badge>
               </motion.div>
@@ -235,7 +235,7 @@ const LandingPage = () => {
                 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6"
               >
                 Your Journey Through
-                <span className="bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent"> Menopause</span>
+                <span className="bg-gradient-to-r from-neon-pink to-neon-purple bg-clip-text text-transparent"> Menopause</span>
                 <br />Starts Here
               </motion.h2>
               <motion.p
@@ -257,7 +257,7 @@ const LandingPage = () => {
                   <Button 
                     size="lg" 
                     onClick={() => navigate('/auth')}
-                    className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white text-lg px-8 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
+                    className="bg-gradient-to-r from-neon-purple to-neon-pink hover:from-purple-dark hover:to-pink-dark text-white text-lg px-8 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
                   >
                     Start Your Journey
                     <ArrowRight className="w-5 h-5 ml-2" />
@@ -268,7 +268,7 @@ const LandingPage = () => {
                     size="lg" 
                     variant="outline"
                     onClick={() => navigate('/auth')}
-                    className="text-lg px-8 py-3 border-2 border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-white transition-all duration-300"
+                    className="text-lg px-8 py-3 border-2 border-neon-pink text-neon-pink hover:bg-neon-pink hover:text-white transition-all duration-300"
                   >
                     <Play className="w-5 h-5 mr-2" />
                     Watch Demo
@@ -294,12 +294,12 @@ const LandingPage = () => {
               </div>
               {/* Floating elements around the image */}
               <motion.div
-                className="absolute -top-4 -right-4 w-20 h-20 bg-pink-500/20 rounded-full blur-xl"
+                className="absolute -top-4 -right-4 w-20 h-20 bg-neon-pink/20 rounded-full blur-xl"
                 animate={{ scale: [1, 1.2, 1], rotate: [0, 180, 360] }}
                 transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
               />
               <motion.div
-                className="absolute -bottom-4 -left-4 w-16 h-16 bg-purple-500/20 rounded-full blur-xl"
+                className="absolute -bottom-4 -left-4 w-16 h-16 bg-neon-purple/20 rounded-full blur-xl"
                 animate={{ scale: [1.2, 1, 1.2], rotate: [360, 180, 0] }}
                 transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
               />
@@ -369,7 +369,7 @@ const LandingPage = () => {
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8 }}
-        className="relative z-10 px-6 py-16 bg-gradient-to-r from-pink-500 to-purple-500 text-white"
+        className="relative z-10 px-6 py-16 bg-gradient-to-r from-neon-purple to-neon-pink text-white"
       >
         <div className="max-w-4xl mx-auto text-center">
           <motion.h3
@@ -398,7 +398,7 @@ const LandingPage = () => {
             <Button 
               size="lg" 
               onClick={() => navigate('/auth')}
-              className="bg-white text-pink-500 hover:bg-gray-100 text-lg px-8 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
+              className="bg-white text-neon-pink hover:bg-gray-100 text-lg px-8 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
             >
               Get Started Today
               <ArrowRight className="w-5 h-5 ml-2" />
@@ -414,7 +414,7 @@ const LandingPage = () => {
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
         viewport={{ once: true }}
-        className="py-20 bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900"
+        className="py-20 bg-gradient-to-br from-purple-light/20 via-pink-light/20 to-neon-purple/10 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
@@ -470,8 +470,8 @@ const LandingPage = () => {
                   "{testimonial.content}"
                 </p>
                 <div className="flex items-center">
-                  <div className="w-10 h-10 bg-pink-100 dark:bg-pink-900/30 rounded-full flex items-center justify-center mr-3">
-                    <Heart className="w-5 h-5 text-pink-500" />
+                  <div className="w-10 h-10 bg-neon-pink/10 dark:bg-neon-pink/20 rounded-full flex items-center justify-center mr-3">
+                    <Heart className="w-5 h-5 text-neon-pink" />
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-900 dark:text-white">{testimonial.name}</h4>
@@ -518,8 +518,8 @@ const LandingPage = () => {
               className="space-y-8"
             >
               <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-pink-100 dark:bg-pink-900/30 rounded-xl flex items-center justify-center">
-                  <Phone className="w-6 h-6 text-pink-500" />
+                <div className="w-12 h-12 bg-neon-pink/10 dark:bg-neon-pink/20 rounded-xl flex items-center justify-center">
+                  <Phone className="w-6 h-6 text-neon-pink" />
                 </div>
                 <div>
                   <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Phone Support</h3>
@@ -529,8 +529,8 @@ const LandingPage = () => {
               </div>
 
               <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-pink-100 dark:bg-pink-900/30 rounded-xl flex items-center justify-center">
-                  <MapPin className="w-6 h-6 text-pink-500" />
+                <div className="w-12 h-12 bg-neon-pink/10 dark:bg-neon-pink/20 rounded-xl flex items-center justify-center">
+                  <MapPin className="w-6 h-6 text-neon-pink" />
                 </div>
                 <div>
                   <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Office Address</h3>
@@ -543,8 +543,8 @@ const LandingPage = () => {
               </div>
 
               <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-pink-100 dark:bg-pink-900/30 rounded-xl flex items-center justify-center">
-                  <Clock className="w-6 h-6 text-pink-500" />
+                <div className="w-12 h-12 bg-neon-pink/10 dark:bg-neon-pink/20 rounded-xl flex items-center justify-center">
+                  <Clock className="w-6 h-6 text-neon-pink" />
                 </div>
                 <div>
                   <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Response Time</h3>
@@ -569,7 +569,7 @@ const LandingPage = () => {
                   </label>
                   <input
                     type="text"
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-neon-pink focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                     placeholder="Your full name"
                   />
                 </div>
@@ -579,7 +579,7 @@ const LandingPage = () => {
                   </label>
                   <input
                     type="email"
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-neon-pink focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                     placeholder="your.email@example.com"
                   />
                 </div>
@@ -589,11 +589,11 @@ const LandingPage = () => {
                   </label>
                   <textarea
                     rows={4}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-neon-pink focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                     placeholder="Tell us how we can help you..."
                   ></textarea>
                 </div>
-                <Button className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white py-3 text-lg">
+                <Button className="w-full bg-gradient-to-r from-neon-purple to-neon-pink hover:from-purple-dark hover:to-pink-dark text-white py-3 text-lg">
                   Send Message
                 </Button>
               </form>

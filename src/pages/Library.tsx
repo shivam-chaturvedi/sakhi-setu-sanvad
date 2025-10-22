@@ -2,7 +2,6 @@ import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import VideoLibrary from "@/components/VideoLibrary";
 import Navigation from "@/components/Navigation";
 import { useAuth } from "@/contexts/AuthContext";
@@ -52,7 +51,6 @@ const Library = () => {
             <p className="text-muted-foreground mt-1">Discover and share wellness videos</p>
           </div>
           <div className="flex gap-2">
-            <ThemeToggle />
           </div>
         </div>
       </motion.header>

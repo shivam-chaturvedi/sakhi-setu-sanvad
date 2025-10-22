@@ -285,7 +285,7 @@ const EnhancedSignupForm: React.FC = () => {
                           value={formData.fullName}
                           onChange={(e) => handleInputChange('fullName', e.target.value)}
                           placeholder="Enter your full name"
-                          className="pl-10 h-11 md:h-12 bg-white/50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20"
+                          className="pl-10 h-11 md:h-12 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-neon-pink focus:ring-neon-pink/20 text-black dark:text-white"
                         />
                       </div>
                       {errors.fullName && <p className="text-sm text-red-500">{errors.fullName}</p>}
@@ -301,7 +301,7 @@ const EnhancedSignupForm: React.FC = () => {
                           value={formData.email}
                           onChange={(e) => handleInputChange('email', e.target.value)}
                           placeholder="Enter your email"
-                          className="pl-10 h-11 md:h-12 bg-white/50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20"
+                          className="pl-10 h-11 md:h-12 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-neon-pink focus:ring-neon-pink/20 text-black dark:text-white"
                         />
                       </div>
                       {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
@@ -318,7 +318,7 @@ const EnhancedSignupForm: React.FC = () => {
                         value={formData.password}
                         onChange={(e) => handleInputChange('password', e.target.value)}
                         placeholder="Create a strong password"
-                        className="pl-10 pr-10 h-11 md:h-12 bg-white/50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20"
+                        className="pl-10 pr-10 h-11 md:h-12 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-neon-pink focus:ring-neon-pink/20 text-black dark:text-white"
                       />
                       <button
                         type="button"
@@ -353,7 +353,7 @@ const EnhancedSignupForm: React.FC = () => {
                         value={formData.confirmPassword}
                         onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
                         placeholder="Confirm your password"
-                        className="pl-10 pr-10 h-11 md:h-12 bg-white/50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20"
+                        className="pl-10 pr-10 h-11 md:h-12 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-neon-pink focus:ring-neon-pink/20 text-black dark:text-white"
                       />
                       <button
                         type="button"
@@ -390,7 +390,7 @@ const EnhancedSignupForm: React.FC = () => {
                         placeholder="Enter your age"
                         min="18"
                         max="100"
-                        className="h-11 md:h-12 bg-white/50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20"
+                        className="h-11 md:h-12 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-neon-pink focus:ring-neon-pink/20 text-black dark:text-white"
                       />
                       {errors.age && <p className="text-sm text-red-500">{errors.age}</p>}
                     </div>
@@ -404,7 +404,7 @@ const EnhancedSignupForm: React.FC = () => {
                           value={formData.location}
                           onChange={(e) => handleInputChange('location', e.target.value)}
                           placeholder="City, State"
-                          className="pl-10 h-11 md:h-12 bg-white/50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20"
+                          className="pl-10 h-11 md:h-12 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-neon-pink focus:ring-neon-pink/20 text-black dark:text-white"
                         />
                       </div>
                       {errors.location && <p className="text-sm text-red-500">{errors.location}</p>}
@@ -422,7 +422,7 @@ const EnhancedSignupForm: React.FC = () => {
                           value={formData.phone}
                           onChange={(e) => handleInputChange('phone', e.target.value)}
                           placeholder="+91 9876543210"
-                          className="pl-10 h-11 md:h-12 bg-white/50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20"
+                          className="pl-10 h-11 md:h-12 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-neon-pink focus:ring-neon-pink/20 text-black dark:text-white"
                         />
                       </div>
                     </div>
@@ -434,7 +434,7 @@ const EnhancedSignupForm: React.FC = () => {
                         value={formData.emergencyContact}
                         onChange={(e) => handleInputChange('emergencyContact', e.target.value)}
                         placeholder="Emergency contact name & number"
-                        className="h-11 md:h-12 bg-white/50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20"
+                        className="h-11 md:h-12 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-neon-pink focus:ring-neon-pink/20 text-black dark:text-white"
                       />
                     </div>
                   </div>
@@ -482,7 +482,7 @@ const EnhancedSignupForm: React.FC = () => {
                         onChange={(e) => handleInputChange('currentMedications', e.target.value.split(',').map(m => m.trim()).filter(m => m))}
                         placeholder="List your current medications (comma separated)"
                         rows={3}
-                        className="bg-white/50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600 focus:border-pink-500 focus:ring-pink-500/20 text-sm md:text-base"
+                        className="bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-neon-pink focus:ring-neon-pink/20 text-black dark:text-white text-sm md:text-base"
                       />
                     </div>
                   </div>

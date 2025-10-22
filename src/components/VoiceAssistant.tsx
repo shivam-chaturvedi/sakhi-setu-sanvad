@@ -235,6 +235,16 @@ const VoiceAssistant: React.FC = () => {
         speakText(response);
       }
 
+      // Create notification for AI interaction
+      if ((window as any).createNotification) {
+        (window as any).createNotification(
+          'AI Assistant Response',
+          'Your voice query has been processed and responded to',
+          'ai',
+          '/profile?tab=assistant'
+        );
+      }
+
     } catch (error) {
       console.error('Error processing voice input:', error);
       toast.error('Error processing your request. Please try again.');
@@ -300,6 +310,16 @@ const VoiceAssistant: React.FC = () => {
       // Speak the response
       if (synthesis && !isMuted) {
         speakText(response);
+      }
+
+      // Create notification for AI text interaction
+      if ((window as any).createNotification) {
+        (window as any).createNotification(
+          'AI Assistant Response',
+          'Your text query has been processed and responded to',
+          'ai',
+          '/profile?tab=assistant'
+        );
       }
 
     } catch (error) {
@@ -408,7 +428,7 @@ const VoiceAssistant: React.FC = () => {
 
   if (!isSupported) {
     return (
-      <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 shadow-xl">
+      <Card className="bg-white dark:bg-gray-800 backdrop-blur-sm border-0 shadow-xl">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Bot className="w-5 h-5 text-pink-500" />
@@ -434,7 +454,7 @@ const VoiceAssistant: React.FC = () => {
   }
 
   return (
-    <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 shadow-xl">
+    <Card className="bg-white dark:bg-gray-800 backdrop-blur-sm border-0 shadow-xl">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -542,7 +562,7 @@ const VoiceAssistant: React.FC = () => {
         </div>
 
         {/* Messages */}
-        <div className="h-64 overflow-y-auto space-y-4 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+        <div className="h-64 overflow-y-auto space-y-4 border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-700">
           {messages.length === 0 ? (
             <div className="text-center text-gray-500 dark:text-gray-400 py-8">
               <MessageCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
@@ -560,7 +580,7 @@ const VoiceAssistant: React.FC = () => {
                   className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
                     message.isUser
                       ? 'bg-pink-500 text-white'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'
+                      : 'bg-white dark:bg-gray-600 text-black dark:text-white border border-gray-200 dark:border-gray-500'
                   }`}
                 >
                   <div className="flex items-start gap-2">
@@ -604,11 +624,11 @@ const VoiceAssistant: React.FC = () => {
               className="space-y-2"
             >
               <form onSubmit={handleTextInput} className="flex gap-2">
-                <Textarea
+                  <Textarea
                   value={textInput}
                   onChange={(e) => setTextInput(e.target.value)}
                   placeholder="Type your question about menopause, symptoms, or wellness..."
-                  className="flex-1 min-h-[80px]"
+                  className="flex-1 min-h-[80px] bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-neon-pink focus:ring-neon-pink/20 text-black dark:text-white"
                   disabled={isProcessing}
                 />
                 <Button

@@ -45,7 +45,7 @@ const Tracker = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-energy-light/20 to-primary-glow/30 pb-24">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 pb-24">
       <motion.header
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -56,13 +56,13 @@ const Tracker = () => {
             variant="ghost" 
             size="icon" 
             onClick={() => navigate("/")}
-            className="hover:bg-primary/10"
+            className="hover:bg-purple-500/20 text-gray-700 hover:text-purple-600"
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">Health Tracker</h1>
-            <p className="text-muted-foreground mt-1">Track symptoms and get AI insights</p>
+            <h1 className="text-3xl font-bold text-gray-800">Health Tracker</h1>
+            <p className="text-purple-600 mt-1">Track symptoms and get AI insights</p>
           </div>
         </div>
       </motion.header>
