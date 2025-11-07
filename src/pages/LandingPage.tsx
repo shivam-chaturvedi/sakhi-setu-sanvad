@@ -23,14 +23,14 @@ const LandingPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-light/20 via-pink-light/20 to-neon-purple/10 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'radial-gradient(circle at center, #ffffff 0%, #ffcdcd 100%)' }}>
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           className="flex flex-col items-center gap-4"
         >
-          <div className="w-16 h-16 border-4 border-neon-pink/30 border-t-neon-pink rounded-full animate-spin"></div>
-          <p className="text-neon-pink dark:text-neon-pink font-medium">Loading...</p>
+          <div className="w-16 h-16 border-4 border-[#faa0cc]/30 border-t-[#faa0cc] rounded-full animate-spin"></div>
+          <p className="text-[#46bdb6] font-medium">Loading...</p>
         </motion.div>
       </div>
     );
@@ -45,15 +45,15 @@ const LandingPage = () => {
       icon: Heart,
       title: 'Symptom Tracking',
       description: 'Track your menopause symptoms with AI-powered insights',
-      color: 'text-neon-pink',
-      bgColor: 'bg-neon-pink/10 dark:bg-neon-pink/20'
+      color: '#faa0cc',
+      bgColor: 'rgba(250, 160, 204, 0.1)'
     },
     {
       icon: Brain,
       title: 'AI Analytics',
       description: 'Get personalized recommendations based on your data',
-      color: 'text-neon-purple',
-      bgColor: 'bg-neon-purple/10 dark:bg-neon-purple/20'
+      color: '#46bdb6',
+      bgColor: 'rgba(70, 189, 182, 0.1)'
     },
     {
       icon: Users,
@@ -95,7 +95,7 @@ const LandingPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-light/20 via-pink-light/20 to-neon-purple/10 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900 relative overflow-hidden">
+    <div className="min-h-screen relative overflow-hidden" style={{ background: 'radial-gradient(circle at center, #ffffff 0%, #ffcdcd 100%)' }}>
 
       {/* Responsive Header */}
       <ResponsiveHeader />
@@ -110,7 +110,8 @@ const LandingPage = () => {
       <div className="absolute inset-0 overflow-hidden">
         {/* Gradient Orbs */}
         <motion.div
-          className="absolute top-20 left-20 w-96 h-96 bg-neon-pink/20 dark:bg-neon-pink/10 rounded-full blur-3xl"
+          className="absolute top-20 left-20 w-96 h-96 rounded-full blur-3xl"
+          style={{ backgroundColor: 'rgba(250, 160, 204, 0.2)' }}
           animate={{
             x: [0, 100, 0],
             y: [0, -50, 0],
@@ -123,7 +124,8 @@ const LandingPage = () => {
           }}
         />
         <motion.div
-          className="absolute top-40 right-20 w-80 h-80 bg-neon-purple/20 dark:bg-neon-purple/10 rounded-full blur-3xl"
+          className="absolute top-40 right-20 w-80 h-80 rounded-full blur-3xl"
+          style={{ backgroundColor: 'rgba(70, 189, 182, 0.2)' }}
           animate={{
             x: [0, -80, 0],
             y: [0, 60, 0],
@@ -136,7 +138,8 @@ const LandingPage = () => {
           }}
         />
         <motion.div
-          className="absolute bottom-20 left-1/3 w-72 h-72 bg-blue-300/20 dark:bg-blue-500/10 rounded-full blur-3xl"
+          className="absolute bottom-20 left-1/3 w-72 h-72 rounded-full blur-3xl"
+          style={{ backgroundColor: 'rgba(255, 205, 205, 0.2)' }}
           animate={{
             x: [0, 60, 0],
             y: [0, -40, 0],
@@ -155,10 +158,11 @@ const LandingPage = () => {
           return (
             <motion.div
               key={index}
-              className={`absolute text-neon-pink/30 dark:text-neon-pink/20 ${element.size}`}
+              className={`absolute ${element.size}`}
               style={{
                 left: `${element.x}%`,
                 top: `${element.y}%`,
+                color: 'rgba(250, 160, 204, 0.3)',
               }}
               animate={{
                 y: [0, -20, 0],
@@ -181,10 +185,11 @@ const LandingPage = () => {
         {[...Array(30)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-1 h-1 bg-neon-pink/40 dark:bg-neon-pink/30 rounded-full"
+            className="absolute w-1 h-1 rounded-full"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
+              backgroundColor: 'rgba(250, 160, 204, 0.4)',
             }}
             animate={{
               y: [0, -100, 0],
@@ -224,7 +229,7 @@ const LandingPage = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
               >
-                <Badge className="mb-4 bg-neon-pink/10 dark:bg-neon-pink/20 text-neon-pink dark:text-neon-pink border-neon-pink/30 dark:border-neon-pink/50">
+                <Badge className="mb-4" style={{ backgroundColor: 'rgba(250, 160, 204, 0.1)', color: '#faa0cc', borderColor: 'rgba(250, 160, 204, 0.3)' }}>
                   🛡️ Trusted by 10,000+ Women
                 </Badge>
               </motion.div>
@@ -232,17 +237,19 @@ const LandingPage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
-                className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6"
+                className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6"
+                style={{ color: '#46bdb6' }}
               >
                 Your Journey Through
-                <span className="bg-gradient-to-r from-neon-pink to-neon-purple bg-clip-text text-transparent"> Menopause</span>
+                <span style={{ background: 'linear-gradient(to right, #faa0cc, #46bdb6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}> Menopause</span>
                 <br />Starts Here
               </motion.h2>
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
-                className="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-8 leading-relaxed"
+                className="text-lg md:text-xl mb-8 leading-relaxed"
+                style={{ color: '#46bdb6' }}
               >
                 Personalized, culturally relevant wellness support for women in India.
                 Track symptoms, get AI insights, and connect with a supportive community.
@@ -257,7 +264,8 @@ const LandingPage = () => {
                   <Button 
                     size="lg" 
                     onClick={() => navigate('/auth')}
-                    className="bg-gradient-to-r from-neon-purple to-neon-pink hover:from-purple-dark hover:to-pink-dark text-white text-lg px-8 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
+                    className="text-white text-lg px-8 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
+                    style={{ backgroundColor: '#faa0cc' }}
                   >
                     Start Your Journey
                     <ArrowRight className="w-5 h-5 ml-2" />
@@ -268,7 +276,16 @@ const LandingPage = () => {
                     size="lg" 
                     variant="outline"
                     onClick={() => navigate('/auth')}
-                    className="text-lg px-8 py-3 border-2 border-neon-pink text-neon-pink hover:bg-neon-pink hover:text-white transition-all duration-300"
+                    className="text-lg px-8 py-3 border-2 transition-all duration-300"
+                    style={{ borderColor: '#faa0cc', color: '#faa0cc' }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#faa0cc';
+                      e.currentTarget.style.color = 'white';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                      e.currentTarget.style.color = '#faa0cc';
+                    }}
                   >
                     <Play className="w-5 h-5 mr-2" />
                     Watch Demo
@@ -294,12 +311,14 @@ const LandingPage = () => {
               </div>
               {/* Floating elements around the image */}
               <motion.div
-                className="absolute -top-4 -right-4 w-20 h-20 bg-neon-pink/20 rounded-full blur-xl"
+                className="absolute -top-4 -right-4 w-20 h-20 rounded-full blur-xl"
+                style={{ backgroundColor: 'rgba(250, 160, 204, 0.2)' }}
                 animate={{ scale: [1, 1.2, 1], rotate: [0, 180, 360] }}
                 transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
               />
               <motion.div
-                className="absolute -bottom-4 -left-4 w-16 h-16 bg-neon-purple/20 rounded-full blur-xl"
+                className="absolute -bottom-4 -left-4 w-16 h-16 rounded-full blur-xl"
+                style={{ backgroundColor: 'rgba(70, 189, 182, 0.2)' }}
                 animate={{ scale: [1.2, 1, 1.2], rotate: [360, 180, 0] }}
                 transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
               />
@@ -314,7 +333,8 @@ const LandingPage = () => {
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="relative z-10 px-6 py-16 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm"
+        className="relative z-10 px-6 py-16 backdrop-blur-sm"
+        style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}
       >
         <div className="max-w-6xl mx-auto">
           <motion.div
@@ -323,10 +343,10 @@ const LandingPage = () => {
             transition={{ delay: 0.5 }}
             className="text-center mb-16"
           >
-            <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+            <h3 className="text-3xl font-bold mb-4" style={{ color: '#46bdb6' }}>
               Everything You Need for Your Menopause Journey
             </h3>
-            <p className="text-lg text-gray-600 dark:text-gray-300">
+            <p className="text-lg" style={{ color: '#46bdb6' }}>
               Comprehensive support designed specifically for Indian women
             </p>
           </motion.div>
@@ -342,17 +362,18 @@ const LandingPage = () => {
                   transition={{ delay: 0.6 + index * 0.1 }}
                   whileHover={{ scale: 1.05, y: -5 }}
                 >
-                  <Card className="h-full hover:shadow-2xl transition-all duration-300 border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+                  <Card className="h-full hover:shadow-2xl transition-all duration-300 border-0 backdrop-blur-sm" style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
                     <CardContent className="p-6 text-center">
                       <motion.div
-                        className={`w-16 h-16 mx-auto mb-4 rounded-full ${feature.bgColor} flex items-center justify-center`}
+                        className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
+                        style={{ backgroundColor: feature.bgColor }}
                         whileHover={{ rotate: 360, scale: 1.1 }}
                         transition={{ duration: 0.6 }}
                       >
-                        <Icon className={`w-8 h-8 ${feature.color}`} />
+                        <Icon className="w-8 h-8" style={{ color: feature.color }} />
                       </motion.div>
-                      <h4 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">{feature.title}</h4>
-                      <p className="text-gray-600 dark:text-gray-300">{feature.description}</p>
+                      <h4 className="text-xl font-semibold mb-3" style={{ color: '#46bdb6' }}>{feature.title}</h4>
+                      <p style={{ color: '#46bdb6' }}>{feature.description}</p>
                     </CardContent>
                   </Card>
                 </motion.div>
@@ -369,7 +390,8 @@ const LandingPage = () => {
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8 }}
-        className="relative z-10 px-6 py-16 bg-gradient-to-r from-neon-purple to-neon-pink text-white"
+        className="relative z-10 px-6 py-16 text-white"
+        style={{ background: 'linear-gradient(to right, #46bdb6, #faa0cc)' }}
       >
         <div className="max-w-4xl mx-auto text-center">
           <motion.h3
@@ -398,7 +420,14 @@ const LandingPage = () => {
             <Button 
               size="lg" 
               onClick={() => navigate('/auth')}
-              className="bg-white text-neon-pink hover:bg-gray-100 text-lg px-8 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
+              className="text-lg px-8 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
+              style={{ backgroundColor: 'white', color: '#faa0cc' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#f5f5f5';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'white';
+              }}
             >
               Get Started Today
               <ArrowRight className="w-5 h-5 ml-2" />
@@ -414,7 +443,8 @@ const LandingPage = () => {
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
         viewport={{ once: true }}
-        className="py-20 bg-gradient-to-br from-purple-light/20 via-pink-light/20 to-neon-purple/10 dark:from-gray-900 dark:via-purple-900 dark:to-blue-900"
+        className="py-20"
+        style={{ background: 'radial-gradient(circle at center, #ffffff 0%, #ffcdcd 100%)' }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
@@ -424,10 +454,10 @@ const LandingPage = () => {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-4xl sm:text-5xl font-bold mb-4" style={{ color: '#46bdb6' }}>
               What Our Users Say
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+            <p className="text-xl max-w-3xl mx-auto" style={{ color: '#46bdb6' }}>
               Join thousands of women who have found support and guidance through their menopause journey
             </p>
           </motion.div>
@@ -459,23 +489,24 @@ const LandingPage = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.2 }}
                 viewport={{ once: true }}
-                className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300"
+                className="rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300"
+                style={{ backgroundColor: 'white' }}
               >
                 <div className="flex items-center mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
                     <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
                   ))}
                 </div>
-                <p className="text-gray-600 dark:text-gray-300 mb-4 italic">
+                <p className="mb-4 italic" style={{ color: '#46bdb6' }}>
                   "{testimonial.content}"
                 </p>
                 <div className="flex items-center">
-                  <div className="w-10 h-10 bg-neon-pink/10 dark:bg-neon-pink/20 rounded-full flex items-center justify-center mr-3">
-                    <Heart className="w-5 h-5 text-neon-pink" />
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center mr-3" style={{ backgroundColor: 'rgba(250, 160, 204, 0.1)' }}>
+                    <Heart className="w-5 h-5" style={{ color: '#faa0cc' }} />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900 dark:text-white">{testimonial.name}</h4>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{testimonial.location}</p>
+                    <h4 className="font-semibold" style={{ color: '#46bdb6' }}>{testimonial.name}</h4>
+                    <p className="text-sm" style={{ color: '#46bdb6' }}>{testimonial.location}</p>
                   </div>
                 </div>
               </motion.div>
@@ -491,7 +522,8 @@ const LandingPage = () => {
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
         viewport={{ once: true }}
-        className="py-20 bg-white dark:bg-gray-800"
+        className="py-20"
+        style={{ backgroundColor: 'white' }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
@@ -501,10 +533,10 @@ const LandingPage = () => {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-4xl sm:text-5xl font-bold mb-4" style={{ color: '#46bdb6' }}>
               Get in Touch
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+            <p className="text-xl max-w-3xl mx-auto" style={{ color: '#46bdb6' }}>
               Have questions? We're here to help you on your menopause journey
             </p>
           </motion.div>
@@ -518,23 +550,23 @@ const LandingPage = () => {
               className="space-y-8"
             >
               <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-neon-pink/10 dark:bg-neon-pink/20 rounded-xl flex items-center justify-center">
-                  <Phone className="w-6 h-6 text-neon-pink" />
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'rgba(250, 160, 204, 0.1)' }}>
+                  <Phone className="w-6 h-6" style={{ color: '#faa0cc' }} />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Phone Support</h3>
-                  <p className="text-gray-600 dark:text-gray-300">+91 98765 43210</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Mon-Fri, 9AM-6PM IST</p>
+                  <h3 className="text-xl font-semibold mb-2" style={{ color: '#46bdb6' }}>Phone Support</h3>
+                  <p style={{ color: '#46bdb6' }}>+91 98765 43210</p>
+                  <p className="text-sm" style={{ color: '#46bdb6' }}>Mon-Fri, 9AM-6PM IST</p>
                 </div>
               </div>
 
               <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-neon-pink/10 dark:bg-neon-pink/20 rounded-xl flex items-center justify-center">
-                  <MapPin className="w-6 h-6 text-neon-pink" />
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'rgba(250, 160, 204, 0.1)' }}>
+                  <MapPin className="w-6 h-6" style={{ color: '#faa0cc' }} />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Office Address</h3>
-                  <p className="text-gray-600 dark:text-gray-300">
+                  <h3 className="text-xl font-semibold mb-2" style={{ color: '#46bdb6' }}>Office Address</h3>
+                  <p style={{ color: '#46bdb6' }}>
                     123 Health Street<br />
                     Mumbai, Maharashtra 400001<br />
                     India
@@ -543,13 +575,13 @@ const LandingPage = () => {
               </div>
 
               <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-neon-pink/10 dark:bg-neon-pink/20 rounded-xl flex items-center justify-center">
-                  <Clock className="w-6 h-6 text-neon-pink" />
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'rgba(250, 160, 204, 0.1)' }}>
+                  <Clock className="w-6 h-6" style={{ color: '#faa0cc' }} />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Response Time</h3>
-                  <p className="text-gray-600 dark:text-gray-300">Within 24 hours</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">We respond to all inquiries promptly</p>
+                  <h3 className="text-xl font-semibold mb-2" style={{ color: '#46bdb6' }}>Response Time</h3>
+                  <p style={{ color: '#46bdb6' }}>Within 24 hours</p>
+                  <p className="text-sm" style={{ color: '#46bdb6' }}>We respond to all inquiries promptly</p>
                 </div>
               </div>
             </motion.div>
@@ -559,41 +591,45 @@ const LandingPage = () => {
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
-              className="bg-gray-50 dark:bg-gray-700 rounded-2xl p-8"
+              className="rounded-2xl p-8"
+              style={{ backgroundColor: 'rgba(255, 255, 255, 0.9)' }}
             >
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Send us a Message</h3>
+              <h3 className="text-2xl font-bold mb-6" style={{ color: '#46bdb6' }}>Send us a Message</h3>
               <form className="space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#46bdb6' }}>
                     Full Name
                   </label>
                   <input
                     type="text"
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-neon-pink focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-3 border rounded-lg bg-white"
+                    style={{ borderColor: '#46bdb6', color: '#46bdb6' }}
                     placeholder="Your full name"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#46bdb6' }}>
                     Email Address
                   </label>
                   <input
                     type="email"
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-neon-pink focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-3 border rounded-lg bg-white"
+                    style={{ borderColor: '#46bdb6', color: '#46bdb6' }}
                     placeholder="your.email@example.com"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: '#46bdb6' }}>
                     Message
                   </label>
                   <textarea
                     rows={4}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-neon-pink focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                    className="w-full px-4 py-3 border rounded-lg bg-white"
+                    style={{ borderColor: '#46bdb6', color: '#46bdb6' }}
                     placeholder="Tell us how we can help you..."
                   ></textarea>
                 </div>
-                <Button className="w-full bg-gradient-to-r from-neon-purple to-neon-pink hover:from-purple-dark hover:to-pink-dark text-white py-3 text-lg">
+                <Button className="w-full text-white py-3 text-lg" style={{ backgroundColor: '#faa0cc' }}>
                   Send Message
                 </Button>
               </form>

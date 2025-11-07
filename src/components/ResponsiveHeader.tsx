@@ -42,10 +42,11 @@ const ResponsiveHeader = () => {
     <motion.header
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700"
+      className="fixed top-0 left-0 right-0 z-50 backdrop-blur-lg border-b"
+      style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', borderColor: 'rgba(70, 189, 182, 0.2)' }}
     >
       
-    <div className='h-8 w-full bg-red-400'></div>
+    <div className='h-8 w-full backdrop-blur-lg' style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)' }}></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -56,22 +57,23 @@ const ResponsiveHeader = () => {
             onClick={() => scrollToSection('#home')}
           >
             <motion.div
-              className="p-2 bg-neon-pink/10 dark:bg-neon-pink/20 rounded-xl"
+              className="p-2 rounded-xl"
+              style={{ backgroundColor: 'rgba(250, 160, 204, 0.1)' }}
               whileHover={{ rotate: 360 }}
               transition={{ duration: 0.6 }}
             >
-              <Heart className="w-6 h-6 sm:w-8 sm:h-8 text-neon-pink" />
+              <Heart className="w-6 h-6 sm:w-8 sm:h-8" style={{ color: '#faa0cc' }} />
             </motion.div>
             <div className="hidden sm:block">
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-xl sm:text-2xl font-bold" style={{ color: '#46bdb6' }}>
                 MyMenoSakhi
               </h1>
-              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">
+              <p className="text-xs sm:text-sm" style={{ color: '#46bdb6' }}>
                 Your Menopause Companion
               </p>
             </div>
             <div className="sm:hidden">
-              <h1 className="text-lg font-bold text-gray-900 dark:text-white">
+              <h1 className="text-lg font-bold" style={{ color: '#46bdb6' }}>
                 MyMenoSakhi
               </h1>
             </div>
@@ -83,7 +85,14 @@ const ResponsiveHeader = () => {
               <motion.button
                 key={index}
                 onClick={() => scrollToSection(item.href)}
-                className="text-gray-700 dark:text-gray-300 hover:text-neon-pink dark:hover:text-neon-pink transition-colors duration-200 font-medium"
+                className="transition-colors duration-200 font-medium"
+                style={{ color: '#46bdb6' }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = '#faa0cc';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = '#46bdb6';
+                }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -102,7 +111,14 @@ const ResponsiveHeader = () => {
             {/* CTA Button */}
             <Button
               onClick={() => navigate('/auth')}
-              className="bg-gradient-to-r from-neon-purple to-neon-pink hover:from-purple-dark hover:to-pink-dark text-white shadow-lg hover:shadow-xl transition-all duration-300 text-sm sm:text-base px-3 sm:px-6 py-2"
+              className="text-white shadow-lg hover:shadow-xl transition-all duration-300 text-sm sm:text-base px-3 sm:px-6 py-2"
+              style={{ backgroundColor: '#faa0cc' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#ffb3d9';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#faa0cc';
+              }}
             >
               Get Started
             </Button>
@@ -113,6 +129,7 @@ const ResponsiveHeader = () => {
               size="icon"
               className="lg:hidden"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
+              style={{ color: '#46bdb6' }}
             >
               {isMenuOpen ? (
                 <X className="w-6 h-6" />
@@ -130,14 +147,24 @@ const ResponsiveHeader = () => {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="lg:hidden border-t border-gray-200 dark:border-gray-700"
+              className="lg:hidden border-t"
+              style={{ borderColor: 'rgba(70, 189, 182, 0.2)' }}
             >
               <nav className="py-4 space-y-2">
                 {menuItems.map((item, index) => (
                   <motion.button
                     key={index}
                     onClick={() => scrollToSection(item.href)}
-                    className="block w-full text-left px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-neon-pink dark:hover:text-neon-pink hover:bg-neon-pink/10 dark:hover:bg-neon-pink/20 transition-colors duration-200 font-medium"
+                    className="block w-full text-left px-4 py-2 transition-colors duration-200 font-medium"
+                    style={{ color: '#46bdb6' }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = '#faa0cc';
+                      e.currentTarget.style.backgroundColor = 'rgba(250, 160, 204, 0.1)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = '#46bdb6';
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
