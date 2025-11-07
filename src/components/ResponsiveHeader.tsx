@@ -64,7 +64,7 @@ const ResponsiveHeader = () => {
             </motion.div>
             <div className="hidden sm:block">
               <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-                Sakhi Setu
+                MyMenoSakhi
               </h1>
               <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">
                 Your Menopause Companion
@@ -72,7 +72,7 @@ const ResponsiveHeader = () => {
             </div>
             <div className="sm:hidden">
               <h1 className="text-lg font-bold text-gray-900 dark:text-white">
-                Sakhi Setu
+                MyMenoSakhi
               </h1>
             </div>
           </motion.div>

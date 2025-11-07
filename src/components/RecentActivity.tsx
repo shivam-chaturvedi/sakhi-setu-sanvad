@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Video, MessageCircle, User, FileText, Heart, Share2 } from 'lucide-react';
+import { Video, MessageCircle, User, FileText, Heart, Share2, Activity } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -97,9 +97,26 @@ const RecentActivity: React.FC<RecentActivityProps> = ({ profile }) => {
         });
       }
 
-      // Add sample wellness activities (in a real app, these would come from wellness tracking tables)
-      const sampleWellnessActivities = generateSampleWellnessActivities();
-      allActivities.push(...sampleWellnessActivities);
+      // Fetch symptom tracking activities
+      const { data: symptoms, error: symptomsError } = await supabase
+        .from('symptoms')
+        .select('id, symptom_type, severity, recorded_at')
+        .eq('user_id', user.id)
+        .order('recorded_at', { ascending: false })
+        .limit(5);
+
+      if (!symptomsError && symptoms && symptoms.length > 0) {
+        symptoms.forEach(symptom => {
+          allActivities.push({
+            id: `symptom-${symptom.id}`,
+            type: 'wellness',
+            title: 'Logged symptom',
+            description: `${symptom.symptom_type.replace('_', ' ')} (Severity: ${symptom.severity}/10)`,
+            created_at: symptom.recorded_at,
+            metadata: { symptomId: symptom.id }
+          });
+        });
+      }
 
       // Sort by date and take most recent 5
       const sortedActivities = allActivities
@@ -115,61 +132,6 @@ const RecentActivity: React.FC<RecentActivityProps> = ({ profile }) => {
     }
   };
 
-  const generateSampleWellnessActivities = (): Activity[] => {
-    const now = new Date();
-    const activities: Activity[] = [];
-
-    // Generate sleep tracking activities
-    for (let i = 0; i < 3; i++) {
-      const sleepQuality = Math.floor(Math.random() * 3) + 7; // 7-9
-      const hoursAgo = (i + 1) * 8; // 8, 16, 24 hours ago
-      const activityDate = new Date(now.getTime() - hoursAgo * 60 * 60 * 1000);
-      
-      activities.push({
-        id: `sleep-${i}`,
-        type: 'wellness',
-        title: 'Logged sleep quality',
-        description: `${sleepQuality}/10`,
-        created_at: activityDate.toISOString(),
-        metadata: { quality: sleepQuality }
-      });
-    }
-
-    // Generate meditation activities
-    for (let i = 0; i < 2; i++) {
-      const hoursAgo = (i + 1) * 12; // 12, 24 hours ago
-      const activityDate = new Date(now.getTime() - hoursAgo * 60 * 60 * 1000);
-      const duration = Math.floor(Math.random() * 10) + 10; // 10-20 minutes
-      
-      activities.push({
-        id: `meditation-${i}`,
-        type: 'wellness',
-        title: 'Completed meditation',
-        description: `${duration} minutes`,
-        created_at: activityDate.toISOString(),
-        metadata: { duration }
-      });
-    }
-
-    // Generate exercise activities
-    for (let i = 0; i < 2; i++) {
-      const hoursAgo = (i + 1) * 24; // 1, 2 days ago
-      const activityDate = new Date(now.getTime() - hoursAgo * 60 * 60 * 1000);
-      const exercises = ['yoga', 'walking', 'stretching', 'breathing exercises'];
-      const exercise = exercises[Math.floor(Math.random() * exercises.length)];
-      
-      activities.push({
-        id: `exercise-${i}`,
-        type: 'wellness',
-        title: 'Completed exercise',
-        description: exercise,
-        created_at: activityDate.toISOString(),
-        metadata: { exercise }
-      });
-    }
-
-    return activities;
-  };
 
   const getActivityIcon = (type: string) => {
     switch (type) {
@@ -251,7 +213,7 @@ const RecentActivity: React.FC<RecentActivityProps> = ({ profile }) => {
           {activities.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <Heart className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-              <p>No recent activity</p>
+              <p>No Activities till now</p>
               <p className="text-sm">Start engaging with the community to see your activity here!</p>
             </div>
           ) : (

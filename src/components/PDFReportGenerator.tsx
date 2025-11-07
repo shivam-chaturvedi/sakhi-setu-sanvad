@@ -80,19 +80,19 @@ const PDFReportGenerator: React.FC<PDFReportGeneratorProps> = ({ userProfile, ai
     const pageHeight = doc.internal.pageSize.getHeight();
     let yPosition = 20;
 
-    // Colors
-    const primaryColor: [number, number, number] = [236, 72, 153]; // Pink
-    const secondaryColor: [number, number, number] = [147, 51, 234]; // Purple
+    // Colors - Updated to match new color scheme
+    const primaryColor: [number, number, number] = [70, 189, 182]; // #46bdb6 - Primary (for text)
+    const secondaryColor: [number, number, number] = [250, 160, 204]; // #faa0cc - Secondary (for backgrounds)
     const textColor: [number, number, number] = [55, 65, 81]; // Gray
 
-    // Header
-    doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+    // Header - using secondary color for background
+    doc.setFillColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
     doc.rect(0, 0, pageWidth, 40, 'F');
     
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(24);
     doc.setFont('helvetica', 'bold');
-    doc.text('Sakhi Setu Sanvad', 20, 25);
+    doc.text('MyMenoSakhi', 20, 25);
     
     doc.setFontSize(12);
     doc.setFont('helvetica', 'normal');
@@ -222,7 +222,7 @@ const PDFReportGenerator: React.FC<PDFReportGeneratorProps> = ({ userProfile, ai
     doc.setFontSize(8);
     doc.setTextColor(128, 128, 128);
     doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, footerY);
-    doc.text('Sakhi Setu Sanvad - Your Wellness Companion', pageWidth - 100, footerY);
+    doc.text('MyMenoSakhi - Your Wellness Companion', pageWidth - 100, footerY);
 
     // Download the PDF
     const fileName = `wellness-report-${data.user?.full_name?.replace(/\s+/g, '-').toLowerCase() || 'user'}-${new Date().toISOString().split('T')[0]}.pdf`;

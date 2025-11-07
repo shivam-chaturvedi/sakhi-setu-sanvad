@@ -63,15 +63,20 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // Neon colors for direct use
+        // New color scheme
         neon: {
-          pink: "#ff0080",
-          purple: "#8b00ff",
-          "pink-light": "#ff66b3",
-          "purple-light": "#b366ff",
-          "pink-dark": "#cc0066",
-          "purple-dark": "#6600cc",
+          pink: "#faa0cc",
+          purple: "#46bdb6",
+          "pink-light": "#ffcdcd",
+          "purple-light": "#46bdb6",
+          "pink-dark": "#faa0cc",
+          "purple-dark": "#46bdb6",
         },
+        // Direct color access
+        "primary-color": "#46bdb6",
+        "secondary-color": "#faa0cc",
+        "bg-gradient-start": "#ffffff",
+        "bg-gradient-end": "#ffcdcd",
       },
       borderRadius: {
         lg: "var(--radius)",

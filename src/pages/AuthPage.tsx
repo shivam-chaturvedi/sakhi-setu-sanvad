@@ -168,7 +168,7 @@ const AuthPage = () => {
               <Heart className="w-8 h-8 text-pink-500" />
             </motion.div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Sakhi Setu</h1>
+              <h1 className="text-2xl font-bold text-gray-900">MyMenoSakhi</h1>
               <p className="text-sm text-gray-600">Your Menopause Companion</p>
             </div>
           </motion.div>
@@ -281,7 +281,7 @@ const AuthPage = () => {
         className="relative z-10 text-center pb-6"
       >
         <p className="text-sm text-gray-500 dark:text-gray-400">
-          © 2025 Sakhi Setu. Empowering women through their menopause journey.
+          © 2025 MyMenoSakhi. Empowering women through their menopause journey.
         </p>
       </motion.footer>
     </div>

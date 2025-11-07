@@ -80,26 +80,26 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Light mode only - Neon pink and purple theme */
+    /* Light mode only - New color theme */
     --background: 0 0% 100%;
-    --foreground: 320 30% 20%;
+    --foreground: 176 46% 30%;
 
     --card: 0 0% 100%;
-    --card-foreground: 320 30% 20%;
+    --card-foreground: 176 46% 30%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 320 30% 20%;
+    --popover-foreground: 176 46% 30%;
 
-    /* Primary: Bright neon purple */
-    --primary: 280 100% 70%;
+    /* Primary: #46bdb6 (teal/cyan) - for text */
+    --primary: 176 46% 51%;
     --primary-foreground: 0 0% 100%;
-    --primary-light: 280 100% 95%;
-    --primary-glow: 280 100% 98%;
+    --primary-light: 176 46% 95%;
+    --primary-glow: 176 46% 98%;
 
-    /* Secondary: Bright neon pink */
-    --secondary: 320 100% 70%;
+    /* Secondary: #faa0cc (pink) - for button backgrounds */
+    --secondary: 330 92% 80%;
     --secondary-foreground: 0 0% 100%;
-    --secondary-light: 320 100% 95%;
+    --secondary-light: 330 92% 95%;
 
     /* Accent: Electric cyan */
     --accent: 180 100% 50%;
@@ -111,26 +111,26 @@ All colors MUST be HSL.
     --energy-light: 30 100% 90%;
 
     --muted: 0 0% 96%;
-    --muted-foreground: 320 20% 50%;
+    --muted-foreground: 176 20% 50%;
 
     --destructive: 0 100% 60%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 0 0% 90%;
     --input: 0 0% 90%;
-    --ring: 280 100% 60%;
+    --ring: 176 46% 51%;
 
     --radius: 1rem;
 
-    /* Light mode gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(280 100% 70%) 0%, hsl(320 100% 70%) 100%);
-    --gradient-warm: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(280 50% 95%) 100%);
-    --gradient-glow: radial-gradient(circle at top right, hsl(280 100% 70% / 0.15), transparent 70%);
+    /* Light mode gradients - Background: #ffffff to #ffcdcd */
+    --gradient-primary: linear-gradient(135deg, hsl(176 46% 51%) 0%, hsl(330 92% 80%) 100%);
+    --gradient-warm: linear-gradient(180deg, #ffffff 0%, #ffcdcd 100%);
+    --gradient-glow: radial-gradient(circle at top right, rgba(255, 205, 205, 0.15), transparent 70%);
     
     /* Light mode shadows */
-    --shadow-soft: 0 4px 20px hsl(280 100% 70% / 0.15);
-    --shadow-card: 0 8px 30px hsl(280 100% 70% / 0.12);
-    --shadow-glow: 0 0 40px hsl(280 100% 70% / 0.3);
+    --shadow-soft: 0 4px 20px hsl(176 46% 51% / 0.15);
+    --shadow-card: 0 8px 30px hsl(176 46% 51% / 0.12);
+    --shadow-glow: 0 0 40px hsl(176 46% 51% / 0.3);
 
     /* Animation timings */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -146,6 +146,7 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground;
     font-family: 'Nunito Sans', 'Segoe UI', system-ui, sans-serif;
+    background: radial-gradient(circle at center, #ffffff 0%, #ffcdcd 100%);
   }
 }
 

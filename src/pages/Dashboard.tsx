@@ -11,18 +11,51 @@ import GoogleTranslate from "@/components/GoogleTranslate";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import RecentActivity from "@/components/RecentActivity";
+import { supabase } from "@/integrations/supabase/client";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, signOut, loading } = useAuth();
+  const [wellnessTip, setWellnessTip] = useState<string | null>(null);
+  const [hasSymptoms, setHasSymptoms] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
       navigate('/auth');
     }
   }, [user, loading, navigate]);
+
+  useEffect(() => {
+    if (user) {
+      fetchUserData();
+    }
+  }, [user]);
+
+  const fetchUserData = async () => {
+    if (!user) return;
+    
+    try {
+      // Check if user has logged any symptoms
+      const { data: symptoms, error } = await supabase
+        .from('symptoms')
+        .select('id')
+        .eq('user_id', user.id)
+        .limit(1);
+
+      if (!error && symptoms && symptoms.length > 0) {
+        setHasSymptoms(true);
+        // Only show tip if user has actual data
+        setWellnessTip("Keep tracking your symptoms to get personalized insights!");
+      } else {
+        setHasSymptoms(false);
+        setWellnessTip(null);
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
 
   if (loading) {
     return (
@@ -233,7 +266,7 @@ const Dashboard = () => {
               </div>
             </div>
             <p className="text-sm sm:text-base text-foreground leading-relaxed">
-              Your sleep quality is excellent! Continue with 15 minutes of morning yoga practice today.
+              {wellnessTip || "Start tracking your symptoms to get personalized wellness insights and recommendations!"}
             </p>
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button 
@@ -328,7 +361,7 @@ const Dashboard = () => {
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.5 }}
-        className="px-4 sm:px-6"
+        className="px-4 sm:px-6 pt-6 sm:pt-8"
       >
         <RecentActivity />
       </motion.div>

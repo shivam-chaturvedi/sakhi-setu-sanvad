@@ -129,7 +129,7 @@ const NotificationBell = () => {
       {
         id: 'welcome-1',
         type: 'tip',
-        title: 'Welcome to Sakhi Setu!',
+        title: 'Welcome to MyMenoSakhi!',
         message: 'Start tracking your symptoms to get personalized insights.',
         created_at: new Date().toISOString(),
         read: false
@@ -166,7 +166,7 @@ const NotificationBell = () => {
       const basicNotifications = [
         {
           user_id: user.id,
-          title: 'Welcome to Sakhi Setu!',
+          title: 'Welcome to MyMenoSakhi!',
           message: 'Start tracking your symptoms to get personalized insights.',
           type: 'tip',
           is_read: false,
@@ -494,7 +494,7 @@ const NotificationBell = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="absolute right-0 top-12 w-80 max-h-96 overflow-hidden z-50"
+            className="fixed sm:absolute right-4 sm:right-0 top-16 sm:top-12 w-[calc(100vw-2rem)] sm:w-80 max-w-sm sm:max-w-80 max-h-96 overflow-hidden z-50"
           >
             <Card className="shadow-lg border">
               <CardHeader className="pb-3">
@@ -544,14 +544,26 @@ const NotificationBell = () => {
                             {getNotificationIcon(notification.type)}
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center justify-between">
-                                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                                <p className={`text-sm font-medium ${
+                                  notification.read 
+                                    ? 'text-gray-900 dark:text-gray-100' 
+                                    : 'text-gray-900 dark:text-white'
+                                }`}>
                                   {notification.title}
                                 </p>
-                                <span className="text-xs text-muted-foreground">
+                                <span className={`text-xs ${
+                                  notification.read 
+                                    ? 'text-gray-700 dark:text-gray-300' 
+                                    : 'text-muted-foreground'
+                                }`}>
                                   {formatTimeAgo(notification.created_at)}
                                 </span>
                               </div>
-                              <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
+                              <p className={`text-xs mt-1 line-clamp-2 ${
+                                notification.read 
+                                  ? 'text-gray-800 dark:text-gray-200' 
+                                  : 'text-gray-600 dark:text-gray-400'
+                              }`}>
                                 {notification.message}
                               </p>
                             </div>

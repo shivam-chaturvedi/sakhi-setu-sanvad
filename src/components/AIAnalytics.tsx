@@ -150,15 +150,44 @@ export const AIAnalytics: React.FC = () => {
   const generateRecommendations = async (symptoms: any[], avgSeverity: number) => {
     const recommendations = [];
 
-    // Get AI-powered recommendations based on actual symptoms
+    // Get AI-powered recommendations based on actual symptoms (not trend)
     try {
-      const symptomList = symptoms.map(s => `${s.symptom_type.replace('_', ' ')} (severity: ${s.severity}/10)`).join(', ');
+      if (symptoms.length === 0) {
+        return generateStaticRecommendations(symptoms, avgSeverity);
+      }
+      
+      // Create detailed symptom list with severity for AI analysis - BASED ONLY ON SYMPTOMS AND SEVERITY
+      const symptomDetails = symptoms.map(s => {
+        const symptomName = s.symptom_type.replace('_', ' ');
+        return `${symptomName} with severity ${s.severity}/10`;
+      }).join(', ');
+      
+      const symptomTypes = symptoms.map(s => s.symptom_type);
+      const highSeveritySymptoms = symptoms.filter(s => s.severity >= 7);
+      const mediumSeveritySymptoms = symptoms.filter(s => s.severity >= 4 && s.severity < 7);
+      const lowSeveritySymptoms = symptoms.filter(s => s.severity < 4);
+      
+      // Build prompt focusing ONLY on symptoms and their severity, NOT trends
+      const aiPrompt = `You are a menopause health advisor. Based ONLY on the following logged symptoms and their severity levels:
+
+SYMPTOMS AND SEVERITY:
+${symptomDetails}
+
+SYMPTOM BREAKDOWN:
+- Total symptoms logged: ${symptoms.length}
+- Average severity: ${avgSeverity.toFixed(1)}/10
+- High severity symptoms (7-10): ${highSeveritySymptoms.length > 0 ? highSeveritySymptoms.map(s => `${s.symptom_type.replace('_', ' ')} (${s.severity}/10)`).join(', ') : 'None'}
+- Medium severity symptoms (4-6): ${mediumSeveritySymptoms.length > 0 ? mediumSeveritySymptoms.map(s => `${s.symptom_type.replace('_', ' ')} (${s.severity}/10)`).join(', ') : 'None'}
+- Low severity symptoms (1-3): ${lowSeveritySymptoms.length > 0 ? lowSeveritySymptoms.map(s => `${s.symptom_type.replace('_', ' ')} (${s.severity}/10)`).join(', ') : 'None'}
+
+IMPORTANT: Provide recommendations based ONLY on the symptoms and their severity levels listed above. Do NOT consider trends, patterns, or changes over time. Focus on managing the specific symptoms at their current severity levels.`;
+      
       const aiAdvice = await generateWellnessAdvice(
-        `Based on these logged symptoms: ${symptomList}, with average severity ${avgSeverity}/10, provide specific recommendations for managing menopause symptoms.`,
+        aiPrompt,
         {
           age: 45, // You can make this dynamic
-          symptoms: symptoms.map(s => s.symptom_type),
-          concerns: ['symptom management', 'quality of life']
+          symptoms: symptomTypes,
+          concerns: ['symptom management', 'quality of life', 'menopause support']
         }
       );
 
@@ -360,7 +389,27 @@ export const AIAnalytics: React.FC = () => {
     if (!aiQuery.trim()) return;
 
     try {
-      const response = await generateWellnessAdvice(aiQuery, {
+      // Build context based ONLY on symptoms and severity, not trends
+      if (!analytics) {
+        toast.error('Please wait for analytics to load');
+        return;
+      }
+
+      // Fetch actual symptoms with severity for context
+      const { data: symptoms } = await supabase
+        .from('symptoms')
+        .select('symptom_type, severity')
+        .eq('user_id', user?.id)
+        .order('recorded_at', { ascending: false })
+        .limit(20);
+
+      const symptomContext = symptoms && symptoms.length > 0
+        ? `Current logged symptoms: ${symptoms.map(s => `${s.symptom_type.replace('_', ' ')} (severity: ${s.severity}/10)`).join(', ')}. Average severity: ${analytics.averageSeverity}/10.`
+        : 'No symptoms logged yet.';
+      
+      const enhancedQuery = `${aiQuery}\n\nContext: ${symptomContext} Please provide recommendations based ONLY on the symptoms and their severity levels, not on trends or patterns over time.`;
+      
+      const response = await generateWellnessAdvice(enhancedQuery, {
         age: 45,
         symptoms: analytics?.symptomTrends ? Object.keys(analytics.symptomTrends) : [],
         concerns: ['symptom management', 'wellness optimization']

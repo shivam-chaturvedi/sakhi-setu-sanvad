@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useGemini } from '@/hooks/useGemini';
@@ -31,7 +32,9 @@ import {
   Target,
   Bot,
   Send,
-  MessageCircle
+  MessageCircle,
+  X,
+  Archive
 } from 'lucide-react';
 
 const symptomTypes = [
@@ -139,29 +142,24 @@ export const SymptomTracker: React.FC = () => {
     const mostCommonSymptom = Object.entries(symptomCounts)
       .sort(([,a], [,b]) => b - a)[0]?.[0] || '';
 
-    // Calculate trend with improved algorithm
+    // Calculate trend based on overall average severity (not comparing recent vs older)
+    // Take every log's severity, calculate overall average, then categorize
     let recentTrend = 'stable';
-    if (symptomData.length >= 3) {
-      // Compare last 3 entries with previous 3 entries for better trend detection
-      const recent = symptomData.slice(0, 3);
-      const older = symptomData.slice(3, 6);
+    
+    if (symptomData.length > 0) {
+      // Calculate overall average of all symptom severities
+      const overallAverage = averageSeverity; // Already calculated above
       
-      if (older.length > 0) {
-        const recentAvg = recent.reduce((sum, s) => sum + s.severity, 0) / recent.length;
-        const olderAvg = older.reduce((sum, s) => sum + s.severity, 0) / older.length;
-        
-        // More sensitive thresholds for trend detection
-        const threshold = 0.5; // Half point difference
-        if (recentAvg > olderAvg + threshold) recentTrend = 'worsening';
-        else if (recentAvg < olderAvg - threshold) recentTrend = 'improving';
+      // Categorize based on average severity range (1-10 scale)
+      if (overallAverage < 2) {
+        recentTrend = 'stable';
+      } else if (overallAverage >= 2 && overallAverage < 5) {
+        recentTrend = 'moderate';
+      } else if (overallAverage >= 5 && overallAverage < 7.5) {
+        recentTrend = 'severe';
+      } else if (overallAverage >= 7.5) {
+        recentTrend = 'worsening';
       }
-    } else if (symptomData.length === 2) {
-      // For just 2 entries, compare them directly
-      const recent = symptomData[0].severity;
-      const older = symptomData[1].severity;
-      const threshold = 1; // One point difference for 2 entries
-      if (recent > older + threshold) recentTrend = 'worsening';
-      else if (recent < older - threshold) recentTrend = 'improving';
     }
 
     setStats({
@@ -224,6 +222,61 @@ export const SymptomTracker: React.FC = () => {
     }
   };
 
+  const handleDeleteSymptom = async (symptomId: string) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('symptoms')
+        .delete()
+        .eq('id', symptomId)
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Error deleting symptom:', error);
+        toast.error('Failed to delete symptom entry.');
+        return;
+      }
+
+      toast.success('Symptom entry cleared', {
+        description: 'The entry has been removed from your records.'
+      });
+
+      // Refresh symptoms list
+      fetchSymptoms();
+    } catch (error) {
+      console.error('Error deleting symptom:', error);
+      toast.error('Failed to delete symptom entry.');
+    }
+  };
+
+  const handleClearAllSymptoms = async () => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('symptoms')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Error clearing all symptoms:', error);
+        toast.error('Failed to clear all symptoms.');
+        return;
+      }
+
+      toast.success('All symptoms cleared', {
+        description: 'All symptom entries have been removed from your records.'
+      });
+
+      // Refresh symptoms list
+      fetchSymptoms();
+    } catch (error) {
+      console.error('Error clearing all symptoms:', error);
+      toast.error('Failed to clear all symptoms.');
+    }
+  };
+
   const getSeverityLabel = (value: number) => {
     if (value <= 2) return 'Mild';
     if (value <= 4) return 'Moderate';
@@ -244,6 +297,8 @@ export const SymptomTracker: React.FC = () => {
     switch (trend) {
       case 'improving': return <TrendingUp className="w-4 h-4 text-green-500" />;
       case 'worsening': return <TrendingUp className="w-4 h-4 text-red-500 rotate-180" />;
+      case 'severe': return <TrendingUp className="w-4 h-4 text-orange-500 rotate-180" />;
+      case 'moderate': return <Activity className="w-4 h-4 text-yellow-500" />;
       default: return <Activity className="w-4 h-4 text-blue-500" />;
     }
   };
@@ -252,6 +307,8 @@ export const SymptomTracker: React.FC = () => {
     switch (trend) {
       case 'improving': return 'text-green-600';
       case 'worsening': return 'text-red-600';
+      case 'severe': return 'text-orange-600';
+      case 'moderate': return 'text-yellow-600';
       default: return 'text-blue-600';
     }
   };
@@ -260,7 +317,14 @@ export const SymptomTracker: React.FC = () => {
     if (!aiQuery.trim()) return;
 
     try {
-      const response = await generateWellnessAdvice(aiQuery, {
+      // Build context based ONLY on symptoms and severity, not trends
+      const symptomContext = symptoms.length > 0 
+        ? `Current logged symptoms: ${symptoms.map(s => `${s.symptom_type.replace('_', ' ')} (severity: ${s.severity}/10)`).join(', ')}. Average severity: ${stats.averageSeverity}/10.`
+        : 'No symptoms logged yet.';
+      
+      const enhancedQuery = `${aiQuery}\n\nContext: ${symptomContext} Please provide recommendations based ONLY on the symptoms and their severity levels, not on trends.`;
+      
+      const response = await generateWellnessAdvice(enhancedQuery, {
         age: 45,
         symptoms: symptoms.map(s => s.symptom_type),
         concerns: ['symptom management', 'wellness optimization']
@@ -299,14 +363,29 @@ export const SymptomTracker: React.FC = () => {
     }
 
     try {
-      // Create detailed symptom analysis based on actual logged symptoms
-      const symptomDetails = symptoms.map(s => 
-        `${s.symptom_type.replace('_', ' ')} (severity: ${s.severity}/10)`
-      ).join(', ');
+      // Create detailed symptom analysis based ONLY on symptoms and severity (NOT trends)
+      const symptomDetails = symptoms.map(s => {
+        const symptomName = s.symptom_type.replace('_', ' ');
+        return `${symptomName} with severity ${s.severity}/10`;
+      }).join(', ');
       
-      const analysisPrompt = `Based on these logged symptoms: ${symptomDetails}. 
-      Total entries: ${stats.totalEntries}, Average severity: ${stats.averageSeverity}/10.
-      Please provide specific recommendations for managing these menopause symptoms.`;
+      const highSeverity = symptoms.filter(s => s.severity >= 7);
+      const mediumSeverity = symptoms.filter(s => s.severity >= 4 && s.severity < 7);
+      const lowSeverity = symptoms.filter(s => s.severity < 4);
+      
+      const analysisPrompt = `You are a menopause health advisor. Based ONLY on the following logged symptoms and their severity levels:
+
+SYMPTOMS AND SEVERITY:
+${symptomDetails}
+
+SYMPTOM BREAKDOWN:
+- Total symptoms: ${symptoms.length}
+- Average severity: ${stats.averageSeverity}/10
+- High severity (7-10): ${highSeverity.length > 0 ? highSeverity.map(s => `${s.symptom_type.replace('_', ' ')} (${s.severity}/10)`).join(', ') : 'None'}
+- Medium severity (4-6): ${mediumSeverity.length > 0 ? mediumSeverity.map(s => `${s.symptom_type.replace('_', ' ')} (${s.severity}/10)`).join(', ') : 'None'}
+- Low severity (1-3): ${lowSeverity.length > 0 ? lowSeverity.map(s => `${s.symptom_type.replace('_', ' ')} (${s.severity}/10)`).join(', ') : 'None'}
+
+IMPORTANT: Provide recommendations based ONLY on the symptoms and their severity levels. Do NOT consider trends or changes over time. Focus on managing the specific symptoms at their current severity levels.`;
       
       const response = await analyzeSymptoms(
         symptoms.map(s => s.symptom_type), 
@@ -413,7 +492,7 @@ export const SymptomTracker: React.FC = () => {
           onClick={handleMotivation}
           disabled={aiLoading}
           variant="outline"
-          className="border-purple-500 text-purple-500 hover:bg-purple-50 text-sm sm:text-base"
+          className="border-purple-500 text-purple-500 hover:bg-purple-500 hover:text-black dark:hover:text-white text-sm sm:text-base transition-colors"
         >
           <Heart className="w-4 h-4 mr-2" />
           <span className="hidden xs:inline">Get Motivation</span>
@@ -425,12 +504,131 @@ export const SymptomTracker: React.FC = () => {
             setShowAiChat(!showAiChat);
           }}
           variant="outline"
-          className="border-pink-500 text-pink-500 hover:bg-pink-50 text-sm sm:text-base"
+          className="border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-black dark:hover:text-white text-sm sm:text-base transition-colors"
         >
           <MessageCircle className="w-4 h-4 mr-2" />
           {showAiChat ? 'Hide AI Chat' : 'Ask AI'}
         </Button>
       </motion.div>
+
+      {/* AI Chat Section - Show at top when opened */}
+      {showAiChat && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="mb-6"
+        >
+          <Card className="bg-gradient-to-br from-purple-50/80 to-pink-50/80 backdrop-blur-sm border border-purple-200 shadow-xl">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Bot className="w-6 h-6 text-purple-500" />
+                  <CardTitle className="text-xl">AI Symptom Assistant</CardTitle>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowAiChat(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  ✕
+                </Button>
+              </div>
+              <CardDescription className="text-base">
+                Ask questions about your symptoms and get personalized AI recommendations
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Textarea
+                  value={aiQuery}
+                  onChange={(e) => setAiQuery(e.target.value)}
+                  placeholder="Ask me anything about your symptoms, wellness, or menopause..."
+                  className="flex-1 min-h-[80px] sm:min-h-[100px] bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-neon-pink focus:ring-neon-pink/20 text-black dark:text-white"
+                  disabled={aiLoading}
+                />
+                <Button
+                  onClick={handleAiQuery}
+                  disabled={aiLoading || !aiQuery.trim()}
+                  className="self-end sm:self-end bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-4 sm:px-6 py-2 text-sm sm:text-base"
+                >
+                  {aiLoading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      <span className="hidden sm:inline">Thinking...</span>
+                      <span className="sm:hidden">...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4 mr-2" />
+                      <span className="hidden sm:inline">Ask AI</span>
+                      <span className="sm:hidden">Ask</span>
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              {aiResponse && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200"
+                  data-ai-response
+                >
+                  <div className="flex items-start gap-2 sm:gap-3">
+                    <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500 mt-1 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-semibold text-purple-900 mb-1 sm:mb-2 text-sm sm:text-base">
+                        AI Recommendation
+                      </h4>
+                      <div className="text-xs sm:text-sm text-gray-700 whitespace-pre-wrap leading-relaxed break-words">
+                        {aiResponse}
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Quick Questions */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setAiQuery("What can I do to manage hot flashes?")}
+                  className="text-xs"
+                >
+                  Hot Flashes
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setAiQuery("How can I improve my sleep during menopause?")}
+                  className="text-xs"
+                >
+                  Sleep Issues
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setAiQuery("What exercises help with menopause symptoms?")}
+                  className="text-xs"
+                >
+                  Exercise
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setAiQuery("How can I manage mood changes?")}
+                  className="text-xs"
+                >
+                  Mood Support
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
 
       {/* Stats Overview */}
       <motion.div
@@ -612,13 +810,48 @@ export const SymptomTracker: React.FC = () => {
         >
           <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-xl">
-                <TrendingUp className="h-6 w-6 text-purple-500" />
-                Recent Symptoms
-              </CardTitle>
-              <CardDescription>
-                Your latest symptom entries and patterns
-              </CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2 text-xl">
+                    <TrendingUp className="h-6 w-6 text-purple-500" />
+                    Recent Symptoms
+                  </CardTitle>
+                  <CardDescription>
+                    Your latest symptom entries and patterns
+                  </CardDescription>
+                </div>
+                {symptoms.length > 0 && (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-red-600 border-red-300 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-900/20"
+                      >
+                        <Archive className="w-4 h-4 mr-2" />
+                        Clear All
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Clear All Symptom Entries?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This will permanently delete all {symptoms.length} symptom entries from your records. This action cannot be undone. Are you sure you want to continue?
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={handleClearAllSymptoms}
+                          className="bg-red-600 hover:bg-red-700 text-white"
+                        >
+                          Clear Symptoms
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
+              </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
@@ -665,10 +898,21 @@ export const SymptomTracker: React.FC = () => {
                           <Badge className={`px-2 sm:px-3 py-1 text-xs sm:text-sm ${getSeverityColor(symptom.severity)}`}>
                             {symptom.severity}/10
                           </Badge>
-                          <div className="text-right">
-                            <div className="text-xs sm:text-sm font-medium text-gray-900">
-                              {getSeverityLabel(symptom.severity)}
+                          <div className="flex items-center gap-2 sm:gap-3">
+                            <div className="text-right">
+                              <div className="text-xs sm:text-sm font-medium text-gray-900">
+                                {getSeverityLabel(symptom.severity)}
+                              </div>
                             </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDeleteSymptom(symptom.id)}
+                              className="h-8 w-8 p-0 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                              title="Clear Entry"
+                            >
+                              <Archive className="w-4 h-4" />
+                            </Button>
                           </div>
                         </div>
                       </motion.div>
@@ -681,124 +925,6 @@ export const SymptomTracker: React.FC = () => {
         </motion.div>
       )}
 
-      {/* AI Chat Section */}
-      {showAiChat && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="mt-6"
-        >
-          <Card className="bg-gradient-to-br from-purple-50/80 to-pink-50/80 backdrop-blur-sm border border-purple-200 shadow-xl">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Bot className="w-6 h-6 text-purple-500" />
-                  <CardTitle className="text-xl">AI Symptom Assistant</CardTitle>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowAiChat(false)}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  ✕
-                </Button>
-              </div>
-              <CardDescription className="text-base">
-                Ask questions about your symptoms and get personalized AI recommendations
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex flex-col sm:flex-row gap-2">
-                <Textarea
-                  value={aiQuery}
-                  onChange={(e) => setAiQuery(e.target.value)}
-                  placeholder="Ask me anything about your symptoms, wellness, or menopause..."
-                  className="flex-1 min-h-[80px] sm:min-h-[100px] bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-neon-pink focus:ring-neon-pink/20 text-black dark:text-white"
-                  disabled={aiLoading}
-                />
-                <Button
-                  onClick={handleAiQuery}
-                  disabled={aiLoading || !aiQuery.trim()}
-                  className="self-end sm:self-end bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-4 sm:px-6 py-2 text-sm sm:text-base"
-                >
-                  {aiLoading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      <span className="hidden sm:inline">Thinking...</span>
-                      <span className="sm:hidden">...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-4 h-4 mr-2" />
-                      <span className="hidden sm:inline">Ask AI</span>
-                      <span className="sm:hidden">Ask</span>
-                    </>
-                  )}
-                </Button>
-              </div>
-
-              {aiResponse && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200"
-                  data-ai-response
-                >
-                  <div className="flex items-start gap-2 sm:gap-3">
-                    <Bot className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500 mt-1 flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-semibold text-purple-900 mb-1 sm:mb-2 text-sm sm:text-base">
-                        AI Recommendation
-                      </h4>
-                      <div className="text-xs sm:text-sm text-gray-700 whitespace-pre-wrap leading-relaxed break-words">
-                        {aiResponse}
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-
-              {/* Quick Questions */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setAiQuery("What can I do to manage hot flashes?")}
-                  className="text-xs"
-                >
-                  Hot Flashes
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setAiQuery("How can I improve my sleep during menopause?")}
-                  className="text-xs"
-                >
-                  Sleep Issues
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setAiQuery("What exercises help with menopause symptoms?")}
-                  className="text-xs"
-                >
-                  Exercise
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setAiQuery("How can I manage mood changes?")}
-                  className="text-xs"
-                >
-                  Mood Support
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-      )}
     </div>
   );
 };

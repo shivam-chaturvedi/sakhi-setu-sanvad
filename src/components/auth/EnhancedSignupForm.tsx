@@ -456,19 +456,19 @@ const EnhancedSignupForm: React.FC = () => {
                     <div>
                       <Label className="text-base font-medium">Medical Conditions (Optional)</Label>
                       <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">Select any conditions you currently have</p>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:gap-3">
+                      <div className="flex flex-wrap gap-2 md:gap-3">
                         {medicalConditionsOptions.map((condition) => (
                           <button
                             key={condition}
                             type="button"
                             onClick={() => handleArrayChange('medicalConditions', condition)}
-                            className={`p-2 md:p-3 rounded-lg text-xs md:text-sm border transition-all text-center ${
+                            className={`px-3 py-2 md:px-4 md:py-2.5 rounded-lg text-xs md:text-sm border transition-all whitespace-nowrap flex-shrink-0 ${
                               formData.medicalConditions.includes(condition)
                                 ? 'bg-pink-100 border-pink-500 text-pink-700 dark:bg-pink-900/30 dark:border-pink-400 dark:text-pink-300'
-                                : 'bg-gray-100 border-gray-200 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300'
+                                : 'bg-gray-100 border-gray-200 text-gray-900 hover:bg-gray-200 hover:text-gray-950 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-600 dark:hover:text-white'
                             }`}
                           >
-                            <span className="break-words">{condition}</span>
+                            {condition}
                           </button>
                         ))}
                       </div>

@@ -287,7 +287,7 @@ const LandingPage = () => {
               <div className="relative w-full h-96 lg:h-[500px] rounded-2xl overflow-hidden shadow-2xl">
                 <img
                   src="/images/home-main.png"
-                  alt="Sakhi Setu - Menopause Support"
+                  alt="MyMenoSakhi - Menopause Support"
                   className="w-full h-full object-cover object-center"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
@@ -386,7 +386,7 @@ const LandingPage = () => {
             transition={{ delay: 1 }}
             className="text-xl mb-8 opacity-90"
           >
-            Join thousands of women who are already using Sakhi Setu to navigate menopause with confidence.
+            Join thousands of women who are already using MyMenoSakhi to navigate menopause with confidence.
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -437,7 +437,7 @@ const LandingPage = () => {
               {
                 name: "Priya Sharma",
                 location: "Mumbai, India",
-                content: "Sakhi Setu has been a lifesaver during my menopause journey. The symptom tracking and AI insights helped me understand my body better.",
+                content: "MyMenoSakhi has been a lifesaver during my menopause journey. The symptom tracking and AI insights helped me understand my body better.",
                 rating: 5
               },
               {

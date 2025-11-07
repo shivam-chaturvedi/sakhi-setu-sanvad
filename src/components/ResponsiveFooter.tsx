@@ -85,7 +85,7 @@ const ResponsiveFooter = () => {
               whileHover={{ scale: 1.05 }}
             >
               <Heart className="w-8 h-8 text-pink-400" />
-              <span className="text-2xl font-bold">Sakhi Setu</span>
+              <span className="text-2xl font-bold">MyMenoSakhi</span>
             </motion.div>
             <p className="text-gray-400 mb-6 leading-relaxed">
               Empowering women through their menopause journey with AI-powered insights and community support.
@@ -148,7 +148,7 @@ const ResponsiveFooter = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-sm text-gray-400 text-center sm:text-left">
-              © 2025 Sakhi Setu. All rights reserved.
+              © 2025 MyMenoSakhi. All rights reserved.
             </p>
             <div className="flex items-center gap-6 text-sm text-gray-400">
               <a href="#" className="hover:text-pink-400 transition-colors duration-200">
