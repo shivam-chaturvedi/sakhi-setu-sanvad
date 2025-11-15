@@ -55,11 +55,59 @@ const symptomTypes = [
   { value: 'breast_tenderness', label: 'Breast Tenderness', icon: Heart, color: 'text-pink-600' }
 ];
 
+const symptomDetailInputs: Record<string, {
+  label: string;
+  placeholder: string;
+  unit?: string;
+  helperText?: string;
+  inputType?: React.HTMLInputTypeAttribute;
+  min?: number;
+  max?: number;
+  step?: number;
+}> = {
+  weight_gain: {
+    label: 'Weight Change',
+    placeholder: 'Enter change in kg (use - for loss)',
+    unit: 'kg',
+    helperText: 'Positive numbers for gain, negative numbers for loss.',
+    inputType: 'number',
+    min: -20,
+    max: 20,
+    step: 0.1
+  },
+  sleep_issues: {
+    label: 'Hours Slept',
+    placeholder: 'e.g. 5.5',
+    unit: 'hrs',
+    helperText: 'Approximate total sleep in the last night.',
+    inputType: 'number',
+    min: 0,
+    max: 14,
+    step: 0.5
+  },
+  hot_flashes: {
+    label: 'Episodes in 24h',
+    placeholder: 'Number of hot flashes',
+    helperText: 'Estimate how many episodes occurred today.',
+    inputType: 'number',
+    min: 0,
+    max: 50,
+    step: 1
+  },
+  mood_swings: {
+    label: 'Mood trigger or note',
+    placeholder: 'e.g. stress, meeting, etc.',
+    helperText: 'Optional quick context about what influenced your mood.',
+    inputType: 'text'
+  }
+};
+
 export const SymptomTracker: React.FC = () => {
   const [symptoms, setSymptoms] = useState<any[]>([]);
   const [selectedSymptom, setSelectedSymptom] = useState('');
   const [severity, setSeverity] = useState([5]);
   const [notes, setNotes] = useState('');
+  const [symptomSpecificValues, setSymptomSpecificValues] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [aiQuery, setAiQuery] = useState('');
@@ -76,8 +124,7 @@ export const SymptomTracker: React.FC = () => {
   const { 
     isLoading: aiLoading, 
     generateWellnessAdvice, 
-    analyzeSymptoms,
-    generateMotivation 
+    analyzeSymptoms
   } = useGemini({
     onSuccess: (response) => setAiResponse(response),
     onError: (error) => console.error('AI Error:', error)
@@ -176,13 +223,21 @@ export const SymptomTracker: React.FC = () => {
 
     setSaving(true);
     try {
+      const symptomKey = selectedSymptom;
+      const detailConfig = symptomKey ? symptomDetailInputs[symptomKey] : undefined;
+      const detailValue = symptomKey && detailConfig ? symptomSpecificValues[symptomKey]?.trim() : '';
+      const formattedDetail = detailConfig && detailValue
+        ? `${detailConfig.label}${detailConfig.unit ? ` (${detailConfig.unit})` : ''}: ${detailValue}`
+        : '';
+      const combinedNotes = [notes?.trim(), formattedDetail].filter(Boolean).join('\n');
+
       const { error } = await supabase
         .from('symptoms')
         .insert({
           user_id: user.id,
           symptom_type: selectedSymptom,
           severity: severity[0],
-          notes: notes || null,
+          notes: combinedNotes || null,
           recorded_at: new Date().toISOString(),
         } as any);
 
@@ -213,6 +268,13 @@ export const SymptomTracker: React.FC = () => {
       setSelectedSymptom('');
       setSeverity([5]);
       setNotes('');
+      if (symptomKey) {
+        setSymptomSpecificValues((prev) => {
+          const updated = { ...prev };
+          delete updated[symptomKey];
+          return updated;
+        });
+      }
       fetchSymptoms();
     } catch (error) {
       console.error('Error recording symptom:', error);
@@ -221,6 +283,15 @@ export const SymptomTracker: React.FC = () => {
       setSaving(false);
     }
   };
+
+  const handleSymptomSelect = (value: string) => {
+    setSelectedSymptom(value);
+  };
+
+  const currentDetailConfig = selectedSymptom ? symptomDetailInputs[selectedSymptom] : undefined;
+  const currentDetailValue = selectedSymptom && currentDetailConfig
+    ? symptomSpecificValues[selectedSymptom] || ''
+    : '';
 
   const handleDeleteSymptom = async (symptomId: string) => {
     if (!user) return;
@@ -311,6 +382,13 @@ export const SymptomTracker: React.FC = () => {
       case 'moderate': return 'text-yellow-600';
       default: return 'text-blue-600';
     }
+  };
+
+  const handleDetailInputChange = (symptomKey: string, value: string) => {
+    setSymptomSpecificValues((prev) => ({
+      ...prev,
+      [symptomKey]: value
+    }));
   };
 
   const handleAiQuery = async () => {
@@ -419,39 +497,6 @@ IMPORTANT: Provide recommendations based ONLY on the symptoms and their severity
     }
   };
 
-  const handleMotivation = async () => {
-    try {
-      const mood = stats.recentTrend === 'improving' ? 'feeling better' : 
-                   stats.recentTrend === 'worsening' ? 'struggling' : 'stable';
-      const response = await generateMotivation(mood, ['symptom management', 'wellness']);
-      
-      // Format response by removing markdown formatting
-      const formattedResponse = response
-        .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold formatting
-        .replace(/\*(.*?)\*/g, '$1') // Remove italic formatting
-        .replace(/#{1,6}\s*/g, '') // Remove headers
-        .replace(/\n{3,}/g, '\n\n') // Reduce multiple line breaks
-        .trim();
-      
-      setAiResponse(formattedResponse);
-      setShowAiChat(true);
-      
-      // Auto-scroll to AI response after a short delay
-      setTimeout(() => {
-        const aiResponseElement = document.querySelector('[data-ai-response]');
-        if (aiResponseElement) {
-          aiResponseElement.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'start' 
-          });
-        }
-      }, 300);
-    } catch (error) {
-      console.error('Error generating motivation:', error);
-      toast.error('Failed to generate motivation');
-    }
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -487,16 +532,6 @@ IMPORTANT: Provide recommendations based ONLY on the symptoms and their severity
           )}
           <span className="hidden xs:inline">Analyze Symptoms</span>
           <span className="xs:hidden">Analyze</span>
-        </Button>
-        <Button
-          onClick={handleMotivation}
-          disabled={aiLoading}
-          variant="outline"
-          className="border-purple-500 text-purple-500 hover:bg-purple-500 hover:text-black dark:hover:text-white text-sm sm:text-base transition-colors"
-        >
-          <Heart className="w-4 h-4 mr-2" />
-          <span className="hidden xs:inline">Get Motivation</span>
-          <span className="xs:hidden">Motivation</span>
         </Button>
         <Button
           onClick={() => {
@@ -706,7 +741,7 @@ IMPORTANT: Provide recommendations based ONLY on the symptoms and their severity
                 className="space-y-2"
               >
                 <Label htmlFor="symptom" className="text-base font-medium">Symptom Type</Label>
-                <Select value={selectedSymptom} onValueChange={setSelectedSymptom}>
+                <Select value={selectedSymptom} onValueChange={handleSymptomSelect}>
                   <SelectTrigger className="h-12 bg-white/50 border-gray-200 focus:border-pink-500 focus:ring-pink-500/20">
                     <SelectValue placeholder="Select a symptom to track" />
                   </SelectTrigger>
@@ -725,6 +760,42 @@ IMPORTANT: Provide recommendations based ONLY on the symptoms and their severity
                   </SelectContent>
                 </Select>
               </motion.div>
+
+              {currentDetailConfig && selectedSymptom && (
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.35 }}
+                  className="space-y-2"
+                >
+                  <Label className="text-base font-medium flex items-center gap-1">
+                    {currentDetailConfig.label}
+                    {currentDetailConfig.unit && (
+                      <span className="text-sm text-gray-500">({currentDetailConfig.unit})</span>
+                    )}
+                  </Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type={currentDetailConfig.inputType || 'text'}
+                      value={currentDetailValue}
+                      onChange={(e) => handleDetailInputChange(selectedSymptom, e.target.value)}
+                      placeholder={currentDetailConfig.placeholder}
+                      min={currentDetailConfig.min}
+                      max={currentDetailConfig.max}
+                      step={currentDetailConfig.step}
+                      className="flex-1 bg-white/80 border-gray-200 focus:border-pink-500 focus:ring-pink-500/20"
+                    />
+                    {currentDetailConfig.unit && (
+                      <div className="px-3 py-2 rounded-lg bg-gray-100 text-sm text-gray-600">
+                        {currentDetailConfig.unit}
+                      </div>
+                    )}
+                  </div>
+                  {currentDetailConfig.helperText && (
+                    <p className="text-xs text-gray-500">{currentDetailConfig.helperText}</p>
+                  )}
+                </motion.div>
+              )}
 
               <motion.div
                 initial={{ opacity: 0, x: -20 }}

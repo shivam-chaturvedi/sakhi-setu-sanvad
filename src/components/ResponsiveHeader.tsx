@@ -12,7 +12,7 @@ const ResponsiveHeader = () => {
   const menuItems = [
     { label: 'Home', href: '#home' },
     { label: 'Features', href: '#features' },
-    { label: 'Testimonials', href: '#testimonials' },
+    // { label: 'Testimonials', href: '#testimonials' }, // temporarily hidden
     { label: 'About', href: '#about' },
     { label: 'Contact', href: '#contact' },
   ];

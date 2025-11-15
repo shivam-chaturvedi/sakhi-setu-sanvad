@@ -436,84 +436,86 @@ const LandingPage = () => {
         </div>
       </motion.section>
 
-      {/* Testimonials Section */}
-      <motion.section
-        id="testimonials"
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        viewport={{ once: true }}
-        className="py-20"
-        style={{ background: 'radial-gradient(circle at center, #ffffff 0%, #ffcdcd 100%)' }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl sm:text-5xl font-bold mb-4" style={{ color: '#46bdb6' }}>
-              What Our Users Say
-            </h2>
-            <p className="text-xl max-w-3xl mx-auto" style={{ color: '#46bdb6' }}>
-              Join thousands of women who have found support and guidance through their menopause journey
-            </p>
-          </motion.div>
+      {/* Testimonials Section - temporarily hidden */}
+      {false && (
+        <motion.section
+          id="testimonials"
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+          className="py-20"
+          style={{ background: 'radial-gradient(circle at center, #ffffff 0%, #ffcdcd 100%)' }}
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-4xl sm:text-5xl font-bold mb-4" style={{ color: '#46bdb6' }}>
+                What Our Users Say
+              </h2>
+              <p className="text-xl max-w-3xl mx-auto" style={{ color: '#46bdb6' }}>
+                Join thousands of women who have found support and guidance through their menopause journey
+              </p>
+            </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                name: "Priya Sharma",
-                location: "Mumbai, India",
-                content: "MyMenoSakhi has been a lifesaver during my menopause journey. The symptom tracking and AI insights helped me understand my body better.",
-                rating: 5
-              },
-              {
-                name: "Anita Patel",
-                location: "Delhi, India",
-                content: "The community support is incredible. I never felt alone in this journey thanks to the amazing women I've connected with here.",
-                rating: 5
-              },
-              {
-                name: "Sunita Reddy",
-                location: "Bangalore, India",
-                content: "The educational resources and expert guidance have empowered me to take control of my health and well-being.",
-                rating: 5
-              }
-            ].map((testimonial, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.2 }}
-                viewport={{ once: true }}
-                className="rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300"
-                style={{ backgroundColor: 'white' }}
-              >
-                <div className="flex items-center mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
-                  ))}
-                </div>
-                <p className="mb-4 italic" style={{ color: '#46bdb6' }}>
-                  "{testimonial.content}"
-                </p>
-                <div className="flex items-center">
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center mr-3" style={{ backgroundColor: 'rgba(250, 160, 204, 0.1)' }}>
-                    <Heart className="w-5 h-5" style={{ color: '#faa0cc' }} />
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[
+                {
+                  name: "Priya Sharma",
+                  location: "Mumbai, India",
+                  content: "MyMenoSakhi has been a lifesaver during my menopause journey. The symptom tracking and AI insights helped me understand my body better.",
+                  rating: 5
+                },
+                {
+                  name: "Anita Patel",
+                  location: "Delhi, India",
+                  content: "The community support is incredible. I never felt alone in this journey thanks to the amazing women I've connected with here.",
+                  rating: 5
+                },
+                {
+                  name: "Sunita Reddy",
+                  location: "Bangalore, India",
+                  content: "The educational resources and expert guidance have empowered me to take control of my health and well-being.",
+                  rating: 5
+                }
+              ].map((testimonial, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.2 }}
+                  viewport={{ once: true }}
+                  className="rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300"
+                  style={{ backgroundColor: 'white' }}
+                >
+                  <div className="flex items-center mb-4">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                    ))}
                   </div>
-                  <div>
-                    <h4 className="font-semibold" style={{ color: '#46bdb6' }}>{testimonial.name}</h4>
-                    <p className="text-sm" style={{ color: '#46bdb6' }}>{testimonial.location}</p>
+                  <p className="mb-4 italic" style={{ color: '#46bdb6' }}>
+                    "{testimonial.content}"
+                  </p>
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center mr-3" style={{ backgroundColor: 'rgba(250, 160, 204, 0.1)' }}>
+                      <Heart className="w-5 h-5" style={{ color: '#faa0cc' }} />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold" style={{ color: '#46bdb6' }}>{testimonial.name}</h4>
+                      <p className="text-sm" style={{ color: '#46bdb6' }}>{testimonial.location}</p>
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              ))}
+            </div>
           </div>
-        </div>
-      </motion.section>
+        </motion.section>
+      )}
 
       {/* Contact Section */}
       <motion.section

@@ -1,7 +1,7 @@
 // Gemini AI Integration
 // Using Gemini 2.5 Flash model with the provided API key
 
-const GEMINI_API_KEY = 'AIzaSyDemiHqUVekPovaBmYn9AF8FLAJ7g2v8dU';
+const GEMINI_API_KEY = 'AIzaSyBscWNBOsm520KHCKeUdT7LlLOtXSsf2VI';
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent';
 
 export interface GeminiResponse {
