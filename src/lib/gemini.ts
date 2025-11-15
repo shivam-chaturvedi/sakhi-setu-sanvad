@@ -2,7 +2,7 @@
 // Using Gemini 2.5 Flash model with the provided API key
 
 const GEMINI_API_KEY = 'AIzaSyBscWNBOsm520KHCKeUdT7LlLOtXSsf2VI';
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent';
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
 export interface GeminiResponse {
   candidates: Array<{
