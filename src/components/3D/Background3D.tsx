@@ -3,7 +3,6 @@ import React from 'react';
 const Background3D = () => {
   return (
     <div className="fixed inset-0 z-0 pointer-events-none">
-      {/* Fallback animated background without Three.js */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#ffcdcd]/20 via-[#faa0cc]/20 to-[#46bdb6]/20">
         {[...Array(5)].map((_, i) => (
           <div

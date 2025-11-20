@@ -3,7 +3,6 @@ import React from 'react';
 const ParticlesBackground = () => {
   return (
     <div className="fixed inset-0 z-0 pointer-events-none">
-      {/* Fallback particle effect without tsparticles */}
       <div className="absolute inset-0">
         {[...Array(50)].map((_, i) => (
           <div
