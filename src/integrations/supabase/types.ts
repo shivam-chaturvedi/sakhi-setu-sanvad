@@ -103,6 +103,7 @@ export type Database = {
           title: string
           content: string
           likes: number
+          is_anonymous: boolean
           created_at: string
         }
         Insert: {
@@ -111,6 +112,7 @@ export type Database = {
           title: string
           content: string
           likes?: number
+          is_anonymous?: boolean
           created_at?: string
         }
         Update: {
@@ -119,6 +121,39 @@ export type Database = {
           title?: string
           content?: string
           likes?: number
+          is_anonymous?: boolean
+          created_at?: string
+        }
+      }
+      notifications: {
+        Row: {
+          id: string
+          user_id: string
+          title: string
+          message: string
+          type: string
+          is_read: boolean
+          action_url: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          title: string
+          message: string
+          type: string
+          is_read?: boolean
+          action_url?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          title?: string
+          message?: string
+          type?: string
+          is_read?: boolean
+          action_url?: string | null
           created_at?: string
         }
       }

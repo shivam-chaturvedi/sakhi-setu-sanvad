@@ -268,11 +268,15 @@ export const CommunityChat: React.FC = () => {
 
     setSending(true);
     try {
+      const content = newMessage.trim();
+      const title = content.length > 80 ? `${content.slice(0, 77)}...` : content;
+
       const { error } = await supabase
         .from('community_posts')
         .insert([{
           user_id: user.id,
-          content: newMessage.trim(),
+          title, // Supabase table enforces NOT NULL on title
+          content,
           is_anonymous: false
         }]);
 

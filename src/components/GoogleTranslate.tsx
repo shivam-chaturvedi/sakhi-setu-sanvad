@@ -281,7 +281,7 @@ const GoogleTranslate = () => {
   }, []);
 
   return (
-    <div className="absolute mt-4 top-20 right-8 z-30 google-translate-container flex items-center gap-2 sm:gap-3">
+    <div className="absolute top-16 sm:top-20 right-4 sm:right-8 z-30 google-translate-container flex items-center gap-2 sm:gap-3">
       
       {/* Google Translate Widget */}
       <div

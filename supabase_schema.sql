@@ -373,10 +373,13 @@ CREATE POLICY "Users can delete own goals" ON public.user_goals
 -- Policies: notifications
 DROP POLICY IF EXISTS "Users can view own notifications" ON public.notifications;
 DROP POLICY IF EXISTS "Users can update own notifications" ON public.notifications;
+DROP POLICY IF EXISTS "Users can insert own notifications" ON public.notifications;
 CREATE POLICY "Users can view own notifications" ON public.notifications
   FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "Users can update own notifications" ON public.notifications
   FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert own notifications" ON public.notifications
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
 
 -- Policies: video library
 DROP POLICY IF EXISTS "Public videos are viewable by everyone" ON public.video_library;
@@ -519,20 +522,11 @@ DROP POLICY IF EXISTS "Users can delete their own avatar" ON storage.objects;
 CREATE POLICY "Avatar images are publicly accessible" ON storage.objects
   FOR SELECT USING (bucket_id = 'avatars');
 CREATE POLICY "Users can upload their own avatar" ON storage.objects
-  FOR INSERT WITH CHECK (
-    bucket_id = 'avatars' AND
-    auth.uid()::text = (storage.foldername(name))[1]
-  );
+  FOR INSERT TO authenticated, anon WITH CHECK (bucket_id = 'avatars');
 CREATE POLICY "Users can update their own avatar" ON storage.objects
-  FOR UPDATE USING (
-    bucket_id = 'avatars' AND
-    auth.uid()::text = (storage.foldername(name))[1]
-  );
+  FOR UPDATE TO authenticated, anon USING (bucket_id = 'avatars') WITH CHECK (bucket_id = 'avatars');
 CREATE POLICY "Users can delete their own avatar" ON storage.objects
-  FOR DELETE USING (
-    bucket_id = 'avatars' AND
-    auth.uid()::text = (storage.foldername(name))[1]
-  );
+  FOR DELETE TO authenticated, anon USING (bucket_id = 'avatars');
 
 -- Storage policies for video thumbnails
 DROP POLICY IF EXISTS "Video thumbnails are publicly accessible" ON storage.objects;
@@ -542,20 +536,11 @@ DROP POLICY IF EXISTS "Users can delete video thumbnails" ON storage.objects;
 CREATE POLICY "Video thumbnails are publicly accessible" ON storage.objects
   FOR SELECT USING (bucket_id = 'video-thumbnails');
 CREATE POLICY "Users can upload video thumbnails" ON storage.objects
-  FOR INSERT WITH CHECK (
-    bucket_id = 'video-thumbnails' AND
-    auth.uid()::text = (storage.foldername(name))[1]
-  );
+  FOR INSERT TO authenticated, anon WITH CHECK (bucket_id = 'video-thumbnails');
 CREATE POLICY "Users can update video thumbnails" ON storage.objects
-  FOR UPDATE USING (
-    bucket_id = 'video-thumbnails' AND
-    auth.uid()::text = (storage.foldername(name))[1]
-  );
+  FOR UPDATE TO authenticated, anon USING (bucket_id = 'video-thumbnails') WITH CHECK (bucket_id = 'video-thumbnails');
 CREATE POLICY "Users can delete video thumbnails" ON storage.objects
-  FOR DELETE USING (
-    bucket_id = 'video-thumbnails' AND
-    auth.uid()::text = (storage.foldername(name))[1]
-  );
+  FOR DELETE TO authenticated, anon USING (bucket_id = 'video-thumbnails');
 
 -- Seed minimal content
 INSERT INTO public.wellness_tips (title, content, category, language)
